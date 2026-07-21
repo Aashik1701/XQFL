@@ -1,0 +1,57 @@
+# Virtual environment
+xqfl-env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Data / experiment outputs
+experiments/*.csv
+experiments/*.json
+data/raw/
+data/processed/
+
+# Planning / idea docs
+Idea/
+
+# Plots
+analysis/figures/
+*.png
+*.pdf
+*.svg
+!Architecture Diagram.png
+
+# Model checkpoints
+*.pt
+*.pth
+*.ckpt
+*.pkl
+*.joblib
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# PennyLane / NumPy cache
+.pennylane/
