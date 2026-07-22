@@ -77,6 +77,7 @@ def run_federation(
     n_explain=5,         # samples for local Q-SHAP per client (0 = skip)
     n_bg=10,             # background for local Q-SHAP
     n_permutations=0,    # Q-SHAP permutations; 0 = skip (Phase 5 default)
+    model_out=None,      # if a list is passed, final-round weights are appended to it
 ):
     """Run federated learning simulation.
 
@@ -154,6 +155,9 @@ def run_federation(
             global_qshap = qshap.mean(axis=0)
             val_acc      = test_acc   # using test set as validation set here
             logger.log(server_round, "global", global_qshap, val_acc)
+
+        if model_out is not None and server_round == n_rounds:
+            model_out.append(eval_model.get_weights())
 
         return 1.0 - test_acc, {"accuracy": test_acc}
 
