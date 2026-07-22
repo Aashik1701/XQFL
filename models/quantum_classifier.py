@@ -45,8 +45,12 @@ class HybridQuantumClassifier(nn.Module):
         self._qnode = _qnode
 
     def _preprocess(self, X, fit=False):
-        """PCA -> MinMaxScale to [0, pi] -> float32."""
-        if fit:
+        """PCA -> MinMaxScale to [0, pi] -> float32.
+
+        If pca is already set (e.g. shared PCA from federation server), fit=True
+        is silently treated as transform-only so clients don't diverge.
+        """
+        if fit and self.pca is None:
             self.pca     = PCA(n_components=self.n_qubits)
             X_pca        = self.pca.fit_transform(X)
             self._scaler = MinMaxScaler(feature_range=(0, np.pi))
