@@ -3,6 +3,8 @@
 Provides:
   make_fedavg_strategy   — build a standard FedAvg strategy with server-side eval.
   TrimmedMeanStrategy    — custom FedAvg subclass with trimmed-mean aggregation.
+  LoggingFedAvg          — FedAvg subclass that extracts per-client Q-SHAP from
+                           fit metrics and writes them to an ExperimentLogger.
 
 Spec note (section 7): Flower does NOT ship a Trimmed-Mean strategy.  The helper
 aggregate_trimmed_avg exists in flwr.server.strategy.aggregate but is not exposed
@@ -15,24 +17,26 @@ from flwr.server.strategy.aggregate import aggregate_trimmed_avg
 from flwr.common import ndarrays_to_parameters, parameters_to_ndarrays
 
 
+# ── FedAvg factory ───────────────────────────────────────────────────────────
+
 def make_fedavg_strategy(initial_params, evaluate_fn, n_clients, n_rounds):
     """Return a FedAvg strategy configured for XQFL simulation.
 
     Parameters
     ----------
-    initial_params : Parameters — starting weights broadcast to all clients in round 1.
+    initial_params : Parameters — starting weights broadcast in round 1.
     evaluate_fn    : callable(server_round, NDArrays, config) -> (loss, metrics)
                      Called after every round to compute global test accuracy.
-    n_clients      : int — total number of virtual clients.
-    n_rounds       : int — total number of federated rounds (informational only here).
+    n_clients      : int — total virtual clients.
+    n_rounds       : int — informational; not used directly here.
 
     Returns
     -------
     strategy : FedAvg instance
     """
     return FedAvg(
-        fraction_fit=1.0,            # sample all clients every round
-        fraction_evaluate=0.0,       # skip client-side evaluate rounds; use evaluate_fn
+        fraction_fit=1.0,
+        fraction_evaluate=0.0,
         min_fit_clients=n_clients,
         min_evaluate_clients=0,
         min_available_clients=n_clients,
@@ -40,6 +44,8 @@ def make_fedavg_strategy(initial_params, evaluate_fn, n_clients, n_rounds):
         initial_parameters=initial_params,
     )
 
+
+# ── Trimmed-Mean strategy (custom subclass) ──────────────────────────────────
 
 class TrimmedMeanStrategy(FedAvg):
     """FedAvg with trimmed-mean aggregation instead of weighted average.
@@ -54,7 +60,7 @@ class TrimmedMeanStrategy(FedAvg):
     ----------
     proportion_to_cut : float in (0, 0.5) — fraction to trim from each tail.
                         E.g. 0.1 trims the 10% lowest and 10% highest updates.
-    **kwargs          : passed through to FedAvg.__init__ (fraction_fit, evaluate_fn, etc.)
+    **kwargs          : passed through to FedAvg.__init__.
     """
 
     def __init__(self, proportion_to_cut=0.1, **kwargs):
@@ -62,18 +68,6 @@ class TrimmedMeanStrategy(FedAvg):
         self.proportion_to_cut = proportion_to_cut
 
     def aggregate_fit(self, server_round, results, failures):
-        """Aggregate client parameters using trimmed mean.
-
-        Parameters
-        ----------
-        server_round : int
-        results      : list of (ClientProxy, FitRes)
-        failures     : list of BaseException
-
-        Returns
-        -------
-        (aggregated_parameters, metrics_dict)
-        """
         if not results:
             return None, {}
 
@@ -87,3 +81,42 @@ class TrimmedMeanStrategy(FedAvg):
         )
 
         return ndarrays_to_parameters(aggregated_ndarrays), {}
+
+
+# ── Logging FedAvg (Phase 6) ─────────────────────────────────────────────────
+
+class LoggingFedAvg(FedAvg):
+    """FedAvg that extracts per-client Q-SHAP attributions and logs them.
+
+    After each round's aggregate_fit, this class reads the Q-SHAP values that
+    each XQFLClient attached to its FitRes.metrics dict and writes one log row
+    per client to the provided ExperimentLogger.
+
+    Parameters
+    ----------
+    logger   : ExperimentLogger | None — if None, behaves like plain FedAvg.
+    n_qubits : int — number of Q-SHAP features expected (default 4).
+    **kwargs : passed through to FedAvg.__init__.
+    """
+
+    def __init__(self, logger=None, n_qubits=4, **kwargs):
+        super().__init__(**kwargs)
+        self._logger   = logger
+        self._n_qubits = n_qubits
+
+    def aggregate_fit(self, server_round, results, failures):
+        # Extract and log per-client explanations BEFORE aggregating so the
+        # values represent locally-trained (pre-aggregation) model behaviour.
+        if self._logger is not None:
+            for _, fit_res in results:
+                m = fit_res.metrics
+                if not m:
+                    continue
+                client_id = m.get("client_id", -1)
+                qshap = [m.get(f"qshap_{i}", None) for i in range(self._n_qubits)]
+                if any(v is not None for v in qshap):
+                    qshap_clean = [v if v is not None else 0.0 for v in qshap]
+                    acc = m.get("accuracy", 0.0)
+                    self._logger.log(server_round, client_id, qshap_clean, acc)
+
+        return super().aggregate_fit(server_round, results, failures)
