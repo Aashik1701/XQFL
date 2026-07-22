@@ -140,6 +140,10 @@ class XQFLClient(NumPyClient):
         n_exp = min(self.n_explain, len(X_q))
         n_bg  = min(self.n_bg, len(X_q))
 
+        # Guard for severely imbalanced partitions (can occur with Dirichlet alpha<<1)
+        if n_exp < 1 or n_bg < 1:
+            return np.zeros(self.model.n_qubits)
+
         q_predict = make_quantum_predict_fn(self.model)
         qshap     = q_shap_values(
             q_predict,

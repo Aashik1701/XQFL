@@ -42,11 +42,11 @@ def _fit_shared_preprocessor(X_train, n_qubits):
     return pca, scaler
 
 
-def _partition_data(X_train, y_train, n_clients, split, seed):
+def _partition_data(X_train, y_train, n_clients, split, seed, dirichlet_alpha=0.5):
     if split == "iid":
         return iid_split(X_train, y_train, n_clients, seed=seed)
     elif split == "dirichlet":
-        return dirichlet_split(X_train, y_train, n_clients, alpha=0.5, seed=seed)
+        return dirichlet_split(X_train, y_train, n_clients, alpha=dirichlet_alpha, seed=seed)
     elif split == "quantity":
         return quantity_skew_split(X_train, y_train, n_clients, skew_factor=0.5, seed=seed)
     else:
@@ -64,6 +64,7 @@ def run_federation(
     n_qubits=4,
     n_layers=2,
     split="iid",
+    dirichlet_alpha=0.5,
     strategy_name="fedavg",
     proportion_to_cut=0.1,
     seed=42,
@@ -113,7 +114,8 @@ def run_federation(
     shared_pca, shared_scaler = _fit_shared_preprocessor(X_train, n_qubits)
 
     # ── 2. data partitioning ────────────────────────────────────────────────
-    partitions = _partition_data(X_train, y_train, n_clients, split, seed)
+    partitions = _partition_data(X_train, y_train, n_clients, split, seed,
+                                  dirichlet_alpha=dirichlet_alpha)
     for i, (Xi, yi) in enumerate(partitions):
         print(f"  Client {i}: {len(Xi)} samples  "
               f"(class 1 ratio: {yi.mean():.2f})")
