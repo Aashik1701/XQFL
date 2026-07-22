@@ -148,6 +148,56 @@ def _flatten_mean(exp):
     return exp.mean(axis=0) if exp.ndim == 2 else exp
 
 
+def cosine_similarity(
+    explanation_round_a,
+    explanation_round_b,
+) -> float:
+    """Cosine similarity between two explanation vectors.
+
+    Measures directional agreement regardless of magnitude.  A value of 1.0
+    means the vectors point in the same direction (same relative sign and
+    ranking, even if magnitudes differ).  Useful for detecting whether
+    explanation direction has converged while magnitude is still growing.
+
+    Both inputs may be 1D (n_features,) or 2D (n_samples, n_features);
+    2D inputs are averaged to 1D first.
+
+    Returns
+    -------
+    cos_sim : float in [-1, 1].  1 = identical direction, -1 = fully opposed.
+              Returns nan if either vector is the zero vector.
+    """
+    a = _flatten_mean(explanation_round_a)
+    b = _flatten_mean(explanation_round_b)
+    norm_a = np.linalg.norm(a)
+    norm_b = np.linalg.norm(b)
+    if norm_a == 0.0 or norm_b == 0.0:
+        return float("nan")
+    return float(np.dot(a, b) / (norm_a * norm_b))
+
+
+def l2_distance(
+    explanation_round_a,
+    explanation_round_b,
+) -> float:
+    """L2 (Euclidean) distance between two raw explanation vectors.
+
+    Unlike rank-based metrics, this is sensitive to both direction and
+    magnitude changes.  A non-zero L2 distance between rounds with tau=1.0
+    confirms that explanation magnitudes are still shifting even though the
+    feature ranking is frozen — tau is too coarse to detect the change.
+
+    Both inputs may be 1D (n_features,) or 2D (n_samples, n_features).
+
+    Returns
+    -------
+    dist : float >= 0.  0 = identical vectors.
+    """
+    a = _flatten_mean(explanation_round_a)
+    b = _flatten_mean(explanation_round_b)
+    return float(np.linalg.norm(a - b))
+
+
 def kendalls_tau(
     explanation_round_a,
     explanation_round_b,
@@ -233,4 +283,21 @@ def explanation_report(
     return {
         "faithfulness": faithfulness(predict_fn, explanations, X, background_mean),
         "infidelity":   infidelity(predict_fn, explanations, X),
+    }
+
+
+def stability_report(
+    explanation_round_a,
+    explanation_round_b,
+) -> dict:
+    """Compute all four stability metrics between two explanation vectors.
+
+    Returns a dict with keys: kendalls_tau, spearman_corr, cosine_similarity, l2_distance.
+    Use this instead of calling rank-only metrics, which saturate at n_features=4.
+    """
+    return {
+        "kendalls_tau":      kendalls_tau(explanation_round_a, explanation_round_b),
+        "spearman_corr":     spearman_corr(explanation_round_a, explanation_round_b),
+        "cosine_similarity": cosine_similarity(explanation_round_a, explanation_round_b),
+        "l2_distance":       l2_distance(explanation_round_a, explanation_round_b),
     }
