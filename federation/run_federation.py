@@ -78,6 +78,7 @@ def run_federation(
     n_bg=10,             # background for local Q-SHAP
     n_permutations=0,    # Q-SHAP permutations; 0 = skip (Phase 5 default)
     model_out=None,      # if a list is passed, final-round weights are appended to it
+    ray_local_mode=False, # True → ray.init(local_mode=True), forces sequential execution
 ):
     """Run federated learning simulation.
 
@@ -229,6 +230,9 @@ def run_federation(
 
     # ── 6. launch simulation ─────────────────────────────────────────────────
     ray_init_args = {"include_dashboard": False, "log_to_driver": False}
+    if ray_local_mode:
+        # local_mode removed in Ray 2.x; force 1 CPU = 1 actor = sequential execution
+        ray_init_args["num_cpus"] = 1
     if project_root:
         ray_init_args["runtime_env"] = {
             "env_vars": {
