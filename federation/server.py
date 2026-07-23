@@ -17,10 +17,28 @@ from flwr.server.strategy.aggregate import aggregate_trimmed_avg
 from flwr.common import ndarrays_to_parameters, parameters_to_ndarrays
 
 
+# ── Deterministic base ───────────────────────────────────────────────────────
+
+class DeterministicFedAvg(FedAvg):
+    """FedAvg with results sorted by integer client CID before aggregation.
+
+    Flower's aggregate_inplace accumulates weights in list order:
+        params = results[0] * scale[0]
+        for i in 1..: params += results[i] * scale[i]
+    Floating-point addition is non-associative, so arrival order (which Ray does
+    not guarantee) produces different aggregated weights across runs even with the
+    same Python seed.  Sorting by CID makes aggregation order deterministic.
+    """
+
+    def aggregate_fit(self, server_round, results, failures):
+        sorted_results = sorted(results, key=lambda x: int(x[0].cid))
+        return super().aggregate_fit(server_round, sorted_results, failures)
+
+
 # ── FedAvg factory ───────────────────────────────────────────────────────────
 
 def make_fedavg_strategy(initial_params, evaluate_fn, n_clients, n_rounds):
-    """Return a FedAvg strategy configured for XQFL simulation.
+    """Return a DeterministicFedAvg strategy configured for XQFL simulation.
 
     Parameters
     ----------
@@ -32,9 +50,9 @@ def make_fedavg_strategy(initial_params, evaluate_fn, n_clients, n_rounds):
 
     Returns
     -------
-    strategy : FedAvg instance
+    strategy : DeterministicFedAvg instance
     """
-    return FedAvg(
+    return DeterministicFedAvg(
         fraction_fit=1.0,
         fraction_evaluate=0.0,
         min_fit_clients=n_clients,
@@ -47,7 +65,7 @@ def make_fedavg_strategy(initial_params, evaluate_fn, n_clients, n_rounds):
 
 # ── Trimmed-Mean strategy (custom subclass) ──────────────────────────────────
 
-class TrimmedMeanStrategy(FedAvg):
+class TrimmedMeanStrategy(DeterministicFedAvg):
     """FedAvg with trimmed-mean aggregation instead of weighted average.
 
     Overrides aggregate_fit to discard the top and bottom `proportion_to_cut`
@@ -71,6 +89,8 @@ class TrimmedMeanStrategy(FedAvg):
         if not results:
             return None, {}
 
+        results = sorted(results, key=lambda x: int(x[0].cid))
+
         weights_results = [
             (parameters_to_ndarrays(fit_res.parameters), fit_res.num_examples)
             for _, fit_res in results
@@ -85,7 +105,7 @@ class TrimmedMeanStrategy(FedAvg):
 
 # ── Logging FedAvg (Phase 6) ─────────────────────────────────────────────────
 
-class LoggingFedAvg(FedAvg):
+class LoggingFedAvg(DeterministicFedAvg):
     """FedAvg that extracts per-client Q-SHAP attributions and logs them.
 
     After each round's aggregate_fit, this class reads the Q-SHAP values that
