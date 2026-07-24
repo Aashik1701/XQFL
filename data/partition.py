@@ -58,7 +58,7 @@ def dirichlet_split(X, y, n_clients, alpha=0.5, seed=42):
 
     partitions = []
     for idxs in client_indices:
-        idxs = np.array(idxs)
+        idxs = np.array(idxs, dtype=int)
         rng.shuffle(idxs)
         partitions.append((X[idxs], y[idxs]))
     return partitions
