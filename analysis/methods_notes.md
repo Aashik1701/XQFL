@@ -248,8 +248,45 @@ each from a different execution context, is evidence of a genuine seed-level eff
    two independent draws from a 5-seed uniform distribution to both give the min).
    In that case revert to UNCONFIRMED.
 
-**Current status: EVIDENCE RE-OPENING — do not report as outlier yet. Revisit when
-all 20 Part A Wisconsin runs are in the CSV.**
+**Final verdict from Phase 9b Part A (all 20 Wisconsin IID runs complete):**
+
+Five-seed statistics (Wisconsin, IID, FedAvg):
+
+| Encoding | Mean | Std | Seed=7 acc | z(seed=7) | Interpretation |
+|---|---|---|---|---|---|
+| angle | 84.03% | 3.06% | 78.95% | **−1.66** | Substantially hurt |
+| amplitude | 94.21% | 2.20% | 97.37% | **+1.44** | Actively helped |
+| reuploading | 94.74% | 0.88% | 93.86% | −1.00 | Neutral (within expected range for lowest of 5) |
+| IQP | 86.67% | 3.94% | 79.82% | **−1.74** | Substantially hurt |
+
+**Three-way split (z-score based, not raw delta):**
+1. **Hurt** (z ≈ −1.7): angle and IQP — both single-pass structured encodings
+2. **Neutral** (z = −1.0): reuploading — z-score is within what any one of 5 seeds would
+   normally produce in a tight distribution (std=0.88%); 0.88pp below mean is not anomalous
+3. **Helped** (z = +1.4): amplitude — seed=7 is amplitude's highest result across all 5 seeds
+
+**Current best hypothesis for the three-way split:**
+The structural distinction is between *fixed-structure single-pass* encodings (angle:
+RY per qubit; IQP: H+RZ+ZZ+H, both one-shot) and *repeated or full-Hilbert* encodings
+(reuploading: data re-embedded per layer; amplitude: StatePrep into full 2^4-dim Hilbert
+space). Seed=7's IID partition may create a data geometry that fixed-structure encodings
+cannot adapt to in a single pass, while richer or repeated encodings compensate.
+
+This hypothesis is explicitly flagged as **CURRENT BEST HYPOTHESIS — PENDING CONFIRMATION.**
+Reuploading uses repeated RY+CNOT layers without entanglement in the encoding step, yet is
+unaffected. IQP uses entangling IsingZZ gates but is still hurt. This rules out a simple
+"entanglement vs no-entanglement" distinction and is not yet fully explained. The hypothesis
+will require cross-checking against the non-IID per-encoding results once Part C's
+remaining encoding conditions are swept (Part C uses amplitude only; per-encoding non-IID
+data is not yet available). Until that confirmation, treat this as an observed pattern, not
+a closed mechanistic finding.
+
+**What MN-03a is now closed on:**
+- The Wisconsin/angle seed=7 "outlier" is a genuine seed-level effect, not actor-RNG noise
+  alone (confirmed by two independent sweeps both placing seed=7 lowest, and by the z-score
+  analysis showing other encodings are not similarly affected)
+- The effect is encoding-specific (angle and IQP are hurt; amplitude and reuploading are not)
+- Therefore it is an encoding×partition interaction, not a data-partition difficulty effect
 
 ### MN-03b: Pima Item-1 collapse-vs-boundary finding — add actor-RNG caveat
 
@@ -279,3 +316,123 @@ specific seed. The per-seed behavioral assignments are not robust.
 **Protocol:** Report the collapse/non-collapse distinction as a model-family property.
 Do not cite specific seeds as "collapsed" or "succeeded" without the full experimental
 context (call order, intervening state).
+
+---
+
+## MN-04: α=0.1 Scope Limitation — Dirichlet Degeneracy at Small n_clients
+
+**Status:** Added Phase 9b, 2026-07-24
+**Affects:** All α=0.1 non-IID findings in Phase 9b Part C.
+
+### Design constraint: α=0.1 conflates heterogeneity severity with effective client count
+
+At α=0.1 with n_clients=4 and moderate dataset sizes (Wisconsin: 455 training, Pima: 614
+training), the Dirichlet allocation routinely produces partitions in which 1–2 clients
+receive near-zero samples. This reduces the effective federation size below the intended
+4-client structure. Results across both datasets:
+
+**Wisconsin α=0.1 — per-client sample counts and effective structure:**
+
+| Seed | C0 (n, %c1) | C1 (n, %c1) | C2 (n, %c1) | C3 (n, %c1) | Eff. clients | Final acc |
+|---|---|---|---|---|---|---|
+| 1 | 204, 100% | 45, 0% | 47, 70% | 159, 30% | 4/4 | 89.47% |
+| 7 | 94, 0% | 8*, 100% | 121, 100% | 232, 67% | ~3/4 | 90.35% |
+| 42 | 278, 100% | 3*, 67% | 157, 2% | 17*, 12% | ~2/4 | 64.04% |
+| 123 | 269, 100% | 3*, 67% | 9*, 0% | 174, 8% | ~2/4 | 85.96% |
+| 999 | 8*, 100% | 276, 100% | 170, 1% | 1*, 0% | ~2/4 | 64.04% |
+
+*ghost client (<20 samples; contributes negligible FedAvg weight).
+
+Note: all seeds have aggregate class-1 fraction ~62.6–62.8% (Dirichlet preserves global
+class frequencies). Collapse cannot be attributed to aggregate imbalance.
+
+**Pima α=0.1 — per-client structure:**
+
+| Seed | C0 (n, %c1) | C1 (n, %c1) | C2 (n, %c1) | C3 (n, %c1) | Eff. clients | Final acc |
+|---|---|---|---|---|---|---|
+| 1 | 610, 35% | 0**, 0% | 2*, 0% | 2*, 50% | ~1/4 | 65.58% |
+| 7 | 196, 87% | 386, 3% | 30, 100% | 2*, 50% | ~3/4 | 39.61% |
+| 42 | 208, 100% | 40, 3% | 17*, 24% | 349, 0% | ~3/4 | 64.94% |
+| 123 | 590, 32% | 3*, 100% | 19*, 100% | 2*, 50% | ~1/4 | 35.06% |
+| 999 | 0**, nan | 232, 0% | 0**, nan | 382, 56% | ~2/4 | 64.94% |
+
+*ghost (<20 samples). **zero samples; excluded from FedAvg by zero weight.
+
+**Scope-limitation statement:**
+
+At α=0.1 with n_clients=4, what is being studied for most seeds is NOT a 4-client
+federated learning system under severe label heterogeneity. It is a 1-client or 2-client
+federated system with a degenerate dominant partition. These are qualitatively different
+regimes:
+
+- A 4-client federation under heterogeneity preserves the benefits of multi-client
+  gradient diversity while testing robustness to label skew.
+- A 1-client or 2-client effective federation eliminates gradient diversity entirely —
+  the model's behavior is then determined by the class composition of 1–2 dominant
+  clients, not by the federation protocol.
+
+The heterogeneity effect (label skew) and the client-count effect (diversity loss) are
+confounded in these results and cannot be disentangled within the current experiment
+design. This is a structural property of α=0.1 with small n_clients and moderate dataset
+sizes — not a partition code bug.
+
+**Practical implication:** The α=0.1 results describe a qualitatively different regime
+from α=0.5, not merely a quantitatively more severe version of the same regime. α=0.5
+tests heterogeneity within a functional multi-client structure (all 5 Wisconsin seeds
+retain ≥3 effective clients). α=0.1 tests robustness to partition degeneracy, i.e., what
+happens when FedAvg's implicit assumption of meaningful client diversity is violated.
+
+### MN-04a: Wisconsin α=0.1 collapse predictor
+
+Collapse at Wisconsin occurs when: a single client holds ≥60% FedAvg weight with ≈100%
+class purity (benign), giving its gradient signal enough weight to overwhelm the
+counterweight from the second client.
+
+| Seed | Dominant client weight | Purity | Outcome |
+|---|---|---|---|
+| 1 | 44.8% (C0, 100% class-1) | pure | Clean escape — below majority weight |
+| 7 | 51.0% (C3, 67% class-1) | mixed | Clean escape — not pure |
+| 42 | 61.1% (C0, 100% class-1) | pure | **Collapse** — ≥60% + pure |
+| 123 | 59.1% (C0, 100% class-1) | pure | Late escape — borderline; C3 (38.2%) eventually wins |
+| 999 | 60.7% (C1, 100% class-1) | pure | **Collapse** — ≥60% + pure |
+
+The ~60% weight threshold is dataset-and-hyperparameter-specific (n_rounds, local_epochs,
+learning rate all affect how quickly a dominant gradient signal overwhelms the minority).
+Treat this as a 5-seed observation, not a general rule.
+
+### MN-04b: Pima α=0.1 behavioral taxonomy — four distinct patterns
+
+Pima/amplitude/α=0.1 is NOT well-described by mean±std (54.0%±13.7% is misleading). The
+five seeds represent four qualitatively distinct behavioral regimes:
+
+1. **All-class-0 collapse** (seeds 42, 999): stuck at 64.94% (= 100/154 = predict
+   non-diabetic for all). In both cases, a dominant client with 0% class-1 and
+   sufficient weight drives the model to the all-class-0 attractor. Perfectly flat
+   accuracy from round 0 through round 15.
+
+2. **All-class-1 collapse** (seed 123): stuck at 35.06% (= 54/154 = predict diabetic for
+   all) from round 0 through round 15, perfectly flat. Seed=123 is a de-facto 1-client
+   federation (C0=96.1% weight, 32% class-1). The amplitude VQC's initial parameters
+   happen to land on an all-class-1 prediction, and no gradient signal is sufficient to
+   move a near-single-client model off this fixed point over 15 rounds.
+
+3. **Anti-correlated attractor** (seed 7): starts at 36.36% (near all-class-1), rises
+   very slowly to 39.61% over 15 rounds. Multi-client structure (C0=196@87%c1,
+   C1=386@3%c1) creates conflicting gradient signals; the model is trapped in a
+   compromise solution near the inverse-baseline, making slow progress toward escape.
+
+4. **Transient escape → regression** (seed 1): de-facto 1-client federation (C0=99.3%
+   weight, 35% class-1). Accuracy rises from 64.94% (round 0) to a peak of 70.78%
+   (round 3), then regresses steadily to 65.58% by round 15. The amplitude VQC briefly
+   finds a discriminating boundary on C0's data but cannot maintain it:
+   - Single-client federation eliminates gradient diversity; no other client provides
+     stabilizing pressure.
+   - Actor-RNG mini-batch oscillation accumulates without cross-client averaging.
+   - The VQC's narrow loss basin on Pima (13 parameters) cannot resist round-to-round
+     drift without the regularizing effect of multi-client aggregation.
+   This is an artifact of de-facto single-client federation, not a heterogeneity effect.
+
+**Protocol:** Report Pima/α=0.1 as a behavioral taxonomy (4 distinct patterns) rather
+than a distribution statistic. Explicitly separate the single-client artifact cases
+(seeds 1 and 123) from the genuine multi-client results (seeds 7, 42, 999) when
+drawing conclusions about FL behavior under extreme skew.
