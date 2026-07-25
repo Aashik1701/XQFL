@@ -511,6 +511,54 @@ explicitly when investigating attractor behavior.
 **Previously stated "initialization-driven" framing was incomplete.** The correct
 framing is: initialization-seeded attractors, partition-determined outcomes.
 
+**Multi-replicate results (3 reps per cell, 2026-07-24):**
+
+Each cell was run 3 times with identical `torch.manual_seed(init_seed)` (same VQC init)
+but unseeded Ray actor RNG (different mini-batch trajectories each run). Accuracies below
+are on the 0–100% scale.
+
+| Label | Init | Partition | R0 | Rep finals | Mean | Std | Range |
+|---|---|---|---|---|---|---|---|
+| ref seed=42 | 42 | 42 | 64.94% ×3 | 59.09%, 35.06%, 64.94% | 53.03% | **16pp** | **30pp** |
+| ref seed=7  | 7  | 7  | 36.36% ×3 | 65.58%, 64.29%, 44.81% | 58.23% | **12pp** | **21pp** |
+| Test A (p=42, i=7) | 7 | 42 | 36.36% ×3 | 35.06%, 64.94%, 64.29% | 54.76% | **17pp** | **30pp** |
+| Test B (p=7, i=42) | 42 | 7 | 64.94% ×3 | 64.94%, 44.16%, 51.30% | 53.46% | **11pp** | **21pp** |
+
+**Finding 1 — CONFIRMED and strengthened:** R0 is perfectly deterministic in all 12
+runs. init=42 → R0=64.94% in all 6 runs; init=7 → R0=36.36% in all 6 runs. The
+partition seed has zero effect on the starting attractor.
+
+**Finding 2 — WITHDRAWN:** Within-cell final-accuracy range is 21–30pp. This dwarfs
+the 3.51pp IID noise-floor range from MN-02 by an order of magnitude. The four cell
+means (53.03%, 58.23%, 54.76%, 53.46%) are statistically indistinguishable — all
+within a 5pp band with individual run ranges of 21–30pp. No partition signal is
+detectable above the noise. The original single-run claim that "partition=42 locks
+inits in their attractors while partition=7 pushes them to a confused intermediate"
+was an artifact of small-n sampling from a very high-variance distribution.
+
+**New finding — extreme actor-RNG sensitivity at Pima/α=0.1:** Within-cell variance
+is 11–17pp (std), range 21–30pp, for the SAME initialization and partition. Individual
+runs land in the class-0 attractor (~65%), the class-1 attractor (~35%), or an
+intermediate state (~44–59%), depending solely on the actor-RNG mini-batch ordering.
+The MN-02 noise floor (±1.75pp half-range, calibrated on Wisconsin/angle/IID) does not
+apply to attractor-sensitive regimes. In these regimes, mini-batch order alone determines
+which basin the model converges to — the model is effectively at a bifurcation point
+where stochastic perturbations select the final attractor.
+
+**Implication for ref seed=7 discrepancy:** The original concern that 46.10% (first
+confound run) vs 39.61% (original sweep) constitutes a 6.49pp gap "above the noise
+floor" is resolved: the noise floor here is ~21pp range, within which both values fall.
+The 3-rep mean for the same config (init=7, partition=7) is 58.23%, with reps spanning
+44.81%–65.58%. Both the original sweep value (39.61%) and the first confound value
+(46.10%) are simply draws from this ~21pp distribution.
+
+**Revised framing for MN-04c:** Only Finding 1 is robust. The attractor-start is
+initialization-determined (confirmed, 12/12). The final-accuracy outcome at
+Pima/amplitude/α=0.1 is not systematically controlled by either initialization or
+partition under the current unseeded actor-RNG setup — it is dominated by stochastic
+mini-batch trajectories. With 3 replicates per cell, no partition or initialization
+signal for final accuracy is detectable above within-cell noise.
+
 ---
 
 ### MN-04d: Pima α=0.5 behavioral taxonomy — attractor failures persist at moderate skew

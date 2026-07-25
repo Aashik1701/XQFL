@@ -67,11 +67,12 @@ dominant client weight ≥60% AND class purity ≈100% → collapse within 1 rou
 logs show: round 0 at 36.84% (anti-correlated start) → round 1 at 65.79% (collapse to
 majority class) → rounds 2–15 flat at 63–65%.
 
-**Out-of-sample test of collapse predictor on Pima:** Seed=123 in the Wisconsin table
-(59.1%, 100% benign) is a borderline case — the predictor narrowly misses, and seed=123
-does escape to 85.96% via the second-largest client (C3, 38.2% weight) eventually
-counteracting. This is consistent with the threshold being approximate (5-seed observation,
-not a calibrated rule).
+**Wisconsin borderline case (seed=123):** Seed=123 (59.1%, 100% benign) sits just under
+the collapse threshold — the predictor narrowly misses, and seed=123 escapes to 85.96%
+via the second-largest client (C3, 38.2% weight) eventually counteracting. This is
+consistent with the threshold being approximate (5-seed Wisconsin observation, not a
+calibrated rule). The out-of-sample test of this predictor applied to Pima is in
+Section 2.2.
 
 **Escape pattern (seeds 1, 7):** Seeds with sub-majority dominant-client weight (<52%)
 or mixed purity achieve 89–90%, close to the IID mean. At α=0.1, these seeds are
@@ -136,13 +137,17 @@ at round 15 — 0.65pp below the non-diabetic majority-class floor. This is the 
 seed in the entire Phase 9b sweep to finish below its majority-class baseline. A
 full 4-client α=0.5 partition cannot sustain the escape achieved in early rounds.
 
-**Attractor vs partition contributions:** The confound-breaking experiment (MN-04c)
-established that initialization sets the starting attractor. The α=0.5 data reveals
-that the partition quality then controls whether training escapes: seed=123 (class-1
-start) escapes immediately in round 1, while seed=7 (also class-1 start) only partially
-escapes before regressing. The two partitions are structurally different for these seeds
-(seed=123 has C1=380 samples at 26%c1, a large mixed-class client; seed=7's partition
-is more extreme), consistent with partition-quality-driven escape.
+**Attractor vs partition contributions:** MN-04c confirms that initialization sets the
+starting attractor (R0 is deterministic by init seed, confirmed across 12 replicates).
+Whether training escapes is a more complex question: the confound experiment shows
+within-cell final-accuracy ranges of 21–30pp from identical init+partition, meaning
+actor-RNG stochasticity is a primary determinant of escape at α=0.1. At α=0.5, the
+same two seeds (7, 123) start in the class-1 attractor but reach different final
+states (seed=7 regresses to below baseline; seed=123 escapes cleanly). These different
+partition structures (seed=123 has a large mixed-class client, seed=7's is more extreme)
+are consistent with partition-quality influencing escape probability, but the α=0.1
+replicate data warns against treating partition as the sole or primary determinant.
+Escape at α=0.5 may also be partly stochastic.
 
 ### 2.2 Severe label skew (α=0.1) — per-seed taxonomy
 
@@ -240,22 +245,36 @@ single step. The model never recovers. This is a training-dynamics failure — t
 IS learning (from the dominant client), but what it learns is wrong. Mitigation: reduce
 maximum client weight (e.g. clip by FedAvg weight cap) or increase n_clients.
 
-**Mechanism B — Initialization-driven attractor trapping (Pima, both α):**
+**Mechanism B — Stochastic attractor selection under initialization bias (Pima, both α):**
 The VQC's 13 trainable parameters initialize near the all-class-0 or all-class-1 trivial
-fixed point. Training gradients from the federation cannot dislodge the model from this
-fixed point — either because the gradients are too small relative to the attractor basin
-depth, or because conflicting client gradients cancel rather than combine. This failure
-occurs even with full 4-client functional partitions at α=0.5. Mitigation: improved VQC
-initialization (e.g. variance-scaled initialization that avoids trivial fixed points),
-or data re-encoding that changes the loss landscape on Pima.
+fixed point. Whether training escapes that fixed point is not reliably determined by the
+partition structure alone. The confound-breaking experiment (MN-04c, 3 replicates per
+cell) shows that within-cell final-accuracy range is 21–30pp under identical
+initialization and partition — meaning actor-RNG mini-batch ordering alone determines
+which basin (class-0, class-1, or intermediate) the model converges to. The model sits
+at a bifurcation point where the loss surface is nearly flat between attractors and
+small stochastic perturbations select the outcome. Initialization determines where
+training *begins* (class-0 or class-1 side of the bifurcation) but not where it ends.
+This failure occurs even with full 4-client functional partitions at α=0.5.
+Mitigation: variance-scaled VQC initialization that places weights away from trivial
+fixed points, or a loss landscape change via alternative encoding or preprocessing.
 
 **Confound note (MN-04c):** In the current sweep, partition_seed and init_seed are
-confounded (same integer). The confound-breaking experiment (Pima/α=0.1, 4 runs crossing
-init/partition seeds) confirms both mechanisms act independently:
-- Round-0 accuracy tracks init_seed exclusively (R0=64.94% for init=42 regardless of
-  partition; R0=36.36% for init=7 regardless of partition).
-- Final accuracy depends on the partition: partition=42 preserves both attractors
-  unchanged; partition=7 pushes both inits toward a confused intermediate state.
+confounded (same integer). The confound-breaking experiment (Pima/α=0.1, 2×2 design,
+3 replicates per cell) yields two findings with different reliability:
+
+- **Round-0 accuracy tracks init_seed exclusively** — confirmed in all 12 replicates.
+  R0=64.94% for init=42 regardless of partition; R0=36.36% for init=7 regardless of
+  partition. Initialization determines which attractor the VQC starts in.
+
+- **Final accuracy is dominated by actor-RNG stochasticity, not partition or init.**
+  Within-cell final-accuracy range is 21–30pp across 3 replicates — an order of
+  magnitude beyond the IID noise floor. Individual runs land in the class-0 attractor
+  (~65%), class-1 attractor (~35%), or intermediate states (~44–59%) from the same
+  init and partition. The four cell means (53–58%) are statistically
+  indistinguishable. The VQC at Pima/α=0.1 is at a bifurcation point where
+  mini-batch ordering alone selects the final basin — no partition signal is detectable
+  above the noise with 3 replicates.
 
 ### 4.2 Encoding×partition interaction at non-IID (MN-03a context)
 
@@ -287,22 +306,30 @@ respectively), and the collapse predictor does not transfer between datasets.
 ## 5. Limitations
 
 1. **Seed confound:** init_seed and partition_seed are the same integer in the original
-   sweep. The confound-breaking experiment (MN-04c) provides partial resolution but a
-   full 5×5 factorial design (5 partition seeds × 5 init seeds) would be required to
-   completely characterise the interaction.
+   sweep. The confound-breaking experiment (MN-04c) confirms initialization sets the
+   starting attractor (R0, robust across 12 replicates) but cannot isolate partition
+   effects on final accuracy because within-cell actor-RNG variance (21–30pp range) is
+   far larger than any detectable between-cell signal. A full 5×5 factorial design at
+   ≥10 replicates per cell would be required, but is unlikely to be interpretable unless
+   the actor-RNG sensitivity is first reduced (e.g. by seeding the actor RNG).
 
-2. **α=0.1 regime conflation:** For most seeds, α=0.1 with n_clients=4 produces
+2. **Actor-RNG sensitivity in attractor regime:** The MN-02 noise floor (±1.75pp
+   half-range, IID calibration) does not apply to Pima/α=0.1. Within-cell variance is
+   21–30pp range from identical init+partition — stochastic mini-batch order alone
+   selects the final attractor. The single-seed point values in the original sweep
+   (e.g., seed=7 → 39.61%) each carry ~21pp uncertainty, not ±1.75pp. All Pima/α=0.1
+   results should be treated as single draws from a high-variance attractor-sensitive
+   distribution. Per-seed behavioral taxonomies describe observed draws, not stable
+   outcomes.
+
+3. **α=0.1 regime conflation:** For most seeds, α=0.1 with n_clients=4 produces
    de-facto 1–2-client federation. Results labeled "α=0.1" describe partition degeneracy
    more than label heterogeneity per se. A larger n_clients or larger dataset would
    separate these effects.
 
-3. **Part C is amplitude-only:** Non-IID per-encoding comparisons are not available from
+4. **Part C is amplitude-only:** Non-IID per-encoding comparisons are not available from
    this sweep. The encoding×partition interaction hypothesis (MN-03a) cannot be
    confirmed or denied for non-IID conditions from the current data.
 
-4. **TrimmedMean at n_clients=4:** The trim fraction (10%) has negligible effect at
+5. **TrimmedMean at n_clients=4:** The trim fraction (10%) has negligible effect at
    this scale. The strategy comparison is inconclusive.
-
-5. **Actor-RNG non-determinism:** Within-seed spread ≈ ±1.75pp means individual seed
-   results carry this uncertainty (MN-02). All effects reported as *NF* (not found)
-   reflect this noise floor.
