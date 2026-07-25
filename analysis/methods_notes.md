@@ -423,16 +423,165 @@ five seeds represent four qualitatively distinct behavioral regimes:
 
 4. **Transient escape → regression** (seed 1): de-facto 1-client federation (C0=99.3%
    weight, 35% class-1). Accuracy rises from 64.94% (round 0) to a peak of 70.78%
-   (round 3), then regresses steadily to 65.58% by round 15. The amplitude VQC briefly
-   finds a discriminating boundary on C0's data but cannot maintain it:
-   - Single-client federation eliminates gradient diversity; no other client provides
-     stabilizing pressure.
-   - Actor-RNG mini-batch oscillation accumulates without cross-client averaging.
-   - The VQC's narrow loss basin on Pima (13 parameters) cannot resist round-to-round
-     drift without the regularizing effect of multi-client aggregation.
-   This is an artifact of de-facto single-client federation, not a heterogeneity effect.
+   (round 3), then declines to 65.58% by round 15.
+
+   **Sign/magnitude reconciliation (Item 2 check):**
+
+   Post-peak deltas (rounds 3→15, 12 transitions): 6 negative (−6.50pp total),
+   2 positive (+1.30pp total), 4 zero. One outlier step: −2.60pp at round 5→6
+   (3-sample loss); removing it leaves 11 transitions with mean −0.35pp.
+
+   - *Sign test*: including zeros as "non-positive" gives 10/12 non-positive
+     (p ≈ 2% under null), marginally significant. Excluding zeros gives 6/8
+     (p ≈ 14.5%), not significant. Result is sensitive to treatment of flat rounds.
+   - *Magnitude test*: mean delta = −0.43pp, sample SE ≈ 0.26pp (from the actual
+     distribution of deltas), t ≈ −1.69, p ≈ 6% — marginal, not conclusive.
+     Using the actor-RNG noise floor (±1.75pp) as SE proxy gives t ≈ −0.86,
+     p ≈ 21% — not significant. The two estimates disagree because within-run
+     round-to-round variance is much smaller than across-run between-seed variance;
+     the noise-floor SE is inappropriate for within-run drift assessment.
+   - *Reconciliation*: both tests are marginal. Neither conclusively confirms
+     nor rules out systematic drift. The dominant visual feature — the −5.20pp
+     decline from round 3 to round 15 — is driven disproportionately by two steps
+     (−2.60pp and −1.30pp), each resolving to test-set resolution (0.65pp = 1 sample
+     on 154 samples). The overall decline is real by inspection but not statistically
+     robust at this sample size.
+
+   **Cross-trajectory comparison (does the pattern recur?):**
+   - Pima/α=0.1 seed=123 (other single-client case): flat at 35.06% from round 0 —
+     no post-peak, no regression. Pattern does NOT appear.
+   - Wisconsin/α=0.1 seeds 1 and 123: escape trajectories (rising to 89%, 86%) —
+     no regression. Pattern does NOT appear.
+
+   **Verdict:** Downgrade from "systematic drift" to **observed in one trajectory,
+   not corroborated**. The mechanistic explanation (actor-RNG amplification, lack of
+   cross-client averaging) remains plausible but unconfirmed. Report this seed as
+   "transient escape then plateau/mild decline" — do not assert systematic drift.
 
 **Protocol:** Report Pima/α=0.1 as a behavioral taxonomy (4 distinct patterns) rather
 than a distribution statistic. Explicitly separate the single-client artifact cases
 (seeds 1 and 123) from the genuine multi-client results (seeds 7, 42, 999) when
 drawing conclusions about FL behavior under extreme skew.
+
+---
+
+### MN-04c: Seed confound experiment — initialization vs partition for Pima attractor
+
+**Experiment design:** The sweep seeds both the Dirichlet partition draw
+(`np.random.default_rng(seed)` in `partition.py`) and the VQC weight initialization
+(`torch.rand(n_layers, n_qubits)` after `torch.manual_seed(seed)` in the sweep script)
+with the same value. To disentangle them, four runs were executed with Pima/amplitude/α=0.1:
+
+| Label | init_seed | partition_seed | R0 acc | Final acc |
+|---|---|---|---|---|
+| ref seed=42 | 42 | 42 | 64.94% (class-0) | 64.94% |
+| ref seed=7  | 7  | 7  | 36.36% (class-1) | 46.10% |
+| Test A: p=42, i=7  | 7  | 42 | **36.36%** (class-1) | 35.06% |
+| Test B: p=7,  i=42 | 42 | 7  | **64.94%** (class-0) | 41.56% |
+
+**Finding 1 — initialization determines attractor start (definitive):**
+Round-0 accuracy is evaluated before any training and depends only on the initial VQC
+weights. R0 tracks the init_seed exactly: init=7 gives R0=36.36% (class-1) regardless
+of partition; init=42 gives R0=64.94% (class-0) regardless of partition. The partition
+plays no role in attractor initialization.
+
+**Finding 2 — partition quality determines final outcome:**
+
+| Partition | init=42 final | init=7 final |
+|---|---|---|
+| partition=42 | 64.94% (stuck class-0) | 35.06% (stuck class-1) |
+| partition=7  | 41.56% (confused intermediate) | 46.10% (partial escape, confused) |
+
+Partition=42 (C0=208@100%c1 dominant, C3=349@0%c1 dominant) cannot pull either init
+out of its starting attractor — both end in the attractor they started in. Partition=7
+(C0=196@87%c1, C1=386@3%c1 — conflicting gradient signals) disrupts both attractors
+but pushes both to an intermediate confused state (41–46%), not productive accuracy.
+
+**Conclusion:** The observed behavior is a product of BOTH factors:
+- **Initialization sets the starting attractor** — which trivial fixed point the VQC
+  begins at (class-0 or class-1) is solely determined by torch initialization weights.
+- **Partition quality determines escape/trajectory** — whether training moves away from
+  the starting attractor, stays in it, or converges to a confused intermediate state
+  depends on gradient diversity across clients.
+
+The two mechanisms are separable and independently consequential. The original confounded
+data cannot distinguish them; future experiments should cross init_seed and partition_seed
+explicitly when investigating attractor behavior.
+
+**Previously stated "initialization-driven" framing was incomplete.** The correct
+framing is: initialization-seeded attractors, partition-determined outcomes.
+
+---
+
+### MN-04d: Pima α=0.5 behavioral taxonomy — attractor failures persist at moderate skew
+
+**Status:** Added Phase 9b, 2026-07-24
+
+The five Pima/amplitude/α=0.5 seeds show qualitatively distinct behavioral patterns,
+making mean±std (67.27%±2.50%) an inadequate summary.
+
+**Key observation:** The same seeds (7, 123) start in the class-1 attractor at α=0.5
+as at α=0.1. Seeds 1, 42, 999 start in the class-0 attractor at α=0.5 as at α=0.1.
+This confirms that round-0 attractor assignment is initialization-driven (same torch
+seed → same VQC weights → same starting attractor), as established by MN-04c.
+
+| Seed | R0 | Attractor start | R15 final | Pattern |
+|---|---|---|---|---|
+| 1 | 64.94% | class-0 | 70.78% | Moderate clean learning — oscillates 68–71% |
+| 7 | 36.36% | class-1 | 64.29% | Partial class-1 escape rounds 1–6; regression to BELOW baseline (64.94%) by R15 |
+| 42 | 64.94% | class-0 | 65.58% | Near-stuck in class-0 despite full 4-client structure (+0.64pp from R0) |
+| 123 | 35.06% | class-1 | 68.18% | Fast class-1 escape to 70.13% in round 1; settles at 67–69% |
+| 999 | 64.94% | class-0 | 67.53% | Slow class-0 escape over 15 rounds |
+
+**Seed=7 regression below baseline:** The most severe case — starts in class-1
+attractor, rises to 66.88%–67.53% by rounds 6–7, then steadily regresses to 64.29%
+at round 15 (below the 64.94% non-diabetic majority-class baseline). A full 4-client
+partition at α=0.5 is insufficient to sustain escape from the class-1 attractor for
+this initialization.
+
+**Scope:** Unlike α=0.1, all five α=0.5 seeds have functional 4-client partitions
+(no ghost clients). The attractor failures at α=0.5 therefore cannot be attributed to
+partition degeneracy — they are genuine attractor-trapping failures under moderate
+label heterogeneity. This is a dataset×encoding incompatibility, not an α=0.1 artifact.
+
+**Protocol:** Report Pima/amplitude/α=0.5 as a 5-seed behavioral taxonomy, not as
+mean±std. The same per-seed structure applies as for α=0.1, with the distinction that
+α=0.5 outcomes are "softer" (partial escapes and regressions rather than complete
+collapse) but still qualitatively heterogeneous.
+
+---
+
+## MN-05: Governing Framework for Part C Reporting
+
+**Status:** Established Phase 9b, 2026-07-24
+**Applies to:** All Phase 9b Part C result tables and narrative.
+
+### Per-condition reporting mode
+
+| Dataset | Distribution | Reporting mode | Rationale |
+|---|---|---|---|
+| Wisconsin | IID | mean±std | Clean learning, no pathologies |
+| Wisconsin | α=0.5 | mean±std, flag seed=7 outlier | Seed=7 outlier (78.95% vs 91.23% for others); encoding×partition interaction (MN-03a), not attractor failure |
+| Wisconsin | α=0.1 | per-seed taxonomy | Bimodal collapse/escape; see MN-04a |
+| Wisconsin | quantity | mean±std | Clean learning, no pathologies |
+| Pima | IID | mean±std | No attractor failures at IID |
+| **Pima** | **α=0.5** | **per-seed taxonomy** | 3/5 seeds show attractor pathology at full 4-client (MN-04d) |
+| **Pima** | **α=0.1** | **per-seed taxonomy** | All 5 seeds distinct behavior (MN-04b) |
+| Pima | quantity | mean±std | Clean learning, no pathologies |
+| Wisconsin | TrimmedMean/IID | mean±std | No attractor failures |
+| Pima | TrimmedMean/IID | mean±std | No attractor failures |
+
+### Noise floor and significance
+
+Apply ≥1.75pp noise floor to individual seed comparisons (MN-02). For mean
+differences across 5-seed distributions, use >3pp threshold (≈ 7pp/√5). Any
+condition flagged for per-seed taxonomy should be reported descriptively — individual
+seed point values carry ±1.75pp uncertainty.
+
+### Key confound disclaimer for Pima attractor findings
+
+Results from the original sweep confound init_seed and partition_seed (same integer
+seeds both). The confound-breaking experiment (MN-04c) shows both factors are
+consequential. All Pima attractor claims should note: "the partition and VQC
+initialization were jointly determined by the seed; full factorial disentanglement
+requires MN-04c-style cross-seeding."
