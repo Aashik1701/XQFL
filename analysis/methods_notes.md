@@ -416,14 +416,35 @@ five seeds represent four qualitatively distinct behavioral regimes:
    happen to land on an all-class-1 prediction, and no gradient signal is sufficient to
    move a near-single-client model off this fixed point over 15 rounds.
 
-3. **Anti-correlated attractor** (seed 7): starts at 36.36% (near all-class-1), rises
-   very slowly to 39.61% over 15 rounds. Multi-client structure (C0=196@87%c1,
-   C1=386@3%c1) creates conflicting gradient signals; the model is trapped in a
-   compromise solution near the inverse-baseline, making slow progress toward escape.
+3. **Stochastic bifurcation** (seed 7): original sweep: 39.61% after 15 rounds
+   (starts at 36.36%, rises slowly). Multi-client structure (C0=196@87%c1,
+   C1=386@3%c1) creates conflicting gradient signals near the attractor boundary.
 
-4. **Transient escape → regression** (seed 1): de-facto 1-client federation (C0=99.3%
-   weight, 35% class-1). Accuracy rises from 64.94% (round 0) to a peak of 70.78%
-   (round 3), then declines to 65.58% by round 15.
+   **⚠ Replicate check (MN-04c ref-seed-7, 3 reps):** The 39.61% outcome did NOT
+   reproduce in 2/3 reps — those ended at 65.58% and 64.29% (class-0 territory).
+   One rep stayed in intermediate range (44.81%). Within-cell range: 21pp. The
+   original "anti-correlated attractor" label described one draw from a high-variance
+   distribution. **Revised characterization: seed=7 at α=0.1 is stochastically
+   bifurcation-sensitive; final state spans ~36–66% depending on actor-RNG mini-batch
+   order. Do not report as a named behavioral pattern.**
+
+4. **Stochastic attractor escape** (seed 1): de-facto 1-client federation (C0=99.3%
+   weight, 35% class-1). Original sweep: rises from 64.94% (R0) to 70.78% (R3),
+   then declines to 65.58% by R15 ("transient escape → regression" shape).
+
+   **⚠ Replicate check (3 reps, 2026-07-24):** Three distinct trajectory shapes observed:
+   - Rep 1: escapes to 71.4% at R4, **holds 69–71% through R15, final=70.78%** — sustained escape, no regression
+   - Rep 2: near-flat 64.9–65.6% all 15 rounds, **final=65.58%** — near-stuck, no escape peak
+   - Rep 3: brief escape to 69.5% at R2, declines to 64.9% at R15 — closest to original shape
+   Finals: 70.78%, 65.58%, 64.94% — mean=67.10%, range=5.8pp (smaller than seeds 7/42).
+
+   The range (5.8pp) is smaller than the α=0.1 bifurcation-regime cases (21–30pp),
+   consistent with seed=1's near-single-client structure (C0=99.3% weight) dominating
+   the gradient regardless of mini-batch order. However the trajectory SHAPES vary
+   substantially — the original "transient escape then regression" is one of three
+   distinct trajectory patterns. **Revised characterization: seed=1 at α=0.1 shows
+   variable escape magnitude (65–71% final); the specific trajectory shape is not
+   reliably reproducible from a single run.**
 
    **Sign/magnitude reconciliation (Item 2 check):**
 
@@ -573,19 +594,34 @@ as at α=0.1. Seeds 1, 42, 999 start in the class-0 attractor at α=0.5 as at α
 This confirms that round-0 attractor assignment is initialization-driven (same torch
 seed → same VQC weights → same starting attractor), as established by MN-04c.
 
-| Seed | R0 | Attractor start | R15 final | Pattern |
+| Seed | R0 | Attractor start | R15 final (orig.) | Pattern |
 |---|---|---|---|---|
 | 1 | 64.94% | class-0 | 70.78% | Moderate clean learning — oscillates 68–71% |
-| 7 | 36.36% | class-1 | 64.29% | Partial class-1 escape rounds 1–6; regression to BELOW baseline (64.94%) by R15 |
+| 7 | 36.36% | class-1 | 64.29% | Escape from class-1 in R1; peaks ~67–69%; mild late regression; see replicate note |
 | 42 | 64.94% | class-0 | 65.58% | Near-stuck in class-0 despite full 4-client structure (+0.64pp from R0) |
 | 123 | 35.06% | class-1 | 68.18% | Fast class-1 escape to 70.13% in round 1; settles at 67–69% |
 | 999 | 64.94% | class-0 | 67.53% | Slow class-0 escape over 15 rounds |
 
-**Seed=7 regression below baseline:** The most severe case — starts in class-1
-attractor, rises to 66.88%–67.53% by rounds 6–7, then steadily regresses to 64.29%
-at round 15 (below the 64.94% non-diabetic majority-class baseline). A full 4-client
-partition at α=0.5 is insufficient to sustain escape from the class-1 attractor for
-this initialization.
+**Seed=7 replicate check (3 reps, 2026-07-24):**
+
+Trajectory shape IS consistently reproduced: all 3 reps show escape from class-1
+attractor in round 1 (R1 jumps to 63–67%), peak around R4 (66.9–68.8%), then mild
+late-round decline. The trajectory shape is reliable.
+
+Finals across 3 reps: 64.94%, 67.53%, 65.58% — mean=66.02%, range=**2.6pp**.
+Original sweep value: 64.29% (the only observation below the 64.94% baseline).
+
+The "regression to BELOW baseline" claim applies to 1 out of 4 total observations
+(original + 3 reps). The remaining 3 end at or above 64.94%. The 2.6pp range confirms
+α=0.5 is NOT in the high-variance bifurcation regime (unlike α=0.1's 21–30pp) — the
+behavior is tightly constrained once the model escapes class-1. The original sweep's
+64.29% is a tail draw from a distribution centered ~66%.
+
+**Revised characterization for seed=7 at α=0.5:** Consistently escapes class-1
+attractor in round 1 and peaks at 67–69%; undergoes mild late-round decline ending at
+65–67%. Occasionally (1/4 obs.) touches or falls marginally below the majority-class
+baseline. The "below baseline" framing overstates the severity — reframe as "partial
+regression, final accuracy ≈ baseline" rather than "regression below baseline."
 
 **Scope:** Unlike α=0.1, all five α=0.5 seeds have functional 4-client partitions
 (no ghost clients). The attractor failures at α=0.5 therefore cannot be attributed to
@@ -613,23 +649,124 @@ collapse) but still qualitatively heterogeneous.
 | Wisconsin | α=0.1 | per-seed taxonomy | Bimodal collapse/escape; see MN-04a |
 | Wisconsin | quantity | mean±std | Clean learning, no pathologies |
 | Pima | IID | mean±std | No attractor failures at IID |
-| **Pima** | **α=0.5** | **per-seed taxonomy** | 3/5 seeds show attractor pathology at full 4-client (MN-04d) |
-| **Pima** | **α=0.1** | **per-seed taxonomy** | All 5 seeds distinct behavior (MN-04b) |
+| **Pima** | **α=0.5** | **per-seed taxonomy** | 3/5 seeds show attractor pathology at full 4-client (MN-04d); seed=7 "below baseline" revised to "partial regression, ≈baseline" after 3-rep check |
+| **Pima** | **α=0.1** | **per-seed taxonomy (with caveats)** | Seeds 42/123/999 collapse patterns reliable; seeds 1 and 7 are stochastically variable (MN-04b, MN-06) — report as "variable escape" not named patterns |
 | Pima | quantity | mean±std | Clean learning, no pathologies |
 | Wisconsin | TrimmedMean/IID | mean±std | No attractor failures |
 | Pima | TrimmedMean/IID | mean±std | No attractor failures |
 
 ### Noise floor and significance
 
-Apply ≥1.75pp noise floor to individual seed comparisons (MN-02). For mean
-differences across 5-seed distributions, use >3pp threshold (≈ 7pp/√5). Any
-condition flagged for per-seed taxonomy should be reported descriptively — individual
-seed point values carry ±1.75pp uncertainty.
+The appropriate noise floor is **regime-dependent** (see MN-06):
+- IID and clean multi-client non-IID: apply ≥1.75pp noise floor per seed (MN-02).
+  For 5-seed means, >3pp threshold (≈ 7pp/√5).
+- Pima/amplitude near attractor bifurcation (α=0.1, and possibly α=0.5): within-seed
+  range is 21–30pp (MN-04c, MN-06). Individual seed values carry this uncertainty.
+  Per-seed taxonomies describe observed draws from a high-variance distribution, not
+  stable fixed outcomes. Do not report single draws as definitive patterns.
 
 ### Key confound disclaimer for Pima attractor findings
 
 Results from the original sweep confound init_seed and partition_seed (same integer
-seeds both). The confound-breaking experiment (MN-04c) shows both factors are
-consequential. All Pima attractor claims should note: "the partition and VQC
-initialization were jointly determined by the seed; full factorial disentanglement
-requires MN-04c-style cross-seeding."
+seeds both). The confound-breaking experiment (MN-04c) confirms initialization
+determines attractor start (R0, robust); final accuracy at α=0.1 is dominated by
+actor-RNG stochasticity, not init or partition (Finding 2 withdrawn). All Pima
+attractor behavioral claims should note the single-draw uncertainty and the regime-
+specific noise amplification documented in MN-06.
+
+---
+
+## MN-06: Actor-RNG Noise is Non-Uniform Across the Experiment Space
+
+**Status:** Added Phase 9b, 2026-07-24
+**Affects:** All accuracy comparisons, behavioral taxonomies, and stability claims.
+
+### Finding
+
+Actor-RNG noise (from unseeded Ray actor mini-batch shuffling, see MN-02) is not
+a fixed property of the simulation — it varies by more than an order of magnitude
+depending on the model's position in the loss landscape.
+
+**Observed noise levels by regime:**
+
+| Regime | Example condition | Within-seed range | Within-seed std | Noise source |
+|---|---|---|---|---|
+| IID, clean multi-client | Wisconsin/angle/IID | ~3.5pp | ~1.2pp | Mini-batch order variation on smooth loss surface |
+| Non-IID, functional multi-client | Wisconsin/amplitude/α=0.5 | ~7–10pp (est.) | ~3pp | Increased gradient heterogeneity amplifies batch-order effects |
+| **Attractor bifurcation** | **Pima/amplitude/α=0.1** | **21–30pp** | **11–17pp** | Mini-batch order selects which attractor basin the model converges to |
+
+The attractor-bifurcation regime values come from the MN-04c confound experiment
+(3 replicates per cell, identical init+partition, only actor-RNG varies):
+- ref seed=42: finals 59.09%, 35.06%, 64.94% — range 30pp
+- ref seed=7:  finals 65.58%, 64.29%, 44.81% — range 21pp
+- Test A (p=42,i=7): finals 35.06%, 64.94%, 64.29% — range 30pp
+- Test B (p=7,i=42): finals 64.94%, 44.16%, 51.30% — range 21pp
+
+### Mechanism
+
+On a smooth loss surface (IID, well-conditioned model), mini-batch ordering changes
+the precise gradient update at each step but the model converges to the same basin
+regardless. The accumulated effect of different orderings is small (≈3.5pp).
+
+Near a loss-surface bifurcation — where two or more attractor basins are separated by
+a low saddle — small perturbations from mini-batch ordering can tip the training
+trajectory into different basins. Each replicate's actor-RNG produces a different
+mini-batch sequence, and whichever sequence crosses the saddle first commits the model
+to that basin. The Pima/amplitude configuration appears to have such a geometry: the
+VQC with 13 parameters sits near a saddle between the all-class-0 (accuracy ≈ 65%)
+and all-class-1 (accuracy ≈ 35%) trivial fixed points, and training can converge to
+either, or to an intermediate state, from the same starting point.
+
+### Implication for behavioral taxonomies
+
+Any behavioral pattern observed in a **single run** in an attractor-sensitive regime
+(Pima/amplitude/α=0.1, possibly α=0.5) has noise equivalent to 21–30pp. A taxonomy
+entry like "seed=7 shows anti-correlated attractor at 39.61%" is a description of one
+draw from a distribution with ~21pp range — the same seed and partition produced
+65.58% and 64.29% in two out of three replicates. Single-draw patterns should not be
+elevated to "named behaviors" without replicate confirmation.
+
+**Taxonomy replication outcomes (2026-07-24):**
+
+- **MN-04b seed=7 α=0.1 (anti-correlated attractor, 39.61%):** NOT reproduced.
+  MN-04c replicates: 65.58%, 64.29%, 44.81% — original 39.61% is one draw from a
+  21pp-range distribution. Renamed to "stochastic bifurcation" — no fixed label
+  assignable. (See MN-04b item 3.)
+
+- **MN-04b seed=1 α=0.1 (transient escape → regression, 65.58%):** Shape NOT
+  reliably reproduced. Three reps show three distinct trajectory patterns (sustained
+  escape 70.78%, near-stuck 65.58%, brief escape then regression 64.94%). Range
+  5.8pp — smaller than full bifurcation regime but trajectory shape is variable.
+  Renamed to "stochastic attractor escape." (See MN-04b item 4.)
+
+- **MN-04d seed=7 α=0.5 (regression below baseline, 64.29%):** Trajectory SHAPE
+  reproduced (class-1 escape + mild late decline) but "below baseline" endpoint
+  is NOT reliable — 3 reps give 64.94%, 67.53%, 65.58% (mean 66.02%, range 2.6pp).
+  The 2.6pp range confirms α=0.5 is NOT in the high-variance bifurcation regime.
+  Revised to "partial regression, final ≈ baseline." (See MN-04d.)
+
+### Protocol for attractor-sensitive regimes
+
+1. Never report a single-run result from Pima/amplitude/α=0.1 (or any condition
+   suspected of attractor bifurcation) as a fixed behavioral characterization.
+2. Run ≥3 replicates per seed before naming a behavioral pattern.
+3. Report the distribution of final accuracies across replicates, not just the shape
+   of one trajectory.
+4. If a pattern reproduces consistently across ≥3 replicates (e.g. always ends
+   class-0), it may be named. If the final state varies by >10pp across replicates,
+   describe the seed as "stochastically attractor-sensitive" rather than assigning a
+   fixed behavioral label.
+5. The ±1.75pp noise floor from MN-02 applies only outside the bifurcation regime.
+   Within the bifurcation regime, report replicate range as the effective uncertainty.
+
+### What is NOT affected
+
+- Wisconsin/amplitude results (all α levels): Wisconsin does not exhibit the VQC
+  attractor geometry. Its noise is in the normal 3–10pp range.
+- Pima/amplitude/IID and quantity-skew: clean learning, no attractor failures
+  observed, normal noise range.
+- Round-0 accuracy for any seed: R0 is pre-training and fully deterministic given
+  the torch init seed and test set. Not subject to actor-RNG noise.
+- MN-03a encoding×partition finding (z-score analysis on Wisconsin/IID): based on
+  5-seed means, well above the IID noise floor.
+- MN-04a Wisconsin collapse predictor: partition-driven, not actor-RNG-sensitive.

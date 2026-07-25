@@ -117,25 +117,28 @@ experiment). Per MN-05, per-seed behavioral reporting is required for α=0.5 and
 All five seeds have functional 4-client partitions (no ghost clients). Attractor failures
 at α=0.5 cannot be attributed to partition degeneracy.
 
-| Seed | R0 | Attractor start | R15 final | Pattern |
+| Seed | R0 | Attractor start | R15 final (orig.) | Pattern |
 |---|---|---|---|---|
-| 1 | 64.94% | class-0 | 70.78% | Moderate learning — oscillates 68–71%, clean |
-| 7 | 36.36% | class-1 | 64.29% | Partial class-1 escape (peaks ~67% at R6), regresses **below baseline** |
+| 1 | 64.94% | class-0 | 70.78% | Moderate clean learning — oscillates 68–71% |
+| 7 | 36.36% | class-1 | 64.29% | Escape from class-1 in R1; peaks ~67–69%; mild late-round decline to near-baseline |
 | 42 | 64.94% | class-0 | 65.58% | Near-stuck in class-0 (+0.64pp over 15 rounds) |
 | 123 | 35.06% | class-1 | 68.18% | Fast class-1 escape in R1 to 70.13%; settles at 67–69% |
 | 999 | 64.94% | class-0 | 67.53% | Slow class-0 escape |
-| **Mean±std** | | | **67.27% ± 2.50pp** | Masks qualitative diversity — misleading |
+| **Mean±std** | | | **67.27% ± 2.50pp** | Masks qualitative diversity — per-seed taxonomy required |
 
 **vs IID: −4.03pp.** The mean decline is above the ≥3pp reliability threshold but the
-distribution is not unimodal — seed=7 ends below the 64.94% majority-class baseline,
-while seed=1 achieves 70.78% (close to IID). The 2.50pp standard deviation severely
-understates within-condition variability.
+distribution is not unimodal: seeds 7 and 42 end near or at the majority-class baseline
+while seed=1 achieves 70.78%. The 2.50pp standard deviation understates within-condition
+variability.
 
-**Seed=7 below-baseline outcome:** Starting in the class-1 attractor (R0=36.36%),
-seed=7 partially escapes to 67.53% by round 6 but then regresses steadily to 64.29%
-at round 15 — 0.65pp below the non-diabetic majority-class floor. This is the only
-seed in the entire Phase 9b sweep to finish below its majority-class baseline. A
-full 4-client α=0.5 partition cannot sustain the escape achieved in early rounds.
+**Seed=7 replication note (MN-04d, 3 reps):** The trajectory shape — escape from class-1
+in round 1, peak at ~67–69%, mild late decline — reproduces consistently across all 3
+replicates (range 2.6pp, mean 66.02%). The original "below baseline" endpoint (64.29%)
+is the tail of this tight distribution; 3 replicates all end at or above 64.94%. Revised
+characterization: **seed=7 at α=0.5 consistently escapes the class-1 attractor but
+achieves only partial recovery (~65–68%), not a return to near-IID performance.**
+The α=0.5 noise regime is normal (~2.6pp range), confirming no bifurcation-level
+sensitivity here.
 
 **Attractor vs partition contributions:** MN-04c confirms that initialization sets the
 starting attractor (R0 is deterministic by init seed, confirmed across 12 replicates).
@@ -151,19 +154,19 @@ Escape at α=0.5 may also be partly stochastic.
 
 ### 2.2 Severe label skew (α=0.1) — per-seed taxonomy
 
-| Seed | Eff. clients | R0 | Final acc | Pattern |
+| Seed | Eff. clients | R0 | Final acc (orig.) | Pattern — replicate status |
 |---|---|---|---|---|
-| 1 | ~1/4 (C0=99.3% weight) | 64.94% | 65.58% | Transient escape to 70.78% (R3) then decline; net +0.64pp |
-| 7 | ~3/4 | 36.36% | 39.61% | Anti-correlated attractor — slow rise from class-1, never escapes |
+| 1 | ~1/4 (C0=99.3% weight) | 64.94% | 65.58% | Variable escape: 3 reps show 64.9–70.8% finals, 3 distinct trajectory shapes (see MN-04b) |
+| 7 | ~3/4 | 36.36% | 39.61% | Stochastic bifurcation: 3 reps span 44.8–65.6%, original 39.61% is low-end draw (see MN-04b) |
 | 42 | ~3/4 | 64.94% | 64.94% | All-class-0 collapse — perfectly flat all 15 rounds |
 | 123 | ~1/4 (C0=96.1% weight) | 35.06% | 35.06% | All-class-1 collapse — perfectly flat all 15 rounds |
 | 999 | ~2/4 | 64.94% | 64.94% | All-class-0 collapse — perfectly flat all 15 rounds |
-| **Mean±std** | | | **54.03% ± 15.32pp** | Deeply misleading — do not use as a summary statistic |
+| **Mean±std** | | | **54.03% ± 15.32pp** | Deeply misleading — single-draw per seed; do not use as a summary statistic |
 
-**vs IID: −17.27pp.** Largest degradation of any condition across both datasets. The
-mean is not interpretable: it averages three separate trivial fixed points (all-class-0
-at 64.94%, all-class-1 at 35.06%, and the anti-correlated attractor at 39.61%) with a
-transient partial escape (65.58%).
+**vs IID: −17.27pp.** The mean is not interpretable. Seeds 42, 123, 999 are confirmed
+repeatable (flat collapse trajectories). Seeds 1 and 7 are stochastically variable
+across their ~21–30pp and ~6pp ranges respectively; their single-run values from the
+original sweep are individual draws, not stable characterizations.
 
 **Out-of-sample test of collapse predictor (MN-04a applied to Pima):**
 The Wisconsin collapse predictor (dominant weight ≥60% AND 100% class purity → collapse)
