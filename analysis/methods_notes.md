@@ -770,3 +770,109 @@ elevated to "named behaviors" without replicate confirmation.
 - MN-03a encoding×partition finding (z-score analysis on Wisconsin/IID): based on
   5-seed means, well above the IID noise floor.
 - MN-04a Wisconsin collapse predictor: partition-driven, not actor-RNG-sensitive.
+
+---
+
+## MN-07: Explanation Sweep — Runtime Estimate and Design Decisions
+
+**Status:** Pre-sweep design note (2026-07-26)
+**Affects:** Phase 10 (targeted explanation sweep for RQ1, RQ2, RQ3).
+
+### 1. Runtime calibration from Phase 6
+
+Phase 6 (angle encoding, IID, 4 clients, 15 rounds, Wisconsin,
+`n_permutations=8`, `n_global_explain=10`, `n_explain=5`) completed in **97 seconds
+(1.6 min)** measured from log timestamps.
+
+Per-round breakdown (from phase6_log.csv timestamps):
+- Round 1: ~18s (includes PennyLane JIT compilation — one-time overhead)
+- Rounds 2–15: ~5–6s each (training + Q-SHAP + aggregation)
+- Warm-up-corrected throughput: ~79s over 14 post-JIT rounds ≈ 5.6s/round
+
+Q-SHAP forward-pass count per run:
+```
+n_permutations × (1 + n_qubits) × (n_global_explain + n_clients × n_explain) × n_rounds
+= 8 × 5 × (10 + 4×5) × 15 = 8 × 5 × 30 × 15 = 18,000 passes / run
+```
+
+Cost scales linearly with `n_permutations × n_explain_samples`. With n_qubits=4
+(fixed), there is no exponential component within the sweep design.
+
+### 2. Feasibility of proposed explanation sweep
+
+**Minimum viable explanation sweep (RQ1 + RQ2):**
+- 4 encodings × 1 distribution (IID) × 1 seed (seed=42)
+- Same n_permutations=8, n_global_explain=10, n_explain=5 as Phase 6
+- Estimated: 4 × ~100s ≈ **7 minutes** (amplitude may add ~15–20% circuit depth
+  overhead on default.qubit; within 4 qubits this is dominated by Python overhead)
+- Centralized baseline (no federation, 1 model per encoding):
+  ~30–60s extra (no Ray overhead, single Q-SHAP call on full test set) → negligible
+
+**RQ3 add-on (non-IID divergence):**
+- 1 encoding (amplitude) × 4 distributions × 1 seed each
+- Estimated: 4 × ~100s ≈ **7 minutes**
+
+**Total combined sweep (RQ1 + RQ2 + RQ3):** ~15–20 minutes. No checkpointing
+or resumable structure required — fits comfortably in one sitting.
+
+If 5-seed replication is added for stability estimates (RQ2), the estimate scales
+to 4 encodings × 5 seeds × IID ≈ 33 minutes. Still a single sitting; no
+checkpoint needed.
+
+**Decision:** Do not add checkpointing. Run as a single blocking script with
+progress prints. If a run fails, re-run that condition only (identified by
+encoding × distribution × seed label in stdout).
+
+### 3. Centralized baseline design (RQ1)
+
+For each encoding, run one centralized training baseline:
+- `HybridQuantumClassifier.fit(X_train_full, y_train, epochs=45, lr=0.05, batch_size=32)`
+  (45 epochs ≈ 15 federated rounds × 3 local epochs — matching total gradient steps)
+- Shared PCA + scaler fitted identically to federated setup (same `_fit_shared_preprocessor`)
+- Q-SHAP on `X_test[:10]` with background `X_train[:20]`, `n_permutations=8`
+
+Comparison metrics against round-15 global federated Q-SHAP:
+- Kendall's τ (rank agreement)
+- Cosine similarity (direction agreement)
+- L2 distance (magnitude difference)
+
+This directly answers RQ1: does federation alter the explanation distribution
+beyond the accuracy degradation, or do the two converge to the same attractor?
+
+### 4. RQ3 framing: collapsed-model explanations
+
+**Decision: Two-track conditional reporting.**
+
+Collapsed models (accuracy ≤ majority-class baseline + 2pp threshold,
+checked per round) produce Q-SHAP vectors that degenerate toward zero magnitude:
+when the model predicts a constant output regardless of input, all marginal
+contributions are near zero. Computing local-global JSD in this state produces
+a number but it carries no interpretable signal about explanation alignment.
+
+| Track | Condition | Analysis |
+|-------|-----------|----------|
+| **Track A** — functional | round accuracy > majority baseline + 2pp | Compute local-global JSD and Kendall's τ per round; report trend vs. non-IID level |
+| **Track B** — collapsed | round accuracy ≤ majority baseline + 2pp | Report that Q-SHAP ||φ|| → 0; note that explanation divergence is undefined; treat as correlated failure (both accuracy and interpretability collapse together) |
+
+Collapse threshold values:
+- Wisconsin: majority class ≈ 62.1% (class-0 = no cancer); threshold = 64.1%
+- Pima: majority class = 64.94% (class-0 = no diabetes); threshold = 66.9%
+
+The Track B finding is itself reportable for RQ3: "In cases where FL accuracy
+collapses under extreme non-IID, explanations also degenerate, meaning the two
+failure modes are correlated — non-IID does not merely degrade accuracy, it
+eliminates both predictive and explanatory utility."
+
+**Round-level vs run-level classification:** Apply the threshold per round per
+client, not just to the global final accuracy. A model may collapse in early
+rounds and recover (or the reverse). Log both the per-round Track A/B
+classification and the final classification for summary reporting.
+
+**Seeds to exclude from Track A divergence analysis (known collapses):**
+- Wisconsin/amplitude/α=0.1: seeds 42, 123, 999 (confirmed collapse per MN-04a)
+- Wisconsin/amplitude/α=0.1: seed=123 (borderline, check per-round)
+- Pima/amplitude/α=0.1: seeds 7, 123 (class-1 attractor, flat trajectory)
+- Pima/amplitude/α=0.1: seeds 42, 999 (class-0 attractor, flat trajectory)
+
+These exclusions should be stated explicitly in the explanation sweep results
+(not silently dropped) so the denominator of the Track A analysis is clear.

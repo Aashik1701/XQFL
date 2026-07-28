@@ -406,7 +406,7 @@ def print_rq3(rows):
                 client_by_round.setdefault(r["round"], []).append(r)
 
         print(f"\n  DISTRIBUTION: {dist_name}")
-        print(f"    {'Rnd':>4} {'Acc':>7} {'Trk':>4} {'Margin':>+8} "
+        print(f"    {'Rnd':>4} {'Acc':>7} {'Trk':>4} {'Margin':>8} "
               f"{'||φ_g||':>9} {'JSD(loc,glb)':>14}")
 
         track_a_jsds  = []
