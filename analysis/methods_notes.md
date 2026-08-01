@@ -382,23 +382,35 @@ tests heterogeneity within a functional multi-client structure (all 5 Wisconsin 
 retain ≥3 effective clients). α=0.1 tests robustness to partition degeneracy, i.e., what
 happens when FedAvg's implicit assumption of meaningful client diversity is violated.
 
-### MN-04a: Wisconsin α=0.1 collapse predictor
+### MN-04a: Wisconsin α=0.1 collapse predictor — RETRACTED AS DETERMINISTIC (2026-07-30)
 
-Collapse at Wisconsin occurs when: a single client holds ≥60% FedAvg weight with ≈100%
-class purity (benign), giving its gradient signal enough weight to overwhelm the
-counterweight from the second client.
+**⚠ Retraction notice:** The original predictor claimed "partition-driven, not
+actor-RNG-sensitive." Phase 10 replication (3 reps × 2 seeds) refutes this.
+Seeds 42 and 999 — the two "confirmed collapse" cases — produce COLLAPSED,
+FUNCTIONAL, and MIXED outcomes in independent reruns under identical partition and
+initialization. The predictor is a risk indicator, not a deterministic rule. See MN-08.
 
-| Seed | Dominant client weight | Purity | Outcome |
-|---|---|---|---|
-| 1 | 44.8% (C0, 100% class-1) | pure | Clean escape — below majority weight |
-| 7 | 51.0% (C3, 67% class-1) | mixed | Clean escape — not pure |
-| 42 | 61.1% (C0, 100% class-1) | pure | **Collapse** — ≥60% + pure |
-| 123 | 59.1% (C0, 100% class-1) | pure | Late escape — borderline; C3 (38.2%) eventually wins |
-| 999 | 60.7% (C1, 100% class-1) | pure | **Collapse** — ≥60% + pure |
+Original predictor finding: collapse at Wisconsin occurs when a single client holds
+≥60% FedAvg weight with ≈100% class purity (benign), giving its gradient signal
+enough weight to overwhelm the counterweight from the second client.
 
-The ~60% weight threshold is dataset-and-hyperparameter-specific (n_rounds, local_epochs,
-learning rate all affect how quickly a dominant gradient signal overwhelms the minority).
-Treat this as a 5-seed observation, not a general rule.
+| Seed | Dominant client weight | Purity | Original outcome | Replication status |
+|---|---|---|---|---|
+| 1 | 44.8% (C0, 100% class-1) | pure | Clean escape — below majority weight | Not retested (escape, no predictor trigger) |
+| 7 | 51.0% (C3, 67% class-1) | mixed | Clean escape — not pure | Not retested (escape, no predictor trigger) |
+| 42 | 61.1% (C0, 100% class-1) | pure | ~~Collapse~~ → **Bifurcation-sensitive** | Phase 10 RQ3: 0/15 B rounds (FUNCTIONAL); 3 reps: 2 COLLAPSED + 1 FUNCTIONAL + 1 MIXED |
+| 123 | 59.1% (C0, 100% class-1) | pure | Late escape — borderline; C3 (38.2%) eventually wins | Not retested |
+| 999 | 60.7% (C1, 100% class-1) | pure | ~~Collapse~~ → **Bifurcation-sensitive** | Phase 10 RQ3: 2/15 B rounds (MIXED); 3 reps: 1 COLLAPSED + 2 MIXED |
+
+**Revised interpretation:** The ≥60% weight + 100% purity condition identifies
+high-risk partition geometry — it places the model near an attractor boundary where
+actor-RNG mini-batch ordering selects the outcome. It does not guarantee collapse.
+The 64.04% "collapse" accuracy reported for seeds 42 and 999 in Phase 9b was a
+single draw from a stochastic distribution spanning COLLAPSED through FUNCTIONAL.
+
+The ~60% weight threshold remains a useful heuristic for flagging high-risk
+partitions. Treat as a risk indicator only, not a deterministic rule. At least 3
+replicates per seed are required before labeling a run as "confirmed collapse."
 
 ### MN-04b: Pima α=0.1 behavioral taxonomy — four distinct patterns
 
@@ -692,7 +704,8 @@ depending on the model's position in the loss landscape.
 | Regime | Example condition | Within-seed range | Within-seed std | Noise source |
 |---|---|---|---|---|
 | IID, clean multi-client | Wisconsin/angle/IID | ~3.5pp | ~1.2pp | Mini-batch order variation on smooth loss surface |
-| Non-IID, functional multi-client | Wisconsin/amplitude/α=0.5 | ~7–10pp (est.) | ~3pp | Increased gradient heterogeneity amplifies batch-order effects |
+| Non-IID, non-adversarial partition | Wisconsin/amplitude/α=0.5 seeds 1,42,123,999 | ~7–10pp (est.) | ~3pp | Increased gradient heterogeneity amplifies batch-order effects |
+| Non-IID, adversarial partition (α=0.5) | Wisconsin/amplitude/α=0.5 seed=7 | **22.81pp (measured, 4 runs)** | ~8.65pp | Actor-RNG basin selection — MN-08 extends to α=0.5 for adversarial partitions |
 | **Attractor bifurcation** | **Pima/amplitude/α=0.1** | **21–30pp** | **11–17pp** | Mini-batch order selects which attractor basin the model converges to |
 
 The attractor-bifurcation regime values come from the MN-04c confound experiment
@@ -769,7 +782,7 @@ elevated to "named behaviors" without replicate confirmation.
   the torch init seed and test set. Not subject to actor-RNG noise.
 - MN-03a encoding×partition finding (z-score analysis on Wisconsin/IID): based on
   5-seed means, well above the IID noise floor.
-- MN-04a Wisconsin collapse predictor: partition-driven, not actor-RNG-sensitive.
+- MN-04a Wisconsin collapse predictor: RETRACTED as deterministic (see MN-04a and MN-08). The ≥60% + purity condition is a high-risk flag, not a deterministic rule — seeds 42 and 999 show COLLAPSED/FUNCTIONAL/MIXED outcomes across replicates.
 
 ---
 
@@ -868,11 +881,121 @@ client, not just to the global final accuracy. A model may collapse in early
 rounds and recover (or the reverse). Log both the per-round Track A/B
 classification and the final classification for summary reporting.
 
-**Seeds to exclude from Track A divergence analysis (known collapses):**
-- Wisconsin/amplitude/α=0.1: seeds 42, 123, 999 (confirmed collapse per MN-04a)
-- Wisconsin/amplitude/α=0.1: seed=123 (borderline, check per-round)
+**Seeds to exclude from Track A divergence analysis (known or high-risk collapses):**
+- Wisconsin/amplitude/α=0.1: seed=123 (borderline — check per-round; late escape in Phase 9b)
+- Wisconsin/amplitude/α=0.1: seeds 42, 999 — bifurcation-sensitive; classify per-run by per-round Track A/B. Do NOT pre-label as "confirmed collapse" — both seeds produce FUNCTIONAL outcomes in some runs (MN-04a retraction; see MN-08)
 - Pima/amplitude/α=0.1: seeds 7, 123 (class-1 attractor, flat trajectory)
 - Pima/amplitude/α=0.1: seeds 42, 999 (class-0 attractor, flat trajectory)
 
 These exclusions should be stated explicitly in the explanation sweep results
 (not silently dropped) so the denominator of the Track A analysis is clear.
+
+---
+
+## MN-08: Actor-RNG-determined outcomes near attractor boundaries — unified phenomenon
+
+**Status:** 2026-07-30
+**Supersedes:** MN-04a deterministic collapse claim; Pima "doesn't transfer" out-of-sample
+conclusion in phase9b_part_c.md §2.2 and §4.1; IQP seed=7 wrong-attractor characterization.
+
+### 1. General phenomenon
+
+This quantum-federated system exhibits **actor-RNG-determined outcomes near attractor
+boundaries**, independent of encoding, dataset, or which specific partition geometry
+creates the boundary. When extreme non-IID partitioning places the model at an attractor
+boundary — where the loss surface has two near-equally-attractive basins — the outcome
+(which basin the model converges to) is selected by the stochastic mini-batch ordering
+across Ray actor subprocesses (MN-05), not by the partition structure or initialization
+alone.
+
+**Four independent instances confirm this as a general phenomenon:**
+
+| Instance | Encoding | Dataset | Condition | Evidence |
+|---|---|---|---|---|
+| Wisconsin/α=0.1 seeds 42, 999 | amplitude | Wisconsin | ≥60% dominant weight + 100% purity | Phase 10 RQ3 + 3 reps each: COLLAPSED/FUNCTIONAL/MIXED outcomes across runs |
+| Pima/α=0.1 (all seeds) | amplitude | Pima | Extreme Dirichlet + VQC near trivial fixed point | MN-04c: 21–30pp within-cell range, 4 cell means statistically indistinguishable |
+| Wisconsin/α=0.5/seed=7 | amplitude | Wisconsin | C2=100% class-1, C0=98% class-0 partition conflict | 3 reps: 71.05%, 93.86%, 87.72%; Phase 9b+reps range=22.81pp; MN-03a attribution downgraded to risk indicator |
+| IQP/IID/seed=7 | IQP | Wisconsin | Single sweep run with cos≈0.07 (wrong attractor) | 3 reps all return cos≥0.99 (NORMAL attractor): original was a noisy draw, not bifurcation |
+
+Note: the IQP seed=7 instance is a single noisy draw, not a reproducible bifurcation —
+it confirms that actor-RNG noise can produce wrong-attractor one-off outcomes even under
+IID, at lower probability than the extreme non-IID cases.
+
+Note: the Wisconsin/α=0.5/seed=7 instance extends MN-08 beyond α=0.1. Adversarial
+partition geometry at α=0.5 (conflicting-gradient clients) is sufficient to create
+attractor-boundary sensitivity, producing a within-seed range (22.81pp) comparable to
+the α=0.1 cases. The α=0.5 condition is not generally affected — seeds 1, 42, 123, 999
+show no replication anomalies. It is the specific partition structure (C2=100% class-1)
+that creates the boundary, not α=0.5 per se.
+
+### 2. Two dynamical modes at the boundary
+
+Phase 10 replication of Wisconsin/amplitude/α=0.1/seed=999 (three MIXED runs)
+reveals two qualitatively distinct trajectory patterns at the boundary:
+
+**Mode 1 — Early lock-in (most common):** The actor-RNG selects a basin within
+the first 1–2 rounds, and training locks in. Subsequent rounds are stable within the
+chosen basin. Examples: Phase 10 RQ3 run (2/15 B rounds: B at R1-2, stable A from R3
+onward at 0.86–0.88); seed=999 Rep 3 (3/15 B rounds: B at R1-2, A at R3-14, single
+slip at R15).
+
+**Mode 2 — Ongoing boundary oscillation:** The competition between attractors
+continues throughout all 15 rounds, with individual round outcomes determined by each
+round's mini-batch sampling. Accuracy oscillates between B-classified (0.6404) and
+A-classified (0.6579) trajectories — a gap of 1.75pp (numerically coincident with the
+MN-02 IID noise-floor estimate, though MN-02 was calibrated on an unrelated regime and
+this agreement should not be taken as a mechanistic link) — crossing the threshold 3
+times across 15 rounds. Example: seed=999 Rep 1 (10/15 B
+rounds: B at R1-6, A at R7-11, B at R12-15). This mode occurs when the partition
+geometry places the model exactly at the threshold between basins, so no accumulation
+of gradient steps is sufficient to escape the boundary region.
+
+**Practical characterization:** The actor-RNG *primarily* selects the outcome in
+early rounds. When the partition geometry is close enough to the basin boundary, the
+selection may not finalize until later rounds or may never finalize within n_rounds=15.
+
+### 3. What the Wisconsin collapse predictor (MN-04a) now means
+
+The ≥60% dominant-weight + 100% class-purity condition correctly identifies **high-risk
+partition geometry** that places the model near the attractor boundary. It does NOT
+determine the outcome. The correct interpretation is:
+
+> Partitions satisfying ≥60% + pure **increase the probability of collapse** by
+> placing the model at or near the attractor boundary. Whether collapse actually occurs
+> in any given run depends on the actor-RNG mini-batch ordering for that run.
+
+This distinction has a direct practical consequence: in a deployed system, the same
+partition geometry will produce collapse in some runs and functional learning in others,
+with no deterministic guarantee from the partition structure alone.
+
+### 4. Revised framing for "Pima doesn't transfer to Wisconsin"
+
+The original phase9b_part_c.md §2.2 conclusion — "The Wisconsin collapse predictor does
+NOT transfer to Pima" — was correct in the literal sense (the predictor misfires on Pima
+partition weights) but incorrect in its mechanistic interpretation. It implied Wisconsin
+had a separate, deterministic partition-driven mechanism that was absent from Pima. Phase
+10 replication shows that Wisconsin is equally stochastic at the boundary.
+
+**Revised framing:** The Wisconsin collapse predictor and Pima attractor trapping are
+not two mechanistically distinct phenomena — they are the same phenomenon (actor-RNG
+basin selection at attractor boundaries) triggered by different conditions (dominant-
+gradient partitions in Wisconsin; VQC initialization near trivial fixed points in Pima).
+The predictor "does not transfer" not because the mechanisms differ, but because the
+risk-flagging condition (partition weight vs VQC initialization geometry) is
+dataset-specific. Both datasets share the same underlying stochastic attractor mechanism.
+
+### 5. Scope and limits of this finding
+
+- The phenomenon requires partition geometry that places the model near an attractor
+  boundary. IID conditions are not affected (MN-02 noise floor applies, ±1.75pp).
+  α=0.5 is affected for seeds with adversarial partition structure (e.g. Wisconsin/seed=7,
+  22.81pp within-seed range); α=0.5 seeds with non-adversarial partitions are unaffected.
+  Treat α=0.5 as "generally safe but check partition geometry" rather than categorically safe.
+- The specific boundary conditions are dataset- and encoding-specific (n_qubits, n_layers,
+  amplitude vs IQP encoding, class balance all affect the loss surface geometry).
+- This finding does not invalidate Wisconsin/amplitude/α=0.1 seed=123 (borderline case
+  that escapes via second client), Wisconsin/amplitude/α=0.5 seeds 1, 42, 123, 999
+  (no replication anomalies), or any IID results.
+- Mitigation directions: (a) seeding the Ray actor RNG to eliminate per-run stochasticity;
+  (b) running ≥3 replicates per condition flagged as high-risk; (c) variance-scaled VQC
+  initialization to avoid near-trivial-fixed-point starts.

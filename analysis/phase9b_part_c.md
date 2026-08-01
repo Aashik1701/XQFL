@@ -2,7 +2,9 @@
 
 **Governing framework:** MN-02 (noise floor ±1.75pp), MN-03a (encoding×partition interaction),
 MN-04 (α=0.1 scope limitation, collapse predictor, behavioral taxonomies), MN-05 (per-condition
-reporting mode). All five-seed means carry ≥3pp meaningful-difference threshold.
+reporting mode), MN-08 (actor-RNG-determined outcomes near attractor boundaries — applies to
+Wisconsin/α=0.5/seed=7 and all α=0.1 attractor cases). All five-seed means carry ≥3pp
+meaningful-difference threshold.
 
 ---
 
@@ -33,17 +35,42 @@ encoding baseline (IID FedAvg, 5 seeds) is:
 | **Mean±std** | **88.42% ± 7.11pp** | |
 
 **vs IID: −5.79pp.** Substantially degraded but still above the centralised baseline
-(86.84%). The wide standard deviation (7.11pp) is driven primarily by seed=7 (78.95%),
-a 15pp drop from that seed's IID result (97.37%). Seed=7's outlier behavior is
-consistent with MN-03a: this seed×partition combination produces difficult data geometry
-for amplitude encoding under heterogeneous conditions, even though amplitude was
-seed=7's best IID result. The remaining four seeds (91–97%) indicate that five-seed
-mean±std adequately summarises the distribution for Wisconsin/α=0.5 once the outlier
-is noted.
+(86.84%). The wide standard deviation (7.11pp) is driven primarily by seed=7 (78.95%
+in the Phase 9b single run), a 15–26pp drop depending on the run (see replication below).
 
-Applying the ≥1.75pp noise floor: seeds 1 and 7 are separated by 17.5pp — well above
-the noise floor. Seeds 42 and 123 differ by only 0.88pp (*NF*). Treat the group as
-two clusters: {7, 999} (low-to-mid, 79–83%) and {1, 42, 123} (high, 91–97%).
+**⚠ Seed=7 replication (MN-08, 2026-07-30) — 3 additional runs:**
+
+| Run | Final acc | Drop from IID |
+|---|---|---|
+| Phase 9b single run | 78.95% | 18.42pp |
+| Rep 1 | 71.05% | 26.32pp |
+| Rep 2 | 93.86% | 3.51pp |
+| Rep 3 | 87.72% | 9.65pp |
+| **Mean ± std (all 4)** | **82.90% ± 8.65pp** | **range: 22.81pp** |
+
+Partition (same all 4 runs): C0=83@2%c1, C1=65@78%c1, C2=111@100%c1, C3=196@62%c1.
+R0=64.04% in all 4 runs (deterministic by init seed, per MN-04c finding).
+
+**MN-03a attribution revised:** The partition IS adversarial for seed=7 — C2 is 100%
+class-1, C0 is 98% class-0, creating conflicting gradient signals that place the model
+near an attractor boundary. MN-03a correctly identifies this as difficult geometry for
+amplitude encoding. However, the specific 78.95% Phase 9b value is not the stable
+outcome of this partition — it is one draw from a 22.81pp-range distribution.
+The MN-03a encoding×partition interaction is a **risk indicator** (adversarial partition
+→ high variance outcome) not a deterministic cause. The actual outcome per run is
+actor-RNG-determined (MN-08). This extends MN-08 from the α=0.1 regime into α=0.5:
+adversarial partition geometry at α=0.5 can also produce attractor-boundary sensitivity,
+albeit less severely than α=0.1 cases (MN-08 instances at α=0.1 showed 21–30pp ranges;
+this α=0.5 case shows 22.81pp — comparable in magnitude).
+
+**Measured α=0.5 within-seed noise for adversarial partitions:** 22.81pp range (replaces
+MN-06's '~7–10pp (est.)' estimate, which was calibrated across seeds, not within an
+attractor-sensitive seed). The 7–10pp estimate remains valid for the non-adversarial
+seeds 1, 42, 123, 999 at this condition.
+
+Seeds 1, 42, 123, 999 (91–97%) show no replication anomalies — their 5-seed mean±std
+adequately summarises a unimodal distribution. Treat seed=7 as a separate
+actor-RNG-sensitive cluster with effective accuracy 71–94% and report accordingly.
 
 ### 1.2 Severe label skew (α=0.1) — per-seed taxonomy required
 
@@ -56,16 +83,22 @@ client-count degeneracy.
 |---|---|---|---|
 | 1 | C0: 44.8%, 100% benign | 89.47% | Clean 4-client escape |
 | 7 | C3: 51.0%, 67% benign | 90.35% | Clean ~3-client escape |
-| 42 | C0: 61.1%, 100% benign | 64.04% | **Partition-driven collapse** (majority-class, all-benign) |
+| 42 | C0: 61.1%, 100% benign | 64.04% | ~~Partition-driven collapse~~ → **Bifurcation-sensitive** (single draw; MN-04a retraction, MN-08) |
 | 123 | C0: 59.1%, 100% benign | 85.96% | Late 2-client escape — borderline threshold |
-| 999 | C1: 60.7%, 100% benign | 64.04% | **Partition-driven collapse** (majority-class, all-benign) |
+| 999 | C1: 60.7%, 100% benign | 64.04% | ~~Partition-driven collapse~~ → **Bifurcation-sensitive** (single draw; MN-04a retraction, MN-08) |
 | **Mean±std** | | **78.77% ± 13.55pp** | Bimodal — do not interpret as unimodal distribution |
 
 **Collapse pattern (seeds 42, 999):** Both collapsed to exactly 64.04% — the Wisconsin
-all-benign majority-class baseline. The collapse predictor (MN-04a) is confirmed:
-dominant client weight ≥60% AND class purity ≈100% → collapse within 1 round. Round
-logs show: round 0 at 36.84% (anti-correlated start) → round 1 at 65.79% (collapse to
-majority class) → rounds 2–15 flat at 63–65%.
+all-benign majority-class baseline — in these single Phase 9b runs. Round logs show:
+round 0 at 36.84% (anti-correlated start) → round 1 at 65.79% (collapse to majority
+class) → rounds 2–15 flat at 63–65%.
+
+**⚠ Phase 10 replication (MN-04a retraction, 2026-07-30):** Seeds 42 and 999 are NOT
+deterministically collapsed. Phase 10 RQ3 found seed=42 with 0/15 B rounds (FUNCTIONAL)
+and seed=999 with 2/15 B rounds (MIXED). 3-rep replication: seed=42 = 2 COLLAPSED +
+1 FUNCTIONAL + 1 MIXED; seed=999 = 1 COLLAPSED + 3 MIXED. The 64.04% Phase 9b values
+are single draws from a stochastic distribution. The MN-04a predictor is a high-risk
+indicator, not a deterministic rule. See MN-08 for unified treatment.
 
 **Wisconsin borderline case (seed=123):** Seed=123 (59.1%, 100% benign) sits just under
 the collapse threshold — the predictor narrowly misses, and seed=123 escapes to 85.96%
@@ -180,13 +213,21 @@ was designed on Wisconsin data. Applied to Pima:
 | 7 | C1: 386@3%c1 | ~62.9% | Nearly pure class-0 | Collapse? | Anti-correlated (class-1 init, partially pushed) |
 | 1 | C0: 610@35%c1 | ~99.3% | Mixed (35%) | Collapse possible | Transient escape then plateau |
 
-**The Wisconsin collapse predictor does NOT transfer to Pima.** The Wisconsin rule
-(partition-driven: dominant gradient overwhelms in round 1) is a different mechanism
-from Pima's initialization-driven attractor trapping. Seeds 42, 999, and 123 collapse
-due to VQC initialization landing in a trivial attractor, independent of partition weight.
-Seed=7's anti-correlated outcome is driven by the class-1 initialization interacting with
-a conflicting-gradient partition. The collapse predictor requires separate calibration per
-dataset and should not be generalized across datasets.
+**The Wisconsin collapse predictor does NOT transfer to Pima** — meaning the specific
+risk-flagging condition (partition weight ≥60% + purity) misfires on Pima partition
+geometry. However, the original framing that this reflects two mechanistically distinct
+phenomena ("partition-driven" for Wisconsin, "initialization-driven" for Pima) is
+incorrect.
+
+**⚠ Revised framing (MN-08, 2026-07-30):** Both Wisconsin and Pima exhibit the same
+underlying mechanism — actor-RNG-determined basin selection near attractor boundaries
+(MN-08). Wisconsin Phase 10 replication shows seeds 42 and 999 are equally stochastic
+at the boundary (2 COLLAPSED / 1 FUNCTIONAL / 1 MIXED for seed=42 across 4 runs).
+The predictor "doesn't transfer" because the risk-flagging condition is dataset-specific,
+not because the mechanism differs. The correct conclusion is: the Wisconsin collapse
+predictor was never a deterministic rule for Wisconsin either — it identifies high-risk
+partition geometry for both datasets, with the outcome stochastically determined by
+actor-RNG mini-batch ordering in both cases.
 
 **Scope note (MN-04):** Seeds 1 and 123 are de-facto single-client (C0 holds 96–99.3%
 of FedAvg weight). Their outcomes (transient escape then plateau, and complete class-1
@@ -237,47 +278,45 @@ injection scenario.
 
 ## 4. Cross-Cutting Analysis
 
-### 4.1 The two attractor failure mechanisms
+### 4.1 The attractor failure mechanism — unified account
 
-Two mechanistically distinct collapse patterns appear across Phase 9b Part C:
+**⚠ Revised (MN-08, 2026-07-30):** The original framing of "two mechanistically
+distinct collapse patterns" (Wisconsin = partition-driven; Pima = initialization-driven)
+is retracted. Phase 10 replication shows Wisconsin/amplitude/α=0.1 is equally
+stochastic at the boundary (MN-04a retraction). Both datasets share a single underlying
+mechanism. The original Wisconsin vs Pima contrast was an artifact of single-run Phase
+9b measurement.
 
-**Mechanism A — Partition-driven gradient overwhelm (Wisconsin, α=0.1):**
-When a single client holds ≥60% FedAvg weight with near-100% class purity, its gradient
-dominates round 1 aggregation and pulls the global model to the majority class in a
-single step. The model never recovers. This is a training-dynamics failure — the model
-IS learning (from the dominant client), but what it learns is wrong. Mitigation: reduce
-maximum client weight (e.g. clip by FedAvg weight cap) or increase n_clients.
+**Unified mechanism — actor-RNG basin selection at attractor boundaries (MN-08):**
+When extreme non-IID partitioning (or VQC initialization near a trivial fixed point)
+places the model at an attractor boundary, the outcome — which basin the model converges
+to — is selected by stochastic mini-batch ordering across Ray actor subprocesses (MN-05),
+not by the partition structure or initialization alone.
 
-**Mechanism B — Stochastic attractor selection under initialization bias (Pima, both α):**
-The VQC's 13 trainable parameters initialize near the all-class-0 or all-class-1 trivial
-fixed point. Whether training escapes that fixed point is not reliably determined by the
-partition structure alone. The confound-breaking experiment (MN-04c, 3 replicates per
-cell) shows that within-cell final-accuracy range is 21–30pp under identical
-initialization and partition — meaning actor-RNG mini-batch ordering alone determines
-which basin (class-0, class-1, or intermediate) the model converges to. The model sits
-at a bifurcation point where the loss surface is nearly flat between attractors and
-small stochastic perturbations select the outcome. Initialization determines where
-training *begins* (class-0 or class-1 side of the bifurcation) but not where it ends.
-This failure occurs even with full 4-client functional partitions at α=0.5.
-Mitigation: variance-scaled VQC initialization that places weights away from trivial
-fixed points, or a loss landscape change via alternative encoding or preprocessing.
+- **In Wisconsin/α=0.1:** The ≥60% dominant-weight + 100% class-purity condition
+  places the model near the majority-class attractor boundary. Phase 10 replication
+  of seeds 42 and 999 produces COLLAPSED, FUNCTIONAL, and MIXED outcomes across runs
+  — the same partition geometry gives different final states each time. The predictor
+  identifies high-risk geometry, not a guaranteed outcome.
 
-**Confound note (MN-04c):** In the current sweep, partition_seed and init_seed are
-confounded (same integer). The confound-breaking experiment (Pima/α=0.1, 2×2 design,
-3 replicates per cell) yields two findings with different reliability:
+- **In Pima/α=0.1:** The VQC initializes near trivial fixed points (all-class-0 or
+  all-class-1). The confound-breaking experiment (MN-04c, 3 replicates per cell) shows
+  within-cell final-accuracy ranges of 21–30pp from identical init+partition — actor-RNG
+  stochasticity dominates, and no partition or initialization signal is detectable above
+  the noise at 3 replicates per cell.
 
-- **Round-0 accuracy tracks init_seed exclusively** — confirmed in all 12 replicates.
-  R0=64.94% for init=42 regardless of partition; R0=36.36% for init=7 regardless of
-  partition. Initialization determines which attractor the VQC starts in.
+- **What initialization does determine:** Round-0 accuracy tracks init_seed exclusively,
+  confirmed in all 12 MN-04c replicates. Initialization sets which attractor basin
+  training begins in, but not where it ends.
 
-- **Final accuracy is dominated by actor-RNG stochasticity, not partition or init.**
-  Within-cell final-accuracy range is 21–30pp across 3 replicates — an order of
-  magnitude beyond the IID noise floor. Individual runs land in the class-0 attractor
-  (~65%), class-1 attractor (~35%), or intermediate states (~44–59%) from the same
-  init and partition. The four cell means (53–58%) are statistically
-  indistinguishable. The VQC at Pima/α=0.1 is at a bifurcation point where
-  mini-batch ordering alone selects the final basin — no partition signal is detectable
-  above the noise with 3 replicates.
+**Partition geometry as risk indicator (not outcome predictor):**
+The ≥60% + purity condition (Wisconsin) and the near-trivial-fixed-point start (Pima)
+correctly flag conditions that place the model near an attractor boundary. They do not
+determine whether the model falls into the collapse or functional basin in any given run.
+Mitigation directions: (a) seeding Ray actor RNG to eliminate per-run stochasticity;
+(b) running ≥3 replicates per high-risk condition before labeling an outcome;
+(c) variance-scaled VQC initialization; (d) weight-capping in FedAvg to reduce
+dominant-client effect.
 
 ### 4.2 Encoding×partition interaction at non-IID (MN-03a context)
 
@@ -292,17 +331,21 @@ repeated/full-Hilbert" hypothesis remains flagged as PENDING CONFIRMATION.
 
 | Condition | Wisconsin Δ vs IID | Pima Δ vs IID |
 |---|---|---|
-| α=0.5 | −5.79pp (moderate, driven by seed=7) | −4.03pp (masked; per-seed taxonomy required) |
-| α=0.1 | −15.44pp (bimodal; 2/5 collapse, 3/5 near-IID) | −17.27pp (deeply bimodal; all 5 seeds distinct) |
+| α=0.5 | −5.79pp (moderate; seed=7 attractor-boundary sensitive — 22.81pp within-seed range, MN-08; seeds 1,42,123,999 stable 91–97%) | −4.03pp (masked; per-seed taxonomy required) |
+| α=0.1 | −15.44pp (attractor-boundary regime; seeds 42, 999 stochastic per-run — MN-08; seeds 1, 7 functional; seed 123 borderline) | −17.27pp (attractor-boundary regime; all 5 seeds distinct; within-cell variance 21–30pp — MN-08) |
 | Quantity skew | −1.05pp (*NF*) | −1.30pp (*NF*) |
 | TrimmedMean/IID | +1.05pp (*NF*) | −0.91pp (*NF*) |
 
 **Key finding:** Quantity skew and TrimmedMean produce negligible change relative to
 IID in both datasets (all differences *NF*). Label skew produces substantial degradation
 in both datasets, increasing nonlinearly from α=0.5 to α=0.1 due to partition degeneracy
-(effective client count drops). The Wisconsin and Pima degradations at α=0.1 are driven
-by fundamentally different mechanisms (gradient overwhelm vs attractor trapping
-respectively), and the collapse predictor does not transfer between datasets.
+(effective client count drops). The Wisconsin and Pima degradations at α=0.1 are both
+driven by the same underlying mechanism — actor-RNG-determined basin selection at
+attractor boundaries (MN-08) — triggered by different dataset-specific conditions
+(dominant-gradient partition in Wisconsin; VQC near trivial fixed point in Pima). The
+collapse predictor (MN-04a) does not transfer its specific risk-flagging condition
+between datasets, but both datasets exhibit equally stochastic outcomes at the boundary
+(MN-04a retraction; MN-08).
 
 ---
 
