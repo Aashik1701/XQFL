@@ -999,3 +999,126 @@ dataset-specific. Both datasets share the same underlying stochastic attractor m
 - Mitigation directions: (a) seeding the Ray actor RNG to eliminate per-run stochasticity;
   (b) running ≥3 replicates per condition flagged as high-risk; (c) variance-scaled VQC
   initialization to avoid near-trivial-fixed-point starts.
+
+### 6. MN-08c: Within-collapse bifurcation (Phase 11, 2026-08-02)
+
+**New mechanism distinct from Modes 1 and 2.**  Modes 1 and 2 describe actor-RNG selection
+at the Track A/B boundary — whether the model ends up functional or collapsed.  MN-08c
+describes actor-RNG selection *within* Track B: the model collapses in every draw, but the
+*specific collapsed state* is actor-RNG-sensitive, alternating between two distinct attractors
+that both lie on the B side of the threshold.
+
+**Evidence:** Phase 11 replication of angle encoding / Wisconsin / α=0.1 / seeds 42 and 999
+(2 geometry-triggered replication reps each, G1 flag: ≥60% FedAvg weight + ≥90% purity):
+
+| Seed | Primary | Rep 1 | Rep 2 | Range | All Track B? |
+|---|---|---|---|---|---|
+| 42 | 63.16% | 63.16% | **46.49%** | 16.7pp | ✓ all B |
+| 999 | 63.16% | **36.84%** | **36.84%** | 26.3pp | ✓ all B |
+
+Seeds 1, 7, 123 show single-attractor collapse: all draws land at ~61–63% with ≤0pp spread.
+Seeds 42 and 999 show within-B bifurcation: the model alternates between the majority-class
+predictor (~63.16% accuracy, always predicting class-0) and the anti-majority predictor
+(~36.84% accuracy, always predicting class-1).  These are complement accuracies
+(63.16% + 36.84% = 100%), confirming that both are constant-output states rather than
+partially-functional models.
+
+**Mechanism:** The angle encoding VQC under extreme Dirichlet skew (α=0.1) has two
+distinct collapsed fixed points — one for each constant-output class — in addition to (or
+instead of) functional attractors.  Which collapsed attractor the model reaches is
+determined by the actor-RNG mini-batch ordering in early rounds, exactly as in Modes 1/2,
+but the competition is between two collapsed states rather than between a collapsed and a
+functional state.
+
+**Implication for reporting:** Track A/B classification alone is insufficient to
+characterize collapsed-regime behaviour.  For encodings and conditions where MN-08c applies,
+two runs that both score "Track B" may have reached qualitatively different model states
+(opposite constant-output predictions).  Any collapsed-regime comparison that pools Track B
+results without examining the specific accuracy values — or the predicted class distribution —
+risks treating these two states as equivalent.
+
+**Phase 12 amplitude data (2026-08-02) — amplitude comparison gap closed:**
+
+3 independent draws logged for amplitude/Wisconsin/α=0.1/seeds 42 and 999
+(results/phase12_log.csv, run keys `amplitude|alpha_0.1|{seed}|draw{n}`):
+
+| Seed | Draw 1 | Draw 2 | Draw 3 | Range | A/B |
+|---|---|---|---|---|---|
+| 42 | 45.6%(B) φ=0.056 | 55.3%(B) φ=0.092 | 55.3%(B) φ=0.092 | 9.7pp | 0A/3B |
+| 999 | 45.6%(B) φ=0.082 | 65.8%(A) φ=0.085 | 74.6%(A) φ=0.252 | 29.0pp | 2A/1B |
+
+**Cross-encoding comparison — all four encodings at α=0.1, seeds 42 and 999
+(Phase 11 replication data + Phase 12; per-draw ‖φ‖ from logged CSV):**
+
+| Encoding | Seed | Draw 1 | Draw 2 | Draw 3 | Range | A/B |
+|---|---|---|---|---|---|---|
+| angle | 42 | 63.2%(B) φ=0.011 | 63.2%(B) φ=0.008 | 46.5%(B) φ=0.048 | 16.7pp | **0A/3B** |
+| angle | 999 | 63.2%(B) φ=0.022 | 36.8%(B) φ=0.003 | 36.8%(B) φ=0.002 | 26.3pp | **0A/3B** |
+| reuploading | 42 | 73.7%(A) φ=0.207 | 38.6%(B) φ=0.068 | 87.7%(A) φ=0.125 | 49.1pp | **2A/1B** |
+| reuploading | 999 | 64.9%(B) φ=0.118 | 63.2%(B) φ=0.015 | 44.7%(B) φ=0.074 | 20.2pp | 0A/3B |
+| IQP | 42 | 63.2%(B) φ=0.003 | 39.5%(B) φ=0.058 | 57.9%(B) φ=0.119 | 23.7pp | 0A/3B |
+| IQP | 999 | 63.2%(B) φ=0.000 | 53.5%(B) φ=0.148 | 75.4%(A) φ=0.279 | 21.9pp | **1A/2B** |
+| amplitude | 42 | 45.6%(B) φ=0.056 | 55.3%(B) φ=0.092 | 55.3%(B) φ=0.092 | 9.7pp | 0A/3B |
+| amplitude | 999 | 45.6%(B) φ=0.082 | 65.8%(A) φ=0.085 | 74.6%(A) φ=0.252 | 29.0pp | **2A/1B** |
+
+*Table verification (2026-08-02, programmatic):* All 24 accuracy/Track-label pairs
+cross-checked against the exact collapse threshold (36/57 + 0.02 = 65.1579%).
+Zero mismatches.  Exact per-draw margins logged; narrowest Track A margin is amplitude/
+seed=999/draw2 at +0.63pp above threshold.
+
+**Final scope determination (Phase 11 + Phase 12, 2026-08-02):**
+
+*What is confirmed:* Multi-attractor collapse-regime sensitivity under α=0.1 G1-geometry
+is present across all four encodings — all show draw-to-draw variance of 10–49pp in the
+collapsed regime.  This is the general finding.
+
+*What is NOT confirmed:* An encoding-expressiveness split between "strict within-B" and
+"A/B-crossing" encodings.  The reuploading/seed=42 result refutes this framing directly:
+reuploading shows the largest A/B bifurcation in the dataset (49.1pp, 2A/1B with a draw
+reaching 87.7%) at seed=42, while showing all-B behaviour at seed=999.  A/B-crossing is
+therefore partition-dependent for all non-angle encodings, not encoding-specific.
+
+Reuploading/seed=999 also deserves note: all three draws are Track B, but the primary
+draw's ‖φ‖=0.118 is comparable to IQP's rep1 ‖φ‖=0.148 (which corresponds to a 53.5%
+Track B draw) and non-trivially larger than angle's collapsed phi (max 0.048).  The 0A/3B
+classification for reuploading/seed=999 reflects where these draws fall relative to the
+65.16% threshold, not a qualitative difference in model behaviour.
+
+*Amplitude/seed=42 range (9.7pp):* With only 3 draws, this is consistent with the
+10–49pp ranges seen for other encodings/seeds; treat it as modest-to-clear within-B
+variance, not as a categorically smaller effect.  All four encodings show within-B variance
+of roughly the same order of magnitude when considered across the two tested seeds.
+
+*The one consistent finding — angle uniquely all-B (⚠ under-replicated claim):*
+
+All angle draws collected across Phase 11 under G1/G2-flagged conditions are Track B with
+‖φ‖ ≤ 0.083, consistent with constant-output predictors.  The full inventory of
+geometry-flagged angle conditions in the Phase 11 log is:
+
+| Condition | Flag type | Draws | All B? | Max ‖φ‖ |
+|---|---|---|---|---|
+| α=0.1 / seed=42 | G1+G2 | 3 (1 prim + 2 rep) | ✓ | 0.048 |
+| α=0.1 / seed=123 | G2 only | 3 (1 prim + 2 rep) | ✓ | 0.015 |
+| α=0.1 / seed=999 | G1+G2 | 3 (1 prim + 2 rep) | ✓ | 0.022 |
+| α=0.5 / seed=999 | G1+G2 | 3 (1 prim + 2 rep)† | ✓ | 0.083 |
+
+†α=0.5/seed=999 has 6 CSV rows due to the Phase 11 Ray-deadlock restart (all six are
+Track B; the valid checkpointed set is 1 primary + 2 reps).
+
+Total: 12 confirmed draws across 3 G1-proper (G1+G2) conditions and 1 G2-only condition,
+all Track B, max ‖φ‖=0.083.  Contrast: angle under non-flagged conditions (α=0.5/seeds
+1,7,42,123; α=0.1/seed=1) reaches Track A with ‖φ‖ up to 0.315 — collapse is not
+intrinsic to angle encoding, only to G1/G2-adversarial partitions.
+
+⚠ **This is the project's most under-replicated surviving claim.**  12 draws across 4
+conditions on a single dataset (Wisconsin) with a single architecture (4-qubit, 2-layer
+BasicEntanglerLayers) is not sufficient evidence for a strong encoding-level statement.
+The sample of G1-proper seeds is 3 out of 5 (seeds 42 and 999 at α=0.1, seed=999 at
+α=0.5), which is not comprehensive.  The Pima dataset, which has a different majority
+class, feature distribution, and class balance, has not been tested under G1 geometry for
+any encoding.  **If compute time allows before final write-up, the first priority should
+be 3 additional draws for angle/Wisconsin/α=0.1/seed=1 or /seed=7 under a manually
+constructed G1 partition, or equivalently for angle/Pima/α=0.1 under the same G1-flagged
+seeds.** A single Track A draw would falsify the current "uniquely all-B" claim as stated.
+
+*Does not affect:* IID conditions, quantity-skew conditions where no collapse was observed.
