@@ -54,7 +54,7 @@ Runtime estimate (MN-07 cost model):
   Total worst-case: ~120 min (~2 hours), 10-13 background passes
 """
 
-import os, sys, csv, json, math
+import os, sys, csv, json, math, signal, subprocess, time
 import numpy as np
 import torch
 from datetime import datetime, timezone
@@ -86,6 +86,7 @@ N_CLIENT_BG      = 10
 N_REPLICATION_REPS = 2         # additional reps per flagged seed
 COLLAPSE_MARGIN    = 0.02      # threshold = majority_baseline + 2pp
 GHOST_THRESHOLD    = 20        # samples below which a client is a 'ghost'
+RUN_TIMEOUT        = 600       # seconds before a hung Ray actor is killed (10 min)
 
 SEEDS = [1, 7, 42, 123, 999]
 
@@ -145,17 +146,39 @@ def make_replcheck_key(encoding, distribution):
 
 
 def load_checkpoint():
+    """Return set of run keys that should be skipped (done or timed-out)."""
     if not os.path.exists(CHECKPOINT_CSV):
         return set()
     done = set()
     with open(CHECKPOINT_CSV, newline="") as fh:
         for row in csv.DictReader(fh):
-            if row.get("status") == "done":
+            if row.get("status") in ("done", "timeout"):
                 done.add(row["run_key"])
     return done
 
 
-def mark_done(rk):
+def timed_out_seeds(encoding_name, distribution_name):
+    """Return set of seeds whose primary run timed out (to skip replication)."""
+    if not os.path.exists(CHECKPOINT_CSV):
+        return set()
+    timed = set()
+    with open(CHECKPOINT_CSV, newline="") as fh:
+        for row in csv.DictReader(fh):
+            if row.get("status") == "timeout":
+                rk = row["run_key"]
+                parts = rk.split("|")
+                if (len(parts) >= 4
+                        and parts[0] == "federated"
+                        and parts[1] == encoding_name
+                        and parts[2] == distribution_name):
+                    try:
+                        timed.add(int(parts[3]))
+                    except ValueError:
+                        pass
+    return timed
+
+
+def mark_done(rk, status="done"):
     first = not os.path.exists(CHECKPOINT_CSV)
     with open(CHECKPOINT_CSV, "a", newline="") as fh:
         w = csv.DictWriter(fh, fieldnames=["run_key", "status", "completed_at"])
@@ -163,10 +186,18 @@ def mark_done(rk):
             w.writeheader()
         w.writerow({
             "run_key":      rk,
-            "status":       "done",
+            "status":       status,
             "completed_at": datetime.now(timezone.utc).isoformat(),
         })
-    print(f"  [checkpoint] done: {rk}")
+    print(f"  [checkpoint] {status}: {rk}")
+
+
+def cleanup_ray():
+    """Kill any lingering Ray worker processes from a previous hung run."""
+    subprocess.run(["pkill", "-f", r"ray.*worker"], capture_output=True)
+    subprocess.run(["pkill", "-f", r"ray/core.*raylet"], capture_output=True)
+    subprocess.run(["pkill", "-f", r"ray.*log_monitor"], capture_output=True)
+    time.sleep(3)  # give OS time to reap workers before next Ray init
 
 # ── results CSV helpers ───────────────────────────────────────────────────────
 
@@ -342,26 +373,42 @@ def run_federated(encoding_name, distribution_name, seed, run_type="federated", 
 
     logger = Phase11Logger(run_type, encoding_name, distribution_name, dist["alpha"], seed)
 
-    run_federation(
-        X_train=X_train, y_train=y_train,
-        X_test=X_test,   y_test=y_test,
-        encoding_fn=ENCODINGS[encoding_name],
-        n_clients=N_CLIENTS, n_rounds=N_ROUNDS, local_epochs=LOCAL_EPOCHS,
-        n_qubits=N_QUBITS,   n_layers=N_LAYERS,
-        split=dist["split"],
-        dirichlet_alpha=dist["alpha"] if dist["alpha"] is not None else 0.5,
-        strategy_name="fedavg",
-        seed=seed,
-        project_root=PROJECT_ROOT,
-        logger=logger,
-        n_global_explain=N_GLOBAL_EXPLAIN,
-        n_global_bg=N_GLOBAL_BG,
-        n_explain=N_CLIENT_EXPLAIN,
-        n_bg=N_CLIENT_BG,
-        n_permutations=N_PERM,
-    )
+    def _timeout_handler(signum, frame):
+        raise TimeoutError(f"Run exceeded {RUN_TIMEOUT}s — Ray actor deadlock suspected")
 
-    mark_done(rk)
+    signal.signal(signal.SIGALRM, _timeout_handler)
+    signal.alarm(RUN_TIMEOUT)
+    try:
+        run_federation(
+            X_train=X_train, y_train=y_train,
+            X_test=X_test,   y_test=y_test,
+            encoding_fn=ENCODINGS[encoding_name],
+            n_clients=N_CLIENTS, n_rounds=N_ROUNDS, local_epochs=LOCAL_EPOCHS,
+            n_qubits=N_QUBITS,   n_layers=N_LAYERS,
+            split=dist["split"],
+            dirichlet_alpha=dist["alpha"] if dist["alpha"] is not None else 0.5,
+            strategy_name="fedavg",
+            seed=seed,
+            project_root=PROJECT_ROOT,
+            logger=logger,
+            n_global_explain=N_GLOBAL_EXPLAIN,
+            n_global_bg=N_GLOBAL_BG,
+            n_explain=N_CLIENT_EXPLAIN,
+            n_bg=N_CLIENT_BG,
+            n_permutations=N_PERM,
+        )
+        signal.alarm(0)  # cancel alarm on clean exit
+        mark_done(rk)
+    except TimeoutError as e:
+        signal.alarm(0)
+        print(f"\n  [TIMEOUT] {rk}: {e}")
+        print(f"  Marking as timeout and cleaning up Ray workers …")
+        mark_done(rk, status="timeout")
+        cleanup_ray()
+    except Exception as e:
+        signal.alarm(0)
+        print(f"\n  [ERROR] {rk}: {e}")
+        raise
 
 
 # ── MN-08 statistical flag + replication ────────────────────────────────────
@@ -420,6 +467,12 @@ def check_and_replicate(encoding_name, distribution_name, rows):
     stat_seeds    = statistical_flags(encoding_name, distribution_name, accs)
     to_replicate  = geo_seeds | stat_seeds
 
+    # Never replicate seeds whose primary run timed out — they will deadlock again
+    timeout_seeds = timed_out_seeds(encoding_name, distribution_name)
+    if timeout_seeds:
+        print(f"  [skip replication] timed-out seeds (deadlock risk): {sorted(timeout_seeds)}")
+        to_replicate -= timeout_seeds
+
     if not to_replicate:
         print(f"  [no MN-08 flags] {encoding_name}/{distribution_name} — skipping replication")
         mark_done(replcheck_key)
@@ -428,6 +481,8 @@ def check_and_replicate(encoding_name, distribution_name, rows):
     print(f"\n  [MN-08 replication] {encoding_name}/{distribution_name}")
     print(f"    Geometry-flagged  : {sorted(geo_seeds)}")
     print(f"    Statistical-flagged: {sorted(stat_seeds)}")
+    if timeout_seeds:
+        print(f"    Timed-out (skipped): {sorted(timeout_seeds)}")
     print(f"    Combined ({len(to_replicate)} seeds): {sorted(to_replicate)}")
     print(f"    Running {N_REPLICATION_REPS} additional reps per flagged seed …")
 
@@ -663,7 +718,8 @@ def print_phase11_analysis(rows, refs):
 
             for seed in SEEDS:
                 if seed not in per_seed:
-                    print(f"  {seed:>5}  (no data)")
+                    to_status = "TIMEOUT" if seed in timed_out_seeds(enc, dist_name) else "no data"
+                    print(f"  {seed:>5}  ({to_status})")
                     continue
                 v = per_seed[seed]
                 flags = []
@@ -671,6 +727,8 @@ def print_phase11_analysis(rows, refs):
                     flags.append("G")
                 if seed in stat_flag_seeds:
                     flags.append("S")
+                if seed in timed_out_seeds(enc, dist_name):
+                    flags.append("T")
                 flag_str = ",".join(flags) if flags else "—"
                 lg_jsd   = f"{v['mean_jsd']:.4f}" if not math.isnan(v['mean_jsd']) else "n/a(B)"
                 iid_j    = f"{v['jsd_iid']:.4f}" if not math.isnan(v['jsd_iid']) else "—"
