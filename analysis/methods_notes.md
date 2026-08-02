@@ -1217,10 +1217,362 @@ The decisive evidence against "diverging dynamics": seed=7 achieves the highest 
 
 1. **Primary finding:** All four quantum encodings tested (angle, amplitude, reuploading, IQP) produce Q-SHAP explanation vectors that leak membership information under direct MIA (mean direct AUC 0.55–0.70 across encodings, all > 0.5).  Leakage magnitude is not reliably ranked between encodings at 5 seeds.
 
-2. **Partition dependence:** Leakage is highly partition-dependent.  Seed=123's IID partition produces below-random AUC across all four encodings, suggesting some data splits generate explanation geometries that resist or invert the standard membership signal.  This is a genuine finding (confirmed not to be a pipeline artefact), opening a new axis for future investigation.
+2. **Partition dependence:** Leakage appears partition-dependent across seeds but no confirmed pattern has been identified.  Seed=123 showed below-random AUC across all four encodings in Phase 13 Draw 1; Phase 13b resample showed 0/4 replication and actor-RNG instability in draw 1 re-run (all four values shifted >3pp).  Downgraded: observed in one training-trajectory × attack-draw combination; not confirmed.  (See Section (C) above and the Replication Discipline section for the full retraction.)
 
 3. **Shadow attack:** Not effective in the federated Q-SHAP setting, with the failure attributable to structural mismatch between locally-trained shadow models and federated target explanation geometry, not to absence of membership signal.  Direct MIA is the reliable attack for this setting.
 
 4. **DP defence:** angle/seed=42 only (Phase 8); ε=1.0 Laplace → AUC=0.296.  Not tested across encodings or seeds.
 
 **RQ4 coverage after Phase 13:** 4 encodings × IID × 5 seeds (Wisconsin).  Non-IID MIA, Pima MIA, and cross-encoding DP remain untested.
+
+---
+
+## Replication Discipline
+
+**Standing rule:** No unusual single-run finding is reported as a confirmed result without at least one independent replication.  "Independent" means a different random draw of one of the sources of non-determinism: a different attack-split sample, a different Ray actor-RNG trajectory from a fresh training run, or a different random seed.  Replication is not required for expected behavior (e.g., a Track-B collapse in a condition where collapse is the documented norm) or for reproducing a previously confirmed finding.
+
+This rule exists because this project has a documented history of single-draw anomalies that did not survive replication — every one of the retracted findings below passed "looks suspicious" on first observation and failed on the first independent draw.  Later RQ sections cite this standard rather than re-establishing it.
+
+### Confirmed retractions
+
+**1. Wisconsin/angle/seed=7 accuracy outlier framing (MN-03a, 2026-07-30)**
+*Original:* Phase 7 report described Wisconsin/angle/seed=7 as "the only seed-level outlier" (78.95% vs ~91% for others under IID/α=0.5), and attributed this to encoding-specific sensitivity specific to the angle encoding at that partition.
+*Why it was retracted:* MN-03a z-score analysis across all four encodings revealed this is an encoding × partition interaction, not an angle-specific phenomenon.  Amplitude/seed=7 is that encoding's *highest* result (z=+1.4), not an outlier.  The "outlier" framing implied angle was uniquely disadvantaged by seed=7's partition; the correct finding is that encodings respond to the same partition geometry in qualitatively different directions.  Additionally, MN-08 extended the explanation to actor-RNG boundary sensitivity: Wisconsin/amplitude/α=0.5/seed=7 shows a 22.81pp range across 3 independent runs, confirming the stochastic dimension.
+*Correct treatment:* Seed=7 partition creates an adversarial gradient conflict geometry (C2=100% class-1 vs C0=98% class-0); which encoding escapes or collapses depends on expressive capacity, not a fixed labelling of "outlier."
+
+**2. Phase 7 label-skew accuracy ordering (multi-seed validation, 2026-07-22)**
+*Original:* Phase 7 (single seed, seed=42) showed α=0.5 accuracy (57.0%) < α=0.1 accuracy (63.2%), implying "moderate non-IID is worse than extreme non-IID."  This counter-intuitive monotonicity violation was treated as a finding.
+*Why it was retracted:* Multi-seed check (seeds 1, 7, 42, 123) showed the α=0.5 < α=0.1 ordering holds only 1/4 seeds.  Seed=42 is the outlier; in the other three seeds, α=0.5 outperforms α=0.1 (expected direction).
+*Correct treatment:* Do not cite monotonicity violation as a general finding.  Seed=42's result is noted with its seed label.  The robust claim is that quantity skew shows better accuracy and lower JSD than either label-skew condition.
+
+**3. MN-04a deterministic collapse predictor (MN-04a retraction, 2026-07-30)**
+*Original:* Collapse at Wisconsin/amplitude/α=0.1 was claimed to be deterministically predicted by the rule "dominant client ≥60% FedAvg weight + 100% class purity."  Seeds 42 and 999 were labelled as "confirmed collapse."
+*Why it was retracted:* Phase 10 replication (3 runs each, seeds 42 and 999) produced COLLAPSED, FUNCTIONAL, and MIXED outcomes from identical partitions and initializations.  Seed=42 Run 1 (Phase 10 RQ3): 0/15 Track-B rounds (fully functional).  Seed=999: 3 independent outcomes including one fully collapsed and two MIXED.
+*Correct treatment:* The ≥60%+purity rule identifies high-risk partition geometry (proximity to an attractor boundary) where actor-RNG mini-batch ordering selects the outcome.  It is a risk indicator, not a deterministic rule.  See MN-08 for the unified framework.
+
+**4. Reuploading 'strict within-B' claim (MN-08c retraction, 2026-07-30)**
+*Original:* After documenting that angle encoding collapses to Track B on all tested adversarial partitions, an implicit encoding-expressiveness taxonomy emerged: angle encoding as "always-B" vs reuploading as exhibiting only modest within-B variance, suggesting reuploading is categorically more robust in the collapsed-state dimension.
+*Why it was retracted:* MN-08c table shows reuploading/seed=42 with a 49.1pp across-run range (2A/1B: two Track-A outcomes and one Track-B), the largest A/B spread in the dataset.  This directly refutes "strict within-B" for reuploading.  Reuploading is bifurcation-sensitive at adversarial partitions, the same as amplitude.  The angle vs others split is preserved (angle is the only encoding that produces all-B outcomes across tested conditions), but the within-reuploading characterization was wrong.
+*Correct treatment:* All four encodings show within-condition variance under bifurcation-sensitive geometry.  The claim that reuploading is categorically "within-B" is retired; per-run Track classification is required.
+
+**5. IQP/seed=7 'wrong attractor' (MN-08, 2026-07-30)**
+*Original:* A single Phase 10 IID run for IQP encoding at seed=7 produced cosine similarity ≈ 0.07 between the federated explanation and the centralized baseline (near-orthogonal, suggesting a structurally different attractor).  This was described as "IQP seed=7 lands in a wrong attractor under IID."
+*Why it was retracted:* Three independent Phase 10 replications of the same condition (IQP/IID/seed=7) all returned cosine similarity ≥ 0.99 — normal attractor, close to centralized baseline.  The original was a single noisy draw.
+*Correct treatment:* The original observation documents that actor-RNG noise can produce a qualitatively wrong attractor outcome even under IID conditions (at low probability).  It is not a reproducible bifurcation phenomenon specific to IQP.  Note: IQP/seed=7 continues to show anomalies in Phase 11 non-IID conditions (see RQ3 section flagged candidates below) — these have not yet been replicated and are currently treated as provisional.
+
+**6. Seed=123 MIA below-random AUC (Phase 13b retraction, 2026-08-02)**
+*Original:* Phase 13 direct MIA showed below-random AUC (< 0.5) for all four encodings at seed=123 under IID Wisconsin.  Composition check ruled out degenerate attack split.  Initial framing: "genuine partition-dependent privacy resistance; a new axis for RQ4."
+*Why it was retracted:* Phase 13b (script `experiments/phase13b_seed123_resample.py`) applied two checks.  (1) Draw 1 re-run: all four encoding AUCs shifted >3pp relative to Phase 13 (IQP flipped from 0.380 to 0.562 across the 0.5 boundary), demonstrating the result is sensitive to actor-RNG variation in the training trajectory.  (2) Draw 2 resample (attack samples [50:100] instead of [0:50]): 0/4 encodings below 0.5 (range 0.544–0.680).  Cross-check of seed=123 in Phase 10/11 RQ1/2/3 data showed no corroborating anomalies.
+*Correct treatment:* Observed in one training-trajectory × attack-draw combination; not confirmed.  Do not cite as evidence of partition-dependent privacy resistance.
+
+---
+
+## Phase 11 Data: RQ3 Divergence-by-Distribution Summary
+
+**Status:** 2026-08-02
+**Data sources:** Phase 10 log (amplitude non-IID; all centralized and IID-federated baselines) + Phase 11 log (angle, reuploading, IQP non-IID).
+**Matrix:** 4 encodings × 3 distributions × 5 seeds = 60 cells (complete).
+**Distributions:** α=0.5 (moderate label skew), α=0.1 (severe label skew), quantity (IID class distribution, unequal sample counts).
+
+### JSD computation
+
+`js_divergence()` in `explain/metrics.py`: takes absolute values → normalises to sum-1 → Jensen-Shannon divergence base-2.  Returns values in [0, 1]; higher = more divergence.
+
+Two reference baselines per cell:
+- **JSD vs Centralized**: divergence between the non-IID federated global explanation (round 15) and the centralized model trained on the full dataset.  Measures the combined effect of federating + non-IID data distribution.
+- **JSD vs IID-Federated**: divergence between the non-IID federated global explanation and the IID-federated global explanation at the same seed.  Isolates the effect of data distribution skew alone (subtracting the federation overhead already present under IID).
+
+Both baselines come from Phase 10 (centralized: 20 rows at round=15; IID-federated: 20 rows at round=15, global).
+
+### ⚠ Track-B artifact warning
+
+When a model collapses (Track B), its explanation vector is near-zero (‖φ‖ ≈ 0).  The JSD between two near-zero vectors is also near-zero — so collapsed models look as though they have excellent fidelity.  This is a documented silent failure mode (see MN-04a, MN-07).  Cells with Track B labels and low JSD values should NOT be interpreted as "low divergence = good"; they reflect a model that has stopped producing meaningful explanations.  The condition mean JSD for heavy-collapse conditions (angle/α=0.1: 4/5 Track-B; IQP/α=0.1: 3/5 Track-B) is dominated by this artifact and should be excluded or annotated in any written comparison.
+
+Where multiple federated runs exist for the same (encoding, distribution, seed) — which occurs for angle/α=0.5 (all 5 seeds) and angle/α=0.1/seed=1 due to replications run to characterise actor-RNG variance — the primary table uses the earliest-timestamp 'federated' run.
+
+### Summary table: mean ± std across 5 seeds
+
+| Encoding | Distribution | JSD vs Cent | JSD vs IID-Fed | Mean Acc | #Track-B |
+|---|---|---|---|---|---|
+| angle | α=0.5 | 0.212 ± 0.077 | 0.195 ± 0.123 | 0.684 ± 0.152 | 1/5 |
+| angle | α=0.1 | 0.092 ± 0.062 † | 0.150 ± 0.037 † | 0.658 ± 0.053 | **4/5** |
+| angle | quantity | 0.103 ± 0.044 | 0.057 ± 0.026 | 0.847 ± 0.025 | 0/5 |
+| amplitude | α=0.5 | 0.218 ± 0.078 | 0.117 ± 0.073 | 0.888 ± 0.105 | 0/5 |
+| amplitude | α=0.1 | 0.193 ± 0.099 | 0.237 ± 0.126 | 0.802 ± 0.107 | 0/5 |
+| amplitude | quantity | 0.088 ± 0.019 | 0.076 ± 0.014 | 0.937 ± 0.013 | 0/5 |
+| reuploading | α=0.5 | 0.223 ± 0.030 | 0.179 ± 0.114 | 0.879 ± 0.095 | 0/5 |
+| reuploading | α=0.1 | 0.201 ± 0.081 | 0.190 ± 0.109 | 0.819 ± 0.109 | 1/5 |
+| reuploading | quantity | 0.187 ± 0.050 | 0.105 ± 0.039 | 0.942 ± 0.011 | 0/5 |
+| IQP | α=0.5 | 0.224 ± 0.060 | 0.333 ± 0.253 ‡ | 0.795 ± 0.084 | 0/5 |
+| IQP | α=0.1 | 0.353 ± 0.135 † | 0.466 ± 0.153 † | 0.670 ± 0.188 | **3/5** |
+| IQP | quantity | 0.219 ± 0.152 ‡ | 0.198 ± 0.200 ‡ | 0.863 ± 0.033 | 0/5 |
+
+† Mean is dominated by near-zero Track-B explanations — do not interpret as "low divergence."  Exclude Track-B seeds before comparing across conditions.
+‡ Flagged: single-seed outlier inflating mean and std; see Replication Candidates below.
+
+### Per-seed detail table (round 15, global explanation vs baselines)
+
+| Encoding | Dist | Seed | JSD_cent | JSD_iid | Acc | Track | ‖φ‖ |
+|---|---|---|---|---|---|---|---|
+| angle | α=0.5 | 1 | 0.1921 | 0.1137 | 0.7719 | A | 0.2542 |
+| angle | α=0.5 | 7 | 0.1112 | 0.0982 | 0.8421 | A | 0.3147 |
+| angle | α=0.5 | 42 | 0.1553 | 0.1015 | 0.7456 | A | 0.2289 |
+| angle | α=0.5 | 123 | 0.3145 | 0.2451 | 0.6579 | A | 0.2022 |
+| angle | α=0.5 | 999 | 0.2874 | 0.4144 | 0.4035 | **B** | 0.0212 |
+| angle | α=0.1 | 1 | 0.0781 | 0.1508 | 0.7632 | A | 0.1965 |
+| angle | α=0.1 | 7 | 0.2131 | 0.1762 | 0.6316 | **B** | 0.0521 |
+| angle | α=0.1 | 42 | 0.0353 | 0.0790 | 0.6316 | **B** | 0.0110 |
+| angle | α=0.1 | 123 | 0.0723 | 0.1587 | 0.6316 | **B** | 0.0122 |
+| angle | α=0.1 | 999 | 0.0610 | 0.1830 | 0.6316 | **B** | 0.0224 |
+| angle | quantity | 1 | 0.1106 | 0.0223 | 0.8333 | A | 0.2999 |
+| angle | quantity | 7 | 0.1436 | 0.0424 | 0.8509 | A | 0.2867 |
+| angle | quantity | 42 | 0.0298 | 0.0462 | 0.8684 | A | 0.3084 |
+| angle | quantity | 123 | 0.0830 | 0.0850 | 0.8772 | A | 0.2844 |
+| angle | quantity | 999 | 0.1484 | 0.0898 | 0.8070 | A | 0.2945 |
+| amplitude | α=0.5 | 1 | 0.1614 | 0.0341 | 0.9649 | A | 0.3549 |
+| amplitude | α=0.5 | 7 | 0.1893 | 0.0325 | 0.9649 | A | 0.3765 |
+| amplitude | α=0.5 | 42 | 0.2713 | 0.1667 | 0.9298 | A | 0.4055 |
+| amplitude | α=0.5 | 123 | 0.3418 | 0.2172 | 0.8947 | A | 0.4528 |
+| amplitude | α=0.5 | 999 | 0.1280 | 0.1340 | 0.6842 | A | 0.1682 |
+| amplitude | α=0.1 | 1 | 0.0988 | 0.1595 | 0.8947 | A | 0.1844 |
+| amplitude | α=0.1 | 7 | 0.1238 | 0.2419 | 0.8947 | A | 0.1871 |
+| amplitude | α=0.1 | 42 | 0.3804 | 0.4678 | 0.6579 | A | 0.0531 |
+| amplitude | α=0.1 | 123 | 0.1775 | 0.0972 | 0.6842 | A | 0.1819 |
+| amplitude | α=0.1 | 999 | 0.1844 | 0.2168 | 0.8772 | A | 0.1651 |
+| amplitude | quantity | 1 | 0.0989 | 0.0811 | 0.9474 | A | 0.3425 |
+| amplitude | quantity | 7 | 0.1114 | 0.0765 | 0.9298 | A | 0.3148 |
+| amplitude | quantity | 42 | 0.0818 | 0.0526 | 0.9561 | A | 0.3684 |
+| amplitude | quantity | 123 | 0.0933 | 0.0752 | 0.9211 | A | 0.3289 |
+| amplitude | quantity | 999 | 0.0565 | 0.0957 | 0.9298 | A | 0.3350 |
+| reuploading | α=0.5 | 1 | 0.2256 | 0.1207 | 0.9386 | A | 0.4785 |
+| reuploading | α=0.5 | 7 | 0.1856 | 0.1269 | 0.9474 | A | 0.4593 |
+| reuploading | α=0.5 | 42 | 0.2419 | 0.1084 | 0.9474 | A | 0.4680 |
+| reuploading | α=0.5 | 123 | 0.1932 | 0.1317 | 0.8596 | A | 0.3816 |
+| reuploading | α=0.5 | 999 | 0.2674 | 0.4056 | 0.7018 | A | 0.0731 |
+| reuploading | α=0.1 | 1 | 0.2075 | 0.1185 | 0.8772 | A | 0.5059 |
+| reuploading | α=0.1 | 7 | 0.1463 | 0.0735 | 0.9386 | A | 0.5027 |
+| reuploading | α=0.1 | 42 | 0.0867 | 0.2431 | 0.7368 | A | 0.2068 |
+| reuploading | α=0.1 | 123 | 0.2401 | 0.1389 | 0.8947 | A | 0.4056 |
+| reuploading | α=0.1 | 999 | 0.3247 | 0.3770 | 0.6491 | **B** | 0.1176 |
+| reuploading | quantity | 1 | 0.1425 | 0.1268 | 0.9561 | A | 0.4229 |
+| reuploading | quantity | 7 | 0.1284 | 0.0817 | 0.9298 | A | 0.4717 |
+| reuploading | quantity | 42 | 0.1730 | 0.0626 | 0.9474 | A | 0.4668 |
+| reuploading | quantity | 123 | 0.2432 | 0.1715 | 0.9298 | A | 0.3462 |
+| reuploading | quantity | 999 | 0.2477 | 0.0821 | 0.9474 | A | 0.5128 |
+| IQP | α=0.5 | 1 | 0.1178 | 0.1974 | 0.8772 | A | 0.3599 |
+| IQP | α=0.5 | 7 | 0.2097 | 0.7990 | 0.6667 | A | 0.1824 |
+| IQP | α=0.5 | 42 | 0.2495 | 0.0586 | 0.8947 | A | 0.4437 |
+| IQP | α=0.5 | 123 | 0.2985 | 0.3627 | 0.7895 | A | 0.2287 |
+| IQP | α=0.5 | 999 | 0.2438 | 0.2481 | 0.7456 | A | 0.2798 |
+| IQP | α=0.1 | 1 | 0.1327 | 0.1800 | 0.8947 | A | 0.4102 |
+| IQP | α=0.1 | 7 | 0.2975 | 0.6090 | 0.8333 | A | 0.2030 |
+| IQP | α=0.1 | 42 | 0.5390 | 0.5850 | 0.6316 | **B** | 0.0031 |
+| IQP | α=0.1 | 123 | 0.4226 | 0.4657 | 0.3596 | **B** | 0.0191 |
+| IQP | α=0.1 | 999 | 0.3716 | 0.4897 | 0.6316 | **B** | 0.0000 |
+| IQP | quantity | 1 | 0.1124 | 0.1048 | 0.8860 | A | 0.3647 |
+| IQP | quantity | 7 | 0.5173 | 0.5890 | 0.7982 | A | 0.1232 |
+| IQP | quantity | 42 | 0.1306 | 0.1704 | 0.8772 | A | 0.3166 |
+| IQP | quantity | 123 | 0.1999 | 0.0966 | 0.8684 | A | 0.3285 |
+| IQP | quantity | 999 | 0.1332 | 0.0301 | 0.8860 | A | 0.3946 |
+
+### Preliminary findings
+
+#### Pattern 1 — Quantity skew causes least explanation divergence
+
+Across all four encodings, quantity skew (IID class distribution, unequal sample counts) produces the lowest JSD vs both baselines (centralized and IID-federated).  JSD vs IID-federated under quantity skew ranges 0.03–0.19 across seeds and encodings; under label skew, it ranges 0.06–0.80.  This is consistent with the accuracy finding (quantity skew preserves accuracy close to IID baseline): when clients see both classes, both the model and its explanation geometry stay close to the balanced-data baseline.
+
+#### Pattern 2 — Severe label skew (α=0.1) collapses angle explanation; artificially depresses JSD
+
+4/5 angle/α=0.1 seeds are Track B with ‖φ‖ < 0.06.  The condition JSD vs centralized (0.092) is the lowest angle value across all three distributions — lower even than quantity skew (0.103).  This is the Track-B artifact: near-zero explanations produce small JSD against any baseline.  For the one Track-A angle/α=0.1 seed (seed=1, acc=0.763, ‖φ‖=0.197), JSD_cent=0.078 — within the range of quantity skew.  The only safe claim for angle/α=0.1 is the collapse rate (4/5 seeds); explanation fidelity is uninterpretable for the collapsed seeds.
+
+IQP/α=0.1 (3/5 Track-B) has the same artifact in the opposite direction: the three collapsed seeds have non-zero but very low ‖φ‖ (0.000–0.019) and moderately high JSD (0.37–0.54), because the near-zero IQP explanation diverges structurally from the IID-federated explanation (which has ‖φ‖ ≈ 0.34).  This inflates the condition mean JSD artificially.
+
+#### Pattern 3 — Amplitude and reuploading show interpretable fidelity across all conditions
+
+Amplitude: 0/15 Track-B across all three non-IID conditions; reuploading: 1/15 Track-B (reuploading/α=0.1/seed=999, which is also a replication candidate below).  For these two encodings, JSD values are interpretable and show a consistent gradient: quantity < α=0.5 < α=0.1 for JSD vs centralized (0.088, 0.218, 0.193 for amplitude; 0.187, 0.223, 0.201 for reuploading), with the α=0.5 vs α=0.1 ordering slightly reversed in both — consistent with the documented Phase 7 finding that α=0.5 is not categorically worse than α=0.1 on accuracy, and here the same holds for explanation fidelity.
+
+### Replication candidates flagged
+
+LOO outlier detection was applied to each (encoding, distribution) condition: for each seed, compare its value to the LOO mean of the other 4 seeds; flag if deviation > max(2 × LOO-std, 0.10).  Cells explained by documented mechanisms (Track-B collapse, MN-04a bifurcation sensitivity) are noted but do not require new replication runs.
+
+**1. IQP / quantity / seed=7 [RESOLVED — Phase 14]**
+- Phase 11 primary: JSD_cent=0.517, JSD_iid=0.589, Track A, acc=0.799, ‖φ‖=0.123 (ANOMALOUS)
+- LOO mean for JSD_cent: 0.144 ± 0.033 (dev=3.7σ); for JSD_iid: 0.100 ± 0.050 (dev=4.9σ)
+- Phase 14 replications: 3 fresh quantity-skew reps + 3 fresh IID reps; full table in Phase 14 section below.
+- **Verdict: initialization-specific instability, not partition-driven.**  Anomaly rate under quantity-skew = 2/4 (50%); anomaly rate under IID = 2/4 (50%).  Since IID has zero non-IID mechanism, the identical rate under IID rules out the quantity partition as the cause.  IQP/seed=7's particular initialization interacts with IQP's entangling structure to produce unstable explanation geometry in approximately half of all training runs, regardless of distribution.
+- Correct treatment for RQ3 table: IQP/quantity/seed=7 is an unreliable single value (50% anomaly rate under any distribution).  Exclude from condition-level aggregation; compute IQP/quantity mean and std over seeds 0, 1, 42, 999 only.  Do not attribute the elevated JSD to the quantity partition.
+
+**2. IQP / α=0.5 / seed=7 [RESOLVED — existing Phase 11 data, new MN-08 instance]**
+- Phase 11 primary: JSD_cent=0.210, JSD_iid=0.799, Track A, acc=0.667, ‖φ‖=0.182 (ANOMALOUS)
+- LOO mean for JSD_iid: 0.217 ± 0.109 (dev=5.3σ); JSD_iid=0.799 is the maximum in the entire Phase 11 dataset.
+- Phase 11 also contains 2 MN-08 replication draws for this cell (triggered by G1-geometry flag): draw 2 (‖φ‖=0.119, acc=0.737, Track A) and draw 3 (‖φ‖=0.140, acc=0.465, Track B).  By the strict ‖φ‖ < 0.15 criterion: 2/3 draws are anomalous (draws 2 and 3).  Draw 1 (‖φ‖=0.182) is above the threshold but well below the normal IQP range of 0.28–0.41; all three draws cluster in the 0.12–0.18 band with zero draws reaching normal geometry.  No new runs needed.
+- **Verdict: near-persistent anomaly under α=0.5 — new MN-08 instance.**  Unlike the IID/quantity cases (50% stochastic bistability with normal draws clearly present), all 3 α=0.5 draws have below-normal norms (0.12–0.18 vs 0.28–0.41 for other IQP seeds).  The α=0.5 partition tilts IQP/seed=7 strongly toward the degenerate regime; the moderate label skew creates systematic gradient conflicts that make the normal-geometry attractor largely inaccessible for this seed's initialization.
+- Structurally unusual combination: JSD_cent=0.210 (within normal range) but JSD_iid=0.799 (maximum in dataset).  The explanation is close to the centralized model but very far from the IID-federated baseline for this seed.  Note: the IID/seed=7 baseline is itself anomalous (Phase 10 norm=0.083, MN-08 single noisy draw), so JSD_iid is not reliable as a reference for any IQP/seed=7 cell.
+- Correct treatment: report as new MN-08 instance (3/3 draws anomalous, attractor-boundary-sensitive under α=0.5).  Exclude from IQP/α=0.5 condition mean for JSD_iid.  Use JSD_cent if reporting single-seed data for this cell.
+
+**3. Reuploading / α=0.5 / seed=999**
+- JSD_iid=0.406, acc=0.702, Track A, ‖φ‖=0.073
+- LOO mean for JSD_iid: 0.122 ± 0.009 (dev=31.6σ, but std is near-zero so this is a visual outlier not a statistical one in the usual sense); LOO mean for acc: 0.923 ± 0.037 (dev=5.9σ)
+- ‖φ‖=0.073 vs 0.382–0.479 for other reuploading/α=0.5 seeds — explanation norm is an order of magnitude lower.  The model is Track A (not collapsed) but producing near-zero explanations.  This looks like a near-Track-B state that the Track-A classifier threshold (≥ collapse-threshold accuracy) missed.
+- MN-08 documents reuploading/α=0.5 can exhibit boundary sensitivity (the general framework), but this specific seed=999 case has not been individually replicated.  **Flag: confirm whether a fresh run for this condition also produces near-zero ‖φ‖ or whether this is a single-draw near-collapse.**
+
+**4. Amplitude / α=0.5 / seed=123**
+- JSD_cent=0.342, JSD_iid=0.217, Track A, acc=0.895, ‖φ‖=0.453
+- LOO mean for JSD_cent: 0.188 ± 0.053 (dev=2.9σ); for JSD_iid: 0.092 ± 0.060 (dev=2.1σ)
+- Track A with the highest ‖φ‖ in the condition (0.453 vs 0.168–0.407).  Both JSD values are elevated relative to peers.  Higher norm can produce higher JSD (more concentrated explanation diverges more from diffuse baseline), so this may be a mechanical consequence of the explanation magnitude rather than a qualitative anomaly.
+- However, seed=123 has been a recurring flag across multiple phases (seed=123 MIA anomaly — now retracted; Phase 7 α=0.5 one of the seeds with the α=0.5 < α=0.1 reversal).  Not previously documented for this specific JSD elevation.  **Low priority flag: note for awareness; not required for RQ3 write-up unless the replication budget allows.**
+
+**5. Amplitude / α=0.1 / seed=42**
+- JSD_cent=0.380, JSD_iid=0.468, Track A, acc=0.658, ‖φ‖=0.053
+- LOO mean for JSD_cent: 0.146 ± 0.036 (dev=6.5σ); for acc: 0.838 ± 0.089 (dev=2.0σ)
+- Very low ‖φ‖ (0.053 vs 0.165–0.453 for other amplitude/α=0.1 seeds).  This is the MN-04a documented case: amplitude/Wisconsin/α=0.1/seed=42 is explicitly listed as "bifurcation-sensitive" (Phase 10 3 reps: collapsed/functional/mixed outcomes).  The current Phase 11 run represents one draw from that distribution.  **Not a new anomaly; apply the MN-04a bifurcation-sensitive label.  No new replication required beyond what MN-04a already captured.**
+
+**6. Reuploading / α=0.1 / seed=42 (LOW JSD direction)**
+- JSD_cent=0.087, LOO mean=0.230 ± 0.064 (dev=2.2σ), Track A, acc=0.737, ‖φ‖=0.207
+- Anomalously LOW JSD — federated explanation unusually close to centralized baseline despite severe non-IID.  No documented explanation.
+- Could reflect a fortunate partition where, despite extreme skew, the four clients collectively provide enough gradient diversity for the global model to converge to a similar explanation as centralized training.  **Weak flag; a positive anomaly.  Not required for write-up but worth noting as evidence that extreme non-IID does not guarantee explanation drift.**
+
+---
+
+### Phase 14 — IQP/seed=7 investigation: quantity-skew and IID replications
+
+**Motivation:** Two independent anomaly signals for IQP/seed=7 under quantity-skew — an accuracy-adjacent outlier in earlier sweep, and now JSD_cent=0.517 (3.7σ above LOO mean) in the Phase 11 RQ3 flag.  The α=0.5 case already had 3 Phase 11 draws available; the question there was resolved without new runs.  The quantity case required new runs because the stochastic vs persistent distinction was open.  An IID control arm was added to test whether the anomaly is partition-independent.
+
+**Protocol (experiments/phase14_iqp_seed7_investigation.py):** 3 fresh quantity-skew reps + 3 fresh IID reps.  Data loading: `random_state=42` matching Phase 10/11.  15 rounds FedAvg, 3 local epochs, n_global_explain=10, n_global_bg=20, n_permutations=8.  Anomaly criteria: ‖φ‖ < 0.15 (primary) or JSD_cent > 0.40.  Normal IQP IID seeds show ‖φ‖ 0.32–0.41, JSD_cent 0.11–0.22.
+
+**Full results table:**
+
+| Draw | Split | acc | Track | ‖φ‖ | JSD_cent | Anomalous? |
+|------|-------|-----|-------|-----|----------|-----------|
+| Phase 11 primary | quantity | 0.799 | A | 0.123 | 0.517 | YES |
+| qty rep 1 | quantity | 0.868 | A | 0.406 | 0.144 | no |
+| qty rep 2 | quantity | 0.851 | A | 0.074 | 0.326 | YES |
+| qty rep 3 | quantity | 0.860 | A | 0.374 | 0.133 | no |
+| Phase 10 primary | IID | — | — | 0.083 | — | YES (MN-08 known draw) |
+| iid rep 1 | IID | 0.895 | A | 0.387 | 0.158 | no |
+| iid rep 2 | IID | 0.868 | A | 0.240 | 0.261 | no |
+| iid rep 3 | IID | 0.798 | A | 0.068 | 0.857 | YES |
+
+Quantity draws: 2/4 anomalous (50%).  IID draws: 2/4 anomalous (50%).  Aggregate: ‖φ‖ mean±std = 0.244±0.147 (quantity), 0.232±0.130 (IID) — statistically indistinguishable.
+
+**Verdict — IQP/quantity/seed=7:** Anomaly rate is identical under quantity-skew and IID.  Since IID has zero non-IID mechanism (equal class distribution, equal sample counts, no Dirichlet partition), the quantity partition cannot be the cause.  IQP/seed=7 has approximately a 50% per-draw anomaly rate under any distribution.  This is an initialization-specific stochastic instability: seed=7's random weight initialization places IQP near an optimization saddle where actor-RNG scheduling noise determines which of two regimes — normal convergence or near-degenerate explanation geometry — the training trajectory reaches.
+
+**Contrast with IQP/α=0.5/seed=7:** That case shows 3/3 draws anomalous (persistent), while quantity and IID show 50% stochastic rate.  The α=0.5 partition is not merely amplifying the baseline stochasticity — it qualitatively changes the optimization landscape for this seed, making the degenerate regime the consistent attractor.  Mechanism: the moderate label skew under α=0.5, combined with seed=7's initialization, likely creates a systematic gradient conflict (one or more clients contributing strongly misaligned updates) that the quantity partition (which preserves class balance across clients) does not.
+
+**MN-08 additions from Phase 14:**
+- IQP / α=0.5 / seed=7: 2/3 draws anomalous by ‖φ‖ < 0.15; all 3 below normal range → near-persistent MN-08 instance.  Distinct from the IID single-draw case (which resolved to normal after 3 replications) and from the G1-triggered full collapse cases.
+- IQP / quantity / seed=7 and IQP / IID / seed=7: ≈50% stochastic anomaly rate, partition-independent → new entry for initialization-sensitive stochastic bistability.  Not captured by original G1/G2 geometry triggers (partition geometry is normal: largest client 45.7% weight, purity 67.8%, well below G1 thresholds).
+
+**IQP/α=0.1/seed=7 — check from existing Phase 11 data:**
+Phase 11 contains 3 MN-08 draws for IQP/α=0.1/seed=7 (triggered by G1-geometry flag on that partition):
+- Draw 1: norm=0.203, Track A, acc=0.833 → below-normal (above 0.15 threshold; below normal range 0.28–0.41)
+- Draw 2: norm=0.091, Track A, acc=0.754 → ANOMALOUS
+- Draw 3: norm=0.034, Track B, acc=0.632 → ANOMALOUS (full collapse)
+
+By ‖φ‖ < 0.15: 2/3 anomalous.  Like α=0.5, zero draws reach the normal IQP norm range.  The Track-B draw (norm=0.034) may overlap with the geometry-triggered collapse mechanism that affects multiple seeds under α=0.1 — this is not necessarily seed=7-specific.  The Track-A anomalous draw (norm=0.091) is the cleaner seed=7 instability signal.
+
+**Complete cross-distribution picture for IQP/seed=7:**
+
+| Distribution | Total draws | ‖φ‖ < 0.15 (strict anomalous) | 0.15 ≤ ‖φ‖ < 0.28 (below-normal) | ‖φ‖ ≥ 0.28 (normal) | Track-B |
+|---|---|---|---|---|---|
+| IID | 4 | 2/4 (50%) | 1/4 | 1/4 | 0 |
+| quantity | 4 | 2/4 (50%) | 0/4 | 2/4 | 0 |
+| α=0.5 | 3 | 2/3 (67%) | 1/3 | 0/3 | 1 |
+| α=0.1 | 3 | 2/3 (67%) | 1/3 | 0/3 | 1 |
+
+No other IQP seed shows this pattern.  Normal IQP seeds (0, 1, 42, 123, 999) have ‖φ‖ 0.28–0.52 in nearly all non-Track-B draws.
+
+**Implications for RQ3 table:**
+- IQP/quantity condition mean and std: compute over seeds 0, 1, 42, 999 only; flag seed=7 exclusion in table footnote.
+- IQP/α=0.5/seed=7 single reported value: use JSD_cent (not JSD_iid); the IID/seed=7 baseline is unreliable (MN-08 single noisy draw, norm=0.083).  Better to exclude this seed from the IQP/α=0.5 condition mean and report the near-persistent anomaly as a separate finding.
+- IQP/α=0.1/seed=7: exclude from IQP/α=0.1 condition mean for the same reason.  The Track-B draw may be geometry-triggered (not seed=7-specific), but the Track-A anomalous draw is consistent with the seed=7 instability pattern.
+
+See the consolidated IQP/seed=7 section below for the full taxonomic write-up.
+
+---
+
+## RQ2 — Explanation stability across training rounds (IID)
+
+**Source data:** phase10_log.csv, IID federated, global client, all 4 encodings × 5 seeds, rounds 0–15.  
+**Metrics:** For each (encoding, seed), compute consecutive round-pair statistics — Kendall's tau on |φ| feature ranks, cosine similarity on φ vectors, L2 distance between consecutive round φ vectors — then average over the 15 pairs (rounds 0→1 through 14→15).  Kendall's tau uses absolute values (|φ|) because the rank of importance magnitude, not sign, is the interpretable quantity.
+
+**Note on metric resolution:** With n=4 features (PCA to 4 qubits), Kendall's tau takes only 7 distinct values (−1, −2/3, −1/3, 0, 1/3, 2/3, 1). Once a single feature dominates the ranking, tau locks at 1.0 for all subsequent pairs regardless of whether the other three features are still shifting. The metric therefore measures "does the top-ranked feature stay the same?" more than "are all four relative importances stable?" This is a resolution limitation, not a stability failure — it should be noted when interpreting values near 1.0.
+
+### Per-seed results
+
+| Encoding | Seed | Track | Acc | ‖φ‖ | mean τ | std τ | mean cos | mean L2 | std L2 |
+|----------|------|-------|-----|-----|--------|-------|----------|---------|--------|
+| angle | 1 | A | 0.851 | 0.298 | 0.978 | 0.083 | 0.999 | 0.020 | 0.013 |
+| angle | 7 | A | 0.816 | 0.320 | 0.911 | 0.191 | 0.882 | 0.022 | 0.011 |
+| angle | 42 | A | 0.851 | 0.293 | 0.889 | 0.337 | 0.944 | 0.020 | 0.012 |
+| angle | 123 | A | 0.868 | 0.273 | 0.956 | 0.113 | 0.871 | 0.019 | 0.013 |
+| angle | 999 | A | 0.868 | 0.324 | 0.911 | 0.147 | 1.000 | 0.021 | 0.014 |
+| amplitude | 1 | A | 0.965 | 0.340 | 0.933 | 0.133 | 0.870 | 0.025 | 0.020 |
+| amplitude | 7 | A | 0.965 | 0.320 | 0.956 | 0.113 | 1.000 | 0.027 | 0.026 |
+| amplitude | 42 | A | 0.930 | 0.339 | 0.889 | 0.199 | 0.972 | 0.025 | 0.021 |
+| amplitude | 123 | A | 0.930 | 0.304 | 0.911 | 0.147 | 0.992 | 0.023 | 0.016 |
+| amplitude | 999 | A | 0.956 | 0.285 | 0.844 | 0.206 | 0.870 | 0.024 | 0.027 |
+| reuploading | 1 | A | 0.939 | 0.445 | 0.911 | 0.147 | 0.870 | 0.035 | 0.037 |
+| reuploading | 7 | A | 0.930 | 0.403 | 0.933 | 0.133 | 0.991 | 0.032 | 0.022 |
+| reuploading | 42 | A | 0.939 | 0.494 | 0.867 | 0.204 | 0.992 | 0.034 | 0.033 |
+| reuploading | 123 | A | 0.947 | 0.399 | 0.822 | 0.401 | 0.975 | 0.030 | 0.026 |
+| reuploading | 999 | A | 0.956 | 0.506 | 0.933 | 0.133 | 0.994 | 0.034 | 0.030 |
+| IQP | 1 | A | 0.851 | 0.322 | 0.756 | 0.333 | 0.962 | 0.037 | 0.026 |
+| IQP | 7 †| A | 0.825 | 0.083 | 0.667 | 0.344 | 0.864 | 0.022 | 0.008 |
+| IQP | 42 | A | 0.868 | 0.354 | 0.844 | 0.295 | 0.902 | 0.030 | 0.029 |
+| IQP | 123 | A | 0.868 | 0.322 | 0.889 | 0.199 | 0.878 | 0.030 | 0.027 |
+| IQP | 999 | A | 0.886 | 0.415 | 0.956 | 0.166 | 0.996 | 0.031 | 0.025 |
+
+† IQP/seed=7: norm=0.083 is from the anomalous Phase 10 primary draw.  MN-09 documents that ~50% of IID draws for this seed are anomalous (norm < 0.15) and ~50% are normal (norm 0.24–0.41).  The τ=0.667 reflects the anomalous trajectory (near-zero explanations have noise-dominated rankings) and is not a representative stability estimate for this seed×encoding.  **Excluded from IQP encoding mean.**
+
+### Summary by encoding
+
+| Encoding | mean τ (5 seeds) | std τ | mean cos | mean L2 | Notes |
+|----------|-----------------|-------|----------|---------|-------|
+| angle | 0.929 ± 0.033 | — | 0.939 | 0.020 | — |
+| amplitude | 0.907 ± 0.038 | — | 0.941 | 0.025 | — |
+| reuploading | 0.893 ± 0.043 | — | 0.964 | 0.033 | — |
+| IQP | **0.861 ± 0.073** (n=4) | — | 0.921 | 0.030 | seed=7 excluded (MN-09: anomalous draw, norm=0.083); incl. seed=7: 0.822 ± 0.101 |
+
+### Findings
+
+**F1 — All four encodings are stable by round-to-round tau under IID.**  Mean tau (seed-7-excluded IQP) ranges 0.861–0.929.  The lowest per-seed value is IQP/seed=7 (τ=0.667), which is from the Phase 10 anomalous draw (norm=0.083, MN-09); the Phase 10 primary draw is one of two coin-flip outcomes (~50% anomaly rate under IID), not representative of IQP's typical stability.  Excluding seed=7, all 19 remaining (encoding, seed) pairs have mean τ ≥ 0.756 and 17/19 have mean τ ≥ 0.822.
+
+**F2 — Encoding ranking by tau (n=4 for IQP): angle > amplitude > reuploading > IQP.**  Differences are small (0.929 vs 0.861 extremes, ≈7pp spread using corrected IQP mean).  Within-encoding seed variance without seed=7: IQP std=0.073, comparable to angle (std=0.033) and amplitude (std=0.038).  The ranking should not be presented as a firm result; per-seed distributions overlap substantially across all four encodings.
+
+**F3 — Cosine similarity is consistently high across all encodings (0.87–1.00 per seed).**  This confirms that even when the absolute tau drops below 1.0, the explanation vectors are moving in nearly the same direction round-to-round — the explanation geometry is stable, not rotating.
+
+**F4 — Reuploading has higher L2 distance (mean 0.033) than angle and amplitude (0.020–0.025) but also higher norm (0.40–0.51).**  The L2 gap is mechanical: higher-norm vectors produce larger absolute displacements even when relative changes are the same.  Cosine similarity for reuploading (0.964) is the highest of the four encodings, consistent with this interpretation.
+
+**F5 — Within-seed tau variance is higher for IQP than for angle and amplitude.**  Per-seed std_τ for IQP (excluding seed=7): 0.17–0.33 vs angle 0.08–0.34 and amplitude 0.13–0.21.  Lower-norm seeds (IQP/seed=1: norm=0.322, the lowest non-anomalous norm) show higher within-seed variance, consistent with more noise in the ranking signal when the explanation magnitude is smaller.  IQP/seed=7's std_τ=0.344 is computed on the anomalous trajectory and is not included in the IQP characterization.
+
+**Metric limitation caveat:** At n=4 features, tau can only detect rank-order changes at the level of the dominant feature.  Subtle re-orderings among the lower-ranked features are not captured.  All values near τ=1.0 should be interpreted as "the top-ranked feature did not change" rather than "the full explanation geometry was stable."  Cosine similarity provides a complementary check that does not suffer from this discretization issue.
+
+---
+
+## MN-09 — IQP/seed=7: initialization-specific bimodal instability across all distributions
+
+**Summary:** IQP/seed=7 is bimodally unstable in its explanation geometry across all four distribution types (IID, quantity-skew, α=0.5, α=0.1). The anomaly is specific to this seed×encoding combination and is not triggered by partition geometry (G1/G2 flags are absent for the IID and quantity cases where it still manifests). It is not a training failure by the accuracy criterion — all anomalous Track-A draws have functional accuracy (0.75–0.85) — but produces near-zero explanation vectors that make the model's attribution output unreliable.
+
+**Evidence:** 14 total draws across all four distributions. See Phase 14 section above for the IID and quantity tables. Phase 11 provided 3 draws each for α=0.5 and α=0.1.
+
+**Taxonomy:**
+
+*Class-balanced conditions (IID, quantity-skew):* Stochastic bistability. Approximately 50% of training runs converge to normal explanation geometry (‖φ‖ 0.24–0.41, JSD_cent consistent with peers), the other 50% to near-degenerate geometry (‖φ‖ < 0.15, anomalously high JSD_cent). The outcome is determined by actor-RNG scheduling noise, not the data partition — confirmed by the equal anomaly rate under IID (zero non-IID mechanism) and quantity-skew. Partition geometry is normal in both cases (G1/G2 absent).
+
+*Label-skewed conditions (α=0.5, α=0.1):* The bistability shifts toward the degenerate regime. All 6 draws across both distributions have ‖φ‖ < 0.21 (below the normal IQP range of 0.28–0.41); zero draws reach normal explanation geometry. 4/6 draws are below the strict ‖φ‖ < 0.15 threshold. The moderate and severe label skew create systematic gradient conflicts that make the normal-geometry attractor largely or entirely inaccessible for seed=7's initialization. This is distinct from the G1-triggered full collapse seen in other seeds under α=0.1 (which produces Track-B models with majority-class lock): seed=7's anomalous draws are mostly Track-A with functional accuracy but near-zero attribution.
+
+*Track-B draws under label skew:* One Track-B draw appears under each of α=0.5 (acc=0.465) and α=0.1 (acc=0.632). These likely reflect the geometry-triggered collapse mechanism documented in MN-08 (G1-flagged partition with extreme class imbalance in one client), which is not seed=7-specific but compounds with the initialization instability under severe skew.
+
+**Mechanism hypothesis:** Seed=7's random weight initialization places IQP's entangling circuit near an optimization landscape saddle. Under balanced data (IID, quantity), the saddle can be cleared in approximately half of training trajectories depending on which actor-RNG trajectory the Ray scheduler takes. Under label skew (α=0.5, α=0.1), the systematic gradient imbalance from non-IID client updates consistently pushes the trajectory toward the degenerate explanation regime, not because of a catastrophic accuracy failure but because the feature-attribution signal collapses while classification accuracy is maintained.
+
+**Distinction from other documented anomalies:**
+- MN-08 IID single-draw (Phase 10 primary): One anomalous draw out of 4 total; 3 normal fresh runs. That case was interpreted as "single noisy draw, not a real finding" — correct for the IID condition in isolation, but underestimated the seed×encoding instability.
+- MN-08 α=0.5 persistent (this note): All draws below-normal under α=0.5 — different from IID bistability.
+- MN-04a amplitude/α=0.1/seed=42 bifurcation: Track B collapse specific to geometry-flagged partition, not initialization.
+
+**Reporting implications:**
+- RQ2 (stability): Exclude IQP/seed=7 from the IQP encoding mean τ. The Phase 10 primary τ=0.667 is from an anomalous draw (norm=0.083) — reporting it inflates IQP's instability score. IQP mean τ over seeds 1, 42, 123, 999 = 0.861 ± 0.073. If reporting seed=7, flag that τ reflects the anomalous trajectory and that ~50% of IID draws for this seed achieve normal norm with expected τ ≈ 0.84–0.96.
+- RQ3 (divergence): Exclude IQP/seed=7 from condition means for all four distributions. JSD values from anomalous draws are not informative about distribution-level explanation fidelity.
+- RQ1 (fidelity): Same exclusion applies. Do not use IQP/seed=7's JSD as evidence about IQP's general fidelity under any condition.
+- What can be reported: IQP/seed=7 as a standalone case study in initialization-specific instability under federated training. The finding is that a specific quantum initialization can produce systematically unreliable explanations without accuracy failure — a failure mode not visible in accuracy metrics alone.
