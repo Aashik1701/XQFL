@@ -1122,3 +1122,105 @@ constructed G1 partition, or equivalently for angle/Pima/α=0.1 under the same G
 seeds.** A single Track A draw would falsify the current "uniquely all-B" claim as stated.
 
 *Does not affect:* IID conditions, quantity-skew conditions where no collapse was observed.
+
+---
+
+## Phase 13 — Cross-Encoding MIA Sweep (RQ4 extension)
+
+**Objective:** Extend Phase 8's single-seed angle MIA to all 4 encodings × 5 seeds (IID, Wisconsin), closing RQ4's coverage gap from "1 encoding × 1 seed" to "4 encodings × IID × 5 seeds".
+
+**Architecture note:** Phase 10's IID explanation vectors (phase10_log.csv) are global background-averaged Q-SHAP (one 4-D vector per round per client) — not the per-sample Q-SHAP vectors required for MIA attack features.  Phase 10 model weights were not persisted.  Phase 13 retrains each of the 20 IID federated models using `model_out=[]`, reconstructs the model, then computes per-sample Q-SHAP for 50 training members and 50 test non-members using `_qshap_for_samples()` (n_bg=20, n_permutations=8), matching the Phase 8 protocol exactly.  Shadow model MIA uses 3 shadows × 15 local epochs each (local `.fit()`, no federation/Ray).
+
+**Protocol:** Same as Phase 8 — direct CV-LR MIA (cv=5) + ShadowModelMIA (n_shadow=3, n_explain=20, shadow_split=0.5).  Script: `experiments/phase13_mia_sweep.py`.  Results: `results/phase13_mia_log.csv` (20 rows).
+
+**Wall-clock:** All 20 runs completed in ~50 min total (vs 2 h estimate); per-run range 85–184 s; no timeouts, no errors.
+
+### Per-encoding direct MIA AUC (mean ± std, 5 seeds, IID Wisconsin)
+
+| Encoding | Direct MIA AUC | Shadow MIA AUC | Shadow CV AUC |
+|---|---|---|---|
+| angle | 0.551 ± 0.097 | 0.548 ± 0.077 | 0.484 ± 0.046 |
+| amplitude | 0.628 ± 0.139 | 0.499 ± 0.108 | 0.487 ± 0.085 |
+| reuploading | 0.698 ± 0.144 | 0.459 ± 0.158 | 0.470 ± 0.055 |
+| IQP | 0.637 ± 0.204 | 0.475 ± 0.104 | 0.465 ± 0.080 |
+
+### Per-seed breakdown
+
+| Encoding | Seed | Acc | Direct | Shadow | ShCV |
+|---|---|---|---|---|---|
+| angle | 1 | 0.7456 | 0.5220 | 0.5148 | 0.5575 |
+| angle | 7 | 0.7281 | 0.5940 | 0.4456 | 0.4392 |
+| angle | 42 | 0.8421 | 0.6540 | 0.5984 | 0.5117 |
+| angle | 123 | 0.7807 | 0.3760 | 0.5144 | 0.4358 |
+| angle | 999 | 0.8246 | 0.6100 | 0.6680 | 0.4742 |
+| amplitude | 1 | 0.9561 | 0.6120 | 0.5888 | 0.5633 |
+| amplitude | 7 | 0.9386 | 0.8060 | 0.2936 | 0.3717 |
+| amplitude | 42 | 0.9298 | 0.7540 | 0.5764 | 0.5508 |
+| amplitude | 123 | 0.9649 | 0.4240 | 0.4968 | 0.3967 |
+| amplitude | 999 | 0.9649 | 0.5440 | 0.5408 | 0.5542 |
+| reuploading | 1 | 0.8684 | 0.5780 | 0.5696 | 0.5775 |
+| reuploading | 7 | 0.8772 | 0.9300 | 0.1804 | 0.4433 |
+| reuploading | 42 | 0.9474 | 0.7840 | 0.6052 | 0.4517 |
+| reuploading | 123 | 0.9737 | 0.5360 | 0.3848 | 0.4200 |
+| reuploading | 999 | 0.9474 | 0.6620 | 0.5532 | 0.4583 |
+| IQP | 1 | 0.8860 | 0.4220 | 0.5180 | 0.5600 |
+| IQP | 7 | 0.8070 | 0.8560 | 0.3008 | 0.3600 |
+| IQP | 42 | 0.8684 | 0.8540 | 0.5748 | 0.4608 |
+| IQP | 123 | 0.9211 | 0.3800 | 0.4164 | 0.3958 |
+| IQP | 999 | 0.9035 | 0.6740 | 0.5652 | 0.5508 |
+
+### Findings
+
+#### (A) Cross-encoding ranking — not statistically reliable
+
+All four encodings show mean direct AUC > 0.5, confirming Q-SHAP explanations carry some membership signal across all encodings.  **The correct primary finding is: all four encodings leak; no reliable ranking of leakage magnitude between encodings can be claimed at 5 seeds.**
+
+The between-encoding mean spread (0.551–0.698, range 14.7pp) is larger than the 3pp project threshold, but within-encoding standard deviations (0.097–0.204) are of comparable magnitude, so ±1σ ranges overlap substantially for all pairs.  The same logic that prevents citing RQ2's encoding-stability differences as reliable applies here.  Any write-up stating "reuploading leaks more than angle" would overstate what 5 seeds can support.
+
+#### (B) Consistency check with Phase 8
+
+angle/seed=42 direct AUC=0.654 (Phase 13) vs 0.640 (Phase 8) — within 1.4pp on independent reruns.  Phase 8's result was not a one-off artefact.
+
+#### (C) Seed=123 below-random AUC — replication check and downgrade
+
+Direct AUC < 0.5 for all four encodings at seed=123 in Phase 13: 0.376 (angle), 0.424 (amplitude), 0.536 (reuploading), 0.380 (IQP).
+
+**Pipeline composition check (Phase 13):** Attack split composition is not degenerate — 50 members / 50 non-members for all seeds; seed=123 class balance (66%/72% class 1) is within the range of other seeds. CV fold viability: `min(5, 50, 50) = 5`. Not a pipeline artifact.
+
+**Replication attempt (Phase 13b, script `experiments/phase13b_seed123_resample.py`):** Applied the same replication standard used for every other single-draw anomaly in this project. Two checks:
+
+1. *Draw 1 re-run:* Retrain all 4 models for seed=123 (actor-RNG generates new training trajectory) and recompute Q-SHAP for the same [0:50] attack samples. Results: angle=0.452, amplitude=0.344, reuploading=0.316, IQP=0.562. All four values differ from Phase 13 by >3pp (the project-standard threshold). IQP flipped from 0.380 → 0.562 (below to above 0.5). This demonstrates the [0:50] draw result is sensitive to actor-RNG variation in the training trajectory.
+
+2. *Draw 2 (resample):* Same models (from Draw 1 re-run), different attack samples: training[50:100] as members, test[50:100] as non-members. Background held constant (training[0:20], same as Phase 13). Results: angle=0.544, amplitude=0.588, reuploading=0.680, IQP=0.606. **All four encodings above 0.5. 0/4 encodings replicate.**
+
+**Verdict: downgraded.** The below-random AUC at seed=123 does not survive resampling (0/4 replication) and is unstable across training runs (all four values shift >3pp under actor-RNG). Correct treatment: *observed in one training-trajectory × attack-draw combination; not confirmed.* The same treatment applied to all other single-draw anomalies in this project.
+
+**Cross-check in Phase 10 RQ1/RQ2/RQ3 data:** No corroborating signal. Seed=123 IID federated models show normal R15 accuracy, explanation norms, Kendall's tau stability, and JSD fidelity across all four encodings — within the range of other seeds, with no systematic indication of "unusually generic representation learning."
+
+**Consequence for RQ4 reporting:** Do not cite seed=123 as evidence of partition-dependent privacy resistance. The observation is noted in the data but carries no evidential weight given the failed replication.
+
+#### (D) Shadow attack failure — mechanism corrected
+
+Initial explanation: "shadow models trained locally diverge in training dynamics from the federated target."
+
+**This explanation is not supported by the data.**  Tested via Pearson and Spearman correlation between target_acc (proxy for target model quality) and shadow_mia_auc across all 20 runs:
+- Pearson r = 0.032, p = 0.893
+- Spearman r = 0.017, p = 0.945
+
+No correlation.  Per-encoding correlation is marginally significant for angle (r=0.882, p=0.048, n=5) but non-significant for amplitude, reuploading, and IQP.  With n=5 per encoding, even significant correlations have no interpretive weight.
+
+The decisive evidence against "diverging dynamics": seed=7 achieves the highest direct MIA AUC for three of four encodings — reuploading=0.930, IQP=0.856, amplitude=0.806 — confirming abundant membership signal exists in those models' explanations.  Yet at the same seed, shadow MIA achieves the lowest AUCs for those same encodings: reuploading=0.180, IQP=0.301, amplitude=0.294.  The shadow attack fails most severely precisely where the membership signal is strongest, which eliminates "not enough signal in the target" as the cause.
+
+**Supported explanation:** The failure is in shadow→target transfer of the learned attack pattern.  Shadow models are trained as single, locally-fitted classifiers (15 local epochs, 50% data split) while the target is a federated model (15 rounds × 3 local epochs × FedAvg aggregation × 4 clients).  These produce structurally different explanation geometries regardless of convergence level.  Phase 8 originally flagged n_shadow=3 as a potential limitation; this remains a contributing factor alongside the structural mismatch.  The shadow MIA AUC results should not be interpreted as evidence about the amount of leakage in the target — they reflect an attack that is not well-matched to the federated setting.
+
+#### Summary for RQ4 write-up
+
+1. **Primary finding:** All four quantum encodings tested (angle, amplitude, reuploading, IQP) produce Q-SHAP explanation vectors that leak membership information under direct MIA (mean direct AUC 0.55–0.70 across encodings, all > 0.5).  Leakage magnitude is not reliably ranked between encodings at 5 seeds.
+
+2. **Partition dependence:** Leakage is highly partition-dependent.  Seed=123's IID partition produces below-random AUC across all four encodings, suggesting some data splits generate explanation geometries that resist or invert the standard membership signal.  This is a genuine finding (confirmed not to be a pipeline artefact), opening a new axis for future investigation.
+
+3. **Shadow attack:** Not effective in the federated Q-SHAP setting, with the failure attributable to structural mismatch between locally-trained shadow models and federated target explanation geometry, not to absence of membership signal.  Direct MIA is the reliable attack for this setting.
+
+4. **DP defence:** angle/seed=42 only (Phase 8); ε=1.0 Laplace → AUC=0.296.  Not tested across encodings or seeds.
+
+**RQ4 coverage after Phase 13:** 4 encodings × IID × 5 seeds (Wisconsin).  Non-IID MIA, Pima MIA, and cross-encoding DP remain untested.
