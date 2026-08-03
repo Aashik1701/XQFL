@@ -1464,23 +1464,32 @@ Quantity draws: 2/4 anomalous (50%).  IID draws: 2/4 anomalous (50%).  Aggregate
 - IQP / quantity / seed=7 and IQP / IID / seed=7: ≈50% stochastic anomaly rate, partition-independent → new entry for initialization-sensitive stochastic bistability.  Not captured by original G1/G2 geometry triggers (partition geometry is normal: largest client 45.7% weight, purity 67.8%, well below G1 thresholds).
 
 **IQP/α=0.1/seed=7 — check from existing Phase 11 data:**
-Phase 11 contains 3 MN-08 draws for IQP/α=0.1/seed=7 (triggered by G1-geometry flag on that partition):
+Phase 11 contains 3 MN-08 draws for IQP/α=0.1/seed=7 (triggered by Trigger S — statistical outlier in accuracy; G1/G2 geometry flags are NONE for this partition, confirmed by Phase 15):
 - Draw 1: norm=0.203, Track A, acc=0.833 → below-normal (above 0.15 threshold; below normal range 0.28–0.41)
 - Draw 2: norm=0.091, Track A, acc=0.754 → ANOMALOUS
-- Draw 3: norm=0.034, Track B, acc=0.632 → ANOMALOUS (full collapse)
+- Draw 3: norm=0.034, Track B, acc=0.632 → ANOMALOUS (full collapse, not geometry-triggered)
 
-By ‖φ‖ < 0.15: 2/3 anomalous.  Like α=0.5, zero draws reach the normal IQP norm range.  The Track-B draw (norm=0.034) may overlap with the geometry-triggered collapse mechanism that affects multiple seeds under α=0.1 — this is not necessarily seed=7-specific.  The Track-A anomalous draw (norm=0.091) is the cleaner seed=7 instability signal.
+By ‖φ‖ < 0.15: 2/3 anomalous.  Like α=0.5, zero draws reach the normal IQP norm range.  Because G1/G2 = NONE, the Track-B draw is not explained by the geometry-triggered majority-class-lock mechanism that causes collapse in other seeds under α=0.1 — it is seed=7's initialization instability reaching its most severe form under label skew without any unusual partition geometry.  The Track-A anomalous draw (norm=0.091) provides the cleaner seed=7 instability signal.
 
-**Complete cross-distribution picture for IQP/seed=7:**
+**Phase 15 — draw 4 each for α=0.5 and α=0.1 (experiments/phase15_iqp_seed7_label_skew.py):**
 
-| Distribution | Total draws | ‖φ‖ < 0.15 (strict anomalous) | 0.15 ≤ ‖φ‖ < 0.28 (below-normal) | ‖φ‖ ≥ 0.28 (normal) | Track-B |
-|---|---|---|---|---|---|
-| IID | 4 | 2/4 (50%) | 1/4 | 1/4 | 0 |
-| quantity | 4 | 2/4 (50%) | 0/4 | 2/4 | 0 |
-| α=0.5 | 3 | 2/3 (67%) | 1/3 | 0/3 | 1 |
-| α=0.1 | 3 | 2/3 (67%) | 1/3 | 0/3 | 1 |
+Both n=3 counts rested on samples too small to distinguish "hard zero escape probability" from "50% Bernoulli rate with 0/3 normal by chance (p=0.125)."  Phase 15 added one fresh draw per condition.  Partition geometry confirmed G1/G2 = NONE for both (consistent with Phase 11 not having been triggered by Trigger G for either condition — Trigger S fired on accuracy outlier).
 
-No other IQP seed shows this pattern.  Normal IQP seeds (0, 1, 42, 123, 999) have ‖φ‖ 0.28–0.52 in nearly all non-Track-B draws.
+- α=0.5 draw 4: acc=0.421, Track B, ‖φ‖=0.122, JSD_cent=0.224 → ANOMALOUS (full collapse, second Track-B draw for this condition)
+- α=0.1 draw 4: acc=0.798, Track A, ‖φ‖=0.271, JSD_cent=0.326 → below-normal (closest any label-skew draw has reached to the normal ‖φ‖ ≥ 0.28 threshold; 2.5% below)
+
+Both conditions remain at 0/4 normal draws.
+
+**Complete cross-distribution picture for IQP/seed=7 (Phase 15 final):**
+
+| Distribution | Total draws | ‖φ‖ < 0.15 (anomalous) | 0.15 ≤ ‖φ‖ < 0.28 (below-normal) | ‖φ‖ ≥ 0.28 (normal) | Track-B | G1/G2 |
+|---|---|---|---|---|---|---|
+| IID | 4 | 2/4 (50%) | 1/4 | 1/4 | 0 | NONE |
+| quantity | 4 | 2/4 (50%) | 0/4 | 2/4 | 0 | NONE |
+| α=0.5 | 4 | 3/4 (75%) | 1/4 | 0/4 | 2 | NONE |
+| α=0.1 | 4 | 2/4 (50%) | 2/4 | 0/4 | 1 | NONE |
+
+No other IQP seed shows this pattern.  Normal IQP seeds (1, 42, 123, 999) have ‖φ‖ 0.28–0.52 in nearly all non-Track-B draws.  G1/G2 = NONE across all four conditions confirms the anomaly is not geometry-triggered.
 
 **Implications for RQ3 table:**
 - IQP/quantity condition mean and std: compute over seeds 0, 1, 42, 999 only; flag seed=7 exclusion in table footnote.
@@ -1552,24 +1561,24 @@ See the consolidated IQP/seed=7 section below for the full taxonomic write-up.
 
 ## MN-09 — IQP/seed=7: initialization-specific bimodal instability across all distributions
 
-**Summary:** IQP/seed=7 is bimodally unstable in its explanation geometry across all four distribution types (IID, quantity-skew, α=0.5, α=0.1). The anomaly is specific to this seed×encoding combination and is not triggered by partition geometry (G1/G2 flags are absent for the IID and quantity cases where it still manifests). It is not a training failure by the accuracy criterion — all anomalous Track-A draws have functional accuracy (0.75–0.85) — but produces near-zero explanation vectors that make the model's attribution output unreliable.
+**Summary:** IQP/seed=7 is bimodally unstable in its explanation geometry across all four distribution types (IID, quantity-skew, α=0.5, α=0.1). The anomaly is specific to this seed×encoding combination and is not triggered by partition geometry — G1/G2 flags are absent for all four conditions (confirmed by Phase 15 for the label-skew partitions). It is not a training failure by the accuracy criterion — all anomalous Track-A draws have functional accuracy (0.75–0.85) — but produces near-zero explanation vectors that make the model's attribution output unreliable.
 
-**Evidence:** 14 total draws across all four distributions. See Phase 14 section above for the IID and quantity tables. Phase 11 provided 3 draws each for α=0.5 and α=0.1.
+**Evidence:** 16 total draws across all four distributions (Phase 15 closed at n=4 per condition). See Phase 14 section above for the IID and quantity tables; Phase 15 section above for the α=0.5 and α=0.1 draw 4 results. Phase 11 provided draws 1–3 for the label-skew conditions.
 
 **Taxonomy:**
 
 *Class-balanced conditions (IID, quantity-skew):* Stochastic bistability. Approximately 50% of training runs converge to normal explanation geometry (‖φ‖ 0.24–0.41, JSD_cent consistent with peers), the other 50% to near-degenerate geometry (‖φ‖ < 0.15, anomalously high JSD_cent). The outcome is determined by actor-RNG scheduling noise, not the data partition — confirmed by the equal anomaly rate under IID (zero non-IID mechanism) and quantity-skew. Partition geometry is normal in both cases (G1/G2 absent).
 
-*Label-skewed conditions (α=0.5, α=0.1):* The bistability shifts toward the degenerate regime. All 6 draws across both distributions have ‖φ‖ < 0.21 (below the normal IQP range of 0.28–0.41); zero draws reach normal explanation geometry. 4/6 draws are below the strict ‖φ‖ < 0.15 threshold. The moderate and severe label skew create systematic gradient conflicts that make the normal-geometry attractor largely or entirely inaccessible for seed=7's initialization. This is distinct from the G1-triggered full collapse seen in other seeds under α=0.1 (which produces Track-B models with majority-class lock): seed=7's anomalous draws are mostly Track-A with functional accuracy but near-zero attribution.
+*Label-skewed conditions (α=0.5, α=0.1):* The bistability shifts toward the degenerate regime. All 8 draws across both distributions (n=4 each, Phase 15 confirmed) have ‖φ‖ < 0.28 (below the normal IQP range); zero draws reach normal explanation geometry. The closest approach is α=0.1 draw 4 at ‖φ‖=0.271 — 2.5% below the 0.28 threshold, and notably the only label-skew draw that is not also strictly anomalous (‖φ‖ ≥ 0.15). Label skew consistently prevents seed=7's IQP from reaching the normal explanation geometry that roughly half of IID and quantity-skew runs achieve. The 0.271 result suggests the α=0.1 escape probability may be slightly higher than α=0.5 (where the highest norm across 4 draws is 0.182), but both are zero at n=4.
 
-*Track-B draws under label skew:* One Track-B draw appears under each of α=0.5 (acc=0.465) and α=0.1 (acc=0.632). These likely reflect the geometry-triggered collapse mechanism documented in MN-08 (G1-flagged partition with extreme class imbalance in one client), which is not seed=7-specific but compounds with the initialization instability under severe skew.
+*Track-B draws under label skew:* Two Track-B draws appear under α=0.5 (acc=0.465 and acc=0.421, Phase 11 draws 3 and 4) and one under α=0.1 (acc=0.632, Phase 11 draw 3). Phase 15 confirms G1/G2 = NONE for both label-skew partitions — these collapses are therefore NOT explained by the geometry-triggered majority-class-lock mechanism that causes Track-B in other seeds under α=0.1. They are seed=7's initialization instability reaching its most severe form (full accuracy collapse) under label skew, without any unusual partition geometry as the proximate trigger. This is distinct from MN-08's geometry-triggered collapse in other seeds, which requires extreme partition structure (G1: ≥60% weight + ≥90% purity).
 
 **Mechanism hypothesis:** Seed=7's random weight initialization places IQP's entangling circuit near an optimization landscape saddle. Under balanced data (IID, quantity), the saddle can be cleared in approximately half of training trajectories depending on which actor-RNG trajectory the Ray scheduler takes. Under label skew (α=0.5, α=0.1), the systematic gradient imbalance from non-IID client updates consistently pushes the trajectory toward the degenerate explanation regime, not because of a catastrophic accuracy failure but because the feature-attribution signal collapses while classification accuracy is maintained.
 
 **Distinction from other documented anomalies:**
 - MN-08 IID single-draw (Phase 10 primary): One anomalous draw out of 4 total; 3 normal fresh runs. That case was interpreted as "single noisy draw, not a real finding" — correct for the IID condition in isolation, but underestimated the seed×encoding instability.
-- MN-08 α=0.5 persistent (this note): All draws below-normal under α=0.5 — different from IID bistability.
-- MN-04a amplitude/α=0.1/seed=42 bifurcation: Track B collapse specific to geometry-flagged partition, not initialization.
+- MN-08 α=0.5 persistent (Phase 15 confirmed): 4/4 draws below-normal, 3/4 strictly anomalous, 2/4 Track-B — zero draws reach normal geometry at n=4. Distinctly more severe than IID (~50% normal).
+- MN-04a amplitude/α=0.1/seed=42 bifurcation: Track-B collapse specific to G1-flagged partition geometry. IQP/seed=7's Track-B draws under label skew are qualitatively different — G1/G2 = NONE, so the collapse arises from the initialization instability alone, not extreme partition geometry.
 
 **Reporting implications:**
 - RQ2 (stability): Exclude IQP/seed=7 from the IQP encoding mean τ. The Phase 10 primary τ=0.667 is from an anomalous draw (norm=0.083) — reporting it inflates IQP's instability score. IQP mean τ over seeds 1, 42, 123, 999 = 0.861 ± 0.073. If reporting seed=7, flag that τ reflects the anomalous trajectory and that ~50% of IID draws for this seed achieve normal norm with expected τ ≈ 0.84–0.96.
