@@ -88,6 +88,14 @@ class XQFLClient(NumPyClient):
         (weights, n_samples, metrics)
         """
         self.model.set_weights(parameters)
+        # Ghost-client guard: Dirichlet α << 1 can assign 0 samples to a client.
+        # Return global weights unchanged with num_examples=0 so FedAvg weights
+        # this client at zero — it contributes nothing to the round's aggregation.
+        if len(self.X_train) == 0:
+            print(f"  [Client {self.client_id}] GHOST: 0 local samples — skipping fit")
+            return self.model.get_weights(), 0, {
+                "client_id": self.client_id, "accuracy": 0.0,
+            }
         self.model.fit(
             self.X_train, self.y_train,
             epochs=self.local_epochs,
@@ -116,6 +124,8 @@ class XQFLClient(NumPyClient):
         -------
         (loss, n_samples, metrics)  — loss = 1 - train_accuracy
         """
+        if len(self.X_train) == 0:
+            return 0.0, 0, {"accuracy": 0.0}
         self.model.set_weights(parameters)
         acc  = float((self.model.predict(self.X_train) == self.y_train).mean())
         loss = 1.0 - acc

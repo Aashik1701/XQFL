@@ -119,8 +119,11 @@ def run_federation(
     partitions = _partition_data(X_train, y_train, n_clients, split, seed,
                                   dirichlet_alpha=dirichlet_alpha)
     for i, (Xi, yi) in enumerate(partitions):
-        print(f"  Client {i}: {len(Xi)} samples  "
-              f"(class 1 ratio: {yi.mean():.2f})")
+        if len(Xi) == 0:
+            print(f"  Client {i}: 0 samples  [GHOST — will be skipped in fit]")
+        else:
+            print(f"  Client {i}: {len(Xi)} samples  "
+                  f"(class 1 ratio: {yi.mean():.2f})")
 
     # ── 3. server-side evaluation model ─────────────────────────────────────
     from models.quantum_classifier import HybridQuantumClassifier
