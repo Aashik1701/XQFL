@@ -1,0 +1,16 @@
+run_key,accuracy,track,status,completed_at
+angle|G1-W1|seed200|draw1,0.3684,Track B,done,2026-08-04T05:25:53.021749+00:00
+angle|G1-W1|seed200|draw2,0.6316,Track B,done,2026-08-04T05:27:26.458290+00:00
+angle|G1-W1|seed200|draw3,0.6316,Track B,done,2026-08-04T05:29:56.994691+00:00
+angle|G1-W2|seed200|draw1,0.6667,Track A,done,2026-08-04T05:31:47.973072+00:00
+angle|G1-W2|seed200|draw2,0.7193,Track A,done,2026-08-04T05:33:17.236315+00:00
+angle|G1-W2|seed200|draw3,0.6754,Track A,done,2026-08-04T05:34:48.688997+00:00
+angle|G1-W3|seed200|draw1,0.6842,Track A,done,2026-08-04T05:36:24.941813+00:00
+angle|G1-W3|seed200|draw2,0.7456,Track A,done,2026-08-04T05:38:19.721685+00:00
+angle|G1-W3|seed200|draw3,0.3684,Track B,done,2026-08-04T05:39:05.460180+00:00
+angle|G1-P1|seed200|draw1,0.6494,Track B,done,2026-08-04T05:41:00.943980+00:00
+angle|G1-P1|seed200|draw2,0.6494,Track B,done,2026-08-04T05:43:00.534820+00:00
+angle|G1-P1|seed200|draw3,0.6494,Track B,done,2026-08-04T05:44:55.555441+00:00
+angle|G1-P2|seed200|draw1,0.6299,Track B,done,2026-08-04T05:46:52.878921+00:00
+angle|G1-P2|seed200|draw2,0.3571,Track B,done,2026-08-04T05:47:48.374986+00:00
+angle|G1-P2|seed200|draw3,0.3636,Track B,done,2026-08-04T05:48:49.020161+00:00
