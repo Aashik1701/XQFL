@@ -79,6 +79,7 @@ def run_federation(
     n_permutations=0,    # Q-SHAP permutations; 0 = skip (Phase 5 default)
     model_out=None,      # if a list is passed, final-round weights are appended to it
     ray_local_mode=False, # True → ray.init(local_mode=True), forces sequential execution
+    precomputed_partitions=None,  # if provided, skip _partition_data entirely
 ):
     """Run federated learning simulation.
 
@@ -116,8 +117,11 @@ def run_federation(
     shared_pca, shared_scaler = _fit_shared_preprocessor(X_train, n_qubits)
 
     # ── 2. data partitioning ────────────────────────────────────────────────
-    partitions = _partition_data(X_train, y_train, n_clients, split, seed,
-                                  dirichlet_alpha=dirichlet_alpha)
+    if precomputed_partitions is not None:
+        partitions = precomputed_partitions
+    else:
+        partitions = _partition_data(X_train, y_train, n_clients, split, seed,
+                                     dirichlet_alpha=dirichlet_alpha)
     for i, (Xi, yi) in enumerate(partitions):
         if len(Xi) == 0:
             print(f"  Client {i}: 0 samples  [GHOST — will be skipped in fit]")

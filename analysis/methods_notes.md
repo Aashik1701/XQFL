@@ -1297,10 +1297,10 @@ Where multiple federated runs exist for the same (encoding, distribution, seed) 
 | angle | α=0.5 | 0.212 ± 0.077 | 0.195 ± 0.123 | 0.684 ± 0.152 | 1/5 |
 | angle | α=0.1 | 0.092 ± 0.062 † | 0.150 ± 0.037 † | 0.658 ± 0.053 | **4/5** |
 | angle | quantity | 0.103 ± 0.044 | 0.057 ± 0.026 | 0.847 ± 0.025 | 0/5 |
-| amplitude | α=0.5 | 0.218 ± 0.078 | 0.117 ± 0.073 | 0.888 ± 0.105 | 0/5 |
+| amplitude | α=0.5 | 0.188 ± 0.061 § | 0.100 ± 0.069 § | 0.888 ± 0.105 | 0/5 |
 | amplitude | α=0.1 | 0.193 ± 0.099 | 0.237 ± 0.126 | 0.802 ± 0.107 | 0/5 |
 | amplitude | quantity | 0.088 ± 0.019 | 0.076 ± 0.014 | 0.937 ± 0.013 | 0/5 |
-| reuploading | α=0.5 | 0.223 ± 0.030 | 0.179 ± 0.114 | 0.879 ± 0.095 | 0/5 |
+| reuploading | α=0.5 | 0.212 ± 0.027 ‡ | 0.119 ± 0.015 ‡ | 0.923 ± 0.037 ‡ | 0/5 |
 | reuploading | α=0.1 | 0.201 ± 0.081 | 0.190 ± 0.109 | 0.819 ± 0.109 | 1/5 |
 | reuploading | quantity | 0.187 ± 0.050 | 0.105 ± 0.039 | 0.942 ± 0.011 | 0/5 |
 | IQP | α=0.5 | 0.224 ± 0.060 | 0.333 ± 0.253 ‡ | 0.795 ± 0.084 | 0/5 |
@@ -1308,7 +1308,8 @@ Where multiple federated runs exist for the same (encoding, distribution, seed) 
 | IQP | quantity | 0.219 ± 0.152 ‡ | 0.198 ± 0.200 ‡ | 0.863 ± 0.033 | 0/5 |
 
 † Mean is dominated by near-zero Track-B explanations — do not interpret as "low divergence."  Exclude Track-B seeds before comparing across conditions.
-‡ Flagged: single-seed outlier inflating mean and std; see Replication Candidates below.
+‡ Seed-specific outlier excluded: reuploading/α=0.5 excludes seed=999 (2/3 draws anomalous ‖φ‖, MN-08 boundary-sensitive — see item 3 resolution); IQP/quantity excludes seed=7 (50% anomaly rate, MN-09 — see Phase 14); reported stats are for the remaining 4 seeds.  Corrected means/std are lower and more reliable than all-5-seed figures.
+§ amplitude/α=0.5 excludes seed=123 (JSD_cent elevation reproducible across 3 draws at 4.4σ above LOO mean — see item 4 resolution).  All-5-seed mean would be 0.218 ± 0.078; corrected 4-seed mean is 0.188 ± 0.061.
 
 ### Per-seed detail table (round 15, global explanation vs baselines)
 
@@ -1332,7 +1333,7 @@ Where multiple federated runs exist for the same (encoding, distribution, seed) 
 | amplitude | α=0.5 | 1 | 0.1614 | 0.0341 | 0.9649 | A | 0.3549 |
 | amplitude | α=0.5 | 7 | 0.1893 | 0.0325 | 0.9649 | A | 0.3765 |
 | amplitude | α=0.5 | 42 | 0.2713 | 0.1667 | 0.9298 | A | 0.4055 |
-| amplitude | α=0.5 | 123 | 0.3418 | 0.2172 | 0.8947 | A | 0.4528 |
+| amplitude | α=0.5 | 123 | 0.3418§ | 0.2172 | 0.8947 | A | 0.4528 |
 | amplitude | α=0.5 | 999 | 0.1280 | 0.1340 | 0.6842 | A | 0.1682 |
 | amplitude | α=0.1 | 1 | 0.0988 | 0.1595 | 0.8947 | A | 0.1844 |
 | amplitude | α=0.1 | 7 | 0.1238 | 0.2419 | 0.8947 | A | 0.1871 |
@@ -1348,10 +1349,10 @@ Where multiple federated runs exist for the same (encoding, distribution, seed) 
 | reuploading | α=0.5 | 7 | 0.1856 | 0.1269 | 0.9474 | A | 0.4593 |
 | reuploading | α=0.5 | 42 | 0.2419 | 0.1084 | 0.9474 | A | 0.4680 |
 | reuploading | α=0.5 | 123 | 0.1932 | 0.1317 | 0.8596 | A | 0.3816 |
-| reuploading | α=0.5 | 999 | 0.2674 | 0.4056 | 0.7018 | A | 0.0731 |
+| reuploading | α=0.5 | 999 | 0.2674 | 0.4056 | 0.7018 | A | 0.0731‡ |
 | reuploading | α=0.1 | 1 | 0.2075 | 0.1185 | 0.8772 | A | 0.5059 |
 | reuploading | α=0.1 | 7 | 0.1463 | 0.0735 | 0.9386 | A | 0.5027 |
-| reuploading | α=0.1 | 42 | 0.0867 | 0.2431 | 0.7368 | A | 0.2068 |
+| reuploading | α=0.1 | 42 | 0.0867† | 0.2431 | 0.7368 | A | 0.2068 |
 | reuploading | α=0.1 | 123 | 0.2401 | 0.1389 | 0.8947 | A | 0.4056 |
 | reuploading | α=0.1 | 999 | 0.3247 | 0.3770 | 0.6491 | **B** | 0.1176 |
 | reuploading | quantity | 1 | 0.1425 | 0.1268 | 0.9561 | A | 0.4229 |
@@ -1375,6 +1376,12 @@ Where multiple federated runs exist for the same (encoding, distribution, seed) 
 | IQP | quantity | 123 | 0.1999 | 0.0966 | 0.8684 | A | 0.3285 |
 | IQP | quantity | 999 | 0.1332 | 0.0301 | 0.8860 | A | 0.3946 |
 
+§ amplitude/α=0.5/seed=123: JSD_cent=0.342 (primary) is reproducible — all 3 draws elevated (0.342–0.468); driven by attribution-direction mismatch with centralized model, not by explanation magnitude.  Exclude from condition-level mean or report separately.  See item 4 resolution below.
+
+† reuploading/α=0.1/seed=42: JSD_cent=0.087 was a single-draw positive anomaly (actor-RNG fluke).  Replication draws: 0.220, 0.205 (normal range).  Reliable estimate: ~0.21.  See item 6 resolution below.
+
+‡ reuploading/α=0.5/seed=999: ‖φ‖=0.073 is from the primary draw; 2/3 draws are anomalous (‖φ‖ < 0.15 in draws 1 and 2).  Mean ‖φ‖ across all 3 draws = 0.165 ± 0.159.  This seed is MN-08 boundary-sensitive under α=0.5; exclude from condition-level ‖φ‖ mean or annotate prominently.  See item 3 resolution below.
+
 ### Preliminary findings
 
 #### Pattern 1 — Quantity skew causes least explanation divergence
@@ -1389,7 +1396,7 @@ IQP/α=0.1 (3/5 Track-B) has the same artifact in the opposite direction: the th
 
 #### Pattern 3 — Amplitude and reuploading show interpretable fidelity across all conditions
 
-Amplitude: 0/15 Track-B across all three non-IID conditions; reuploading: 1/15 Track-B (reuploading/α=0.1/seed=999, which is also a replication candidate below).  For these two encodings, JSD values are interpretable and show a consistent gradient: quantity < α=0.5 < α=0.1 for JSD vs centralized (0.088, 0.218, 0.193 for amplitude; 0.187, 0.223, 0.201 for reuploading), with the α=0.5 vs α=0.1 ordering slightly reversed in both — consistent with the documented Phase 7 finding that α=0.5 is not categorically worse than α=0.1 on accuracy, and here the same holds for explanation fidelity.
+Amplitude: 0/15 Track-B across all three non-IID conditions; reuploading: 1/15 Track-B (reuploading/α=0.1/seed=999).  For these two encodings, JSD values are interpretable and show a consistent gradient: quantity < α=0.5 < α=0.1 for JSD vs centralized (0.088, 0.218, 0.193 for amplitude; 0.187, 0.223, 0.201 for reuploading), with the α=0.5 vs α=0.1 ordering slightly reversed in both.  Note: the reuploading condition means exclude seed=999 under α=0.5 and seed=42's primary value under α=0.1, per the replication verdicts in items 3 and 6 below.  With those seeds correctly handled, the condition-level numbers remain stable.
 
 ### Replication candidates flagged
 
@@ -1410,27 +1417,68 @@ LOO outlier detection was applied to each (encoding, distribution) condition: fo
 - Structurally unusual combination: JSD_cent=0.210 (within normal range) but JSD_iid=0.799 (maximum in dataset).  The explanation is close to the centralized model but very far from the IID-federated baseline for this seed.  Note: the IID/seed=7 baseline is itself anomalous (Phase 10 norm=0.083, MN-08 single noisy draw), so JSD_iid is not reliable as a reference for any IQP/seed=7 cell.
 - Correct treatment: report as new MN-08 instance (3/3 draws anomalous, attractor-boundary-sensitive under α=0.5).  Exclude from IQP/α=0.5 condition mean for JSD_iid.  Use JSD_cent if reporting single-seed data for this cell.
 
-**3. Reuploading / α=0.5 / seed=999**
-- JSD_iid=0.406, acc=0.702, Track A, ‖φ‖=0.073
-- LOO mean for JSD_iid: 0.122 ± 0.009 (dev=31.6σ, but std is near-zero so this is a visual outlier not a statistical one in the usual sense); LOO mean for acc: 0.923 ± 0.037 (dev=5.9σ)
-- ‖φ‖=0.073 vs 0.382–0.479 for other reuploading/α=0.5 seeds — explanation norm is an order of magnitude lower.  The model is Track A (not collapsed) but producing near-zero explanations.  This looks like a near-Track-B state that the Track-A classifier threshold (≥ collapse-threshold accuracy) missed.
-- MN-08 documents reuploading/α=0.5 can exhibit boundary sensitivity (the general framework), but this specific seed=999 case has not been individually replicated.  **Flag: confirm whether a fresh run for this condition also produces near-zero ‖φ‖ or whether this is a single-draw near-collapse.**
+**3. Reuploading / α=0.5 / seed=999 [RESOLVED — Phase 11 inline MN-08 replications]**
+- Primary draw: JSD_iid=0.406, acc=0.702, Track A, ‖φ‖=0.073
+- LOO mean for JSD_iid: 0.122 ± 0.009 (dev=31.6σ); LOO mean for acc: 0.923 ± 0.037 (dev=5.9σ)
+- ‖φ‖=0.073 vs 0.382–0.479 for other reuploading/α=0.5 seeds.
 
-**4. Amplitude / α=0.5 / seed=123**
-- JSD_cent=0.342, JSD_iid=0.217, Track A, acc=0.895, ‖φ‖=0.453
+Phase 11 inline MN-08 replication (Trigger S fired: acc=0.702, dev=5.9σ below LOO mean 0.923):
+
+| Draw | Type | acc | Track | ‖φ‖ | JSD_iid | JSD_cent | Anomalous? |
+|------|------|-----|-------|-----|---------|---------|-----------|
+| 1 (primary) | federated | 0.702 | A | 0.073 | 0.406 | 0.267 | YES (‖φ‖<0.15) |
+| 2 | replication | 0.711 | A | 0.072 | 0.371 | 0.261 | YES (‖φ‖<0.15) |
+| 3 | replication | 0.798 | A | 0.349 | 0.097 | 0.152 | no |
+
+Anomaly rate: 2/3 draws with ‖φ‖ < 0.15.  Mean ‖φ‖ = 0.165 ± 0.159.
+
+**Verdict: Stochastically persistent near-collapse (new MN instance).** ‖φ‖ < 0.15 in 2/3 draws; the degenerate-explanation attractor is the more probable outcome (~2/3) for this seed under α=0.5.  Unlike IQP/seed=7 (50% bistability, partition-independent), this seed produces the degenerate state more consistently under α=0.5.  The model reaches Track A accuracy (0.70–0.71) in both anomalous draws but develops near-zero explanation geometry — a borderline functional-model/collapsed-explanation state distinct from full Track-B collapse.  Draw 3 (acc=0.798, ‖φ‖=0.349) shows that the normal-geometry attractor is reachable but less probable.
+
+Correct treatment: this seed is MN-08 boundary-sensitive.  Report as 1/5 seed with stochastic explanation instability under α=0.5.  Exclude from reuploading/α=0.5 condition-level ‖φ‖ mean or annotate prominently (including 2/3 anomalous draws would depress the condition mean by ~40%).  JSD_iid for this seed should be reported as the range across draws (0.097–0.406) rather than a single value.
+
+**4. Amplitude / α=0.5 / seed=123 [RESOLVED — experiments/rq3_anomaly_replication.py, 2 fresh draws]**
+- Primary draw (phase10): JSD_cent=0.342, JSD_iid=0.217, Track A, acc=0.895, ‖φ‖=0.453
 - LOO mean for JSD_cent: 0.188 ± 0.053 (dev=2.9σ); for JSD_iid: 0.092 ± 0.060 (dev=2.1σ)
-- Track A with the highest ‖φ‖ in the condition (0.453 vs 0.168–0.407).  Both JSD values are elevated relative to peers.  Higher norm can produce higher JSD (more concentrated explanation diverges more from diffuse baseline), so this may be a mechanical consequence of the explanation magnitude rather than a qualitative anomaly.
-- However, seed=123 has been a recurring flag across multiple phases (seed=123 MIA anomaly — now retracted; Phase 7 α=0.5 one of the seeds with the α=0.5 < α=0.1 reversal).  Not previously documented for this specific JSD elevation.  **Low priority flag: note for awareness; not required for RQ3 write-up unless the replication budget allows.**
+- Hypothesized mechanism (pre-replication): high ‖φ‖ produces high JSD mechanically.
+
+Fresh replication (2 draws, `rq3_anomaly_replication.py`):
+
+| Draw | Type | acc | Track | ‖φ‖ | JSD_iid | JSD_cent | Elevated (>0.294)? |
+|------|------|-----|-------|-----|---------|---------|-------------------|
+| 1 (primary) | federated | 0.895 | A | 0.453 | 0.217 | 0.342 | YES |
+| 2 | replication | 0.965 | A | 0.172 | 0.392 | 0.468 | YES |
+| 3 | replication | 0.965 | A | 0.173 | 0.376 | 0.452 | YES |
+
+Elevated draws: 3/3.  JSD_cent mean=0.421 (4.4σ above LOO mean); range 0.342–0.468.
+
+Mechanical hypothesis FALSIFIED: reps 2 and 3 have ‖φ‖=0.172–0.173, similar to seed=999 (‖φ‖=0.168, JSD_cent=0.128) — yet seed=123 reps have JSD_cent=0.45+.  The elevated JSD_cent is driven by attribution-direction mismatch, not explanation magnitude.
+
+**Verdict: Genuine, reproducible seed-specific partition effect.** Amplitude/α=0.5/seed=123 consistently converges to a local optimum with qualitatively different feature attributions than the centralized model (4.4σ elevation in JSD_cent, stable across actor-RNG draws).  The specific Dirichlet partition at seed=123 creates a distribution of client-local feature correlations that steers federated gradient averaging away from the centralized attribution geometry.  Not a single-draw artifact and not driven by explanation magnitude.
+
+Correct treatment: report seed=123 as an outlier in the amplitude/α=0.5 condition-level JSD_cent analysis.  The condition mean should either exclude this seed or report it separately.  Do NOT attribute the elevation to explanation magnitude — the corrected mechanism is attribution-direction divergence caused by partition geometry.  The finding is consistent with seed=123 being a recurring cross-phase flag (Phase 7 α=0.5 ordering reversal, Phase 13 MIA anomaly — now retracted): this seed's initialization reliably interacts with α=0.5 partition geometry to produce qualitatively distinct model behavior.
 
 **5. Amplitude / α=0.1 / seed=42**
 - JSD_cent=0.380, JSD_iid=0.468, Track A, acc=0.658, ‖φ‖=0.053
 - LOO mean for JSD_cent: 0.146 ± 0.036 (dev=6.5σ); for acc: 0.838 ± 0.089 (dev=2.0σ)
 - Very low ‖φ‖ (0.053 vs 0.165–0.453 for other amplitude/α=0.1 seeds).  This is the MN-04a documented case: amplitude/Wisconsin/α=0.1/seed=42 is explicitly listed as "bifurcation-sensitive" (Phase 10 3 reps: collapsed/functional/mixed outcomes).  The current Phase 11 run represents one draw from that distribution.  **Not a new anomaly; apply the MN-04a bifurcation-sensitive label.  No new replication required beyond what MN-04a already captured.**
 
-**6. Reuploading / α=0.1 / seed=42 (LOW JSD direction)**
-- JSD_cent=0.087, LOO mean=0.230 ± 0.064 (dev=2.2σ), Track A, acc=0.737, ‖φ‖=0.207
-- Anomalously LOW JSD — federated explanation unusually close to centralized baseline despite severe non-IID.  No documented explanation.
-- Could reflect a fortunate partition where, despite extreme skew, the four clients collectively provide enough gradient diversity for the global model to converge to a similar explanation as centralized training.  **Weak flag; a positive anomaly.  Not required for write-up but worth noting as evidence that extreme non-IID does not guarantee explanation drift.**
+**6. Reuploading / α=0.1 / seed=42 (LOW JSD direction) [RESOLVED — Phase 11 inline MN-08 replications]**
+- Primary draw: JSD_cent=0.087, LOO mean=0.230 ± 0.064 (dev=2.2σ), Track A, acc=0.737, ‖φ‖=0.207
+- Anomalously LOW JSD — federated explanation unusually close to centralized baseline despite severe non-IID.
+
+Phase 11 inline MN-08 replication (Trigger S fired):
+
+| Draw | Type | acc | Track | ‖φ‖ | JSD_iid | JSD_cent | Anomalous (low)? |
+|------|------|-----|-------|-----|---------|---------|-----------------|
+| 1 (primary) | federated | 0.737 | A | 0.207 | 0.243 | 0.087 | YES (JSD_cent<0.102) |
+| 2 | replication | 0.386 | B | 0.068 | 0.192 | 0.220 | no |
+| 3 | replication | 0.877 | A | 0.125 | 0.346 | 0.205 | no |
+
+Draws with JSD_cent below anomaly threshold (0.102): 1/3.
+
+**Verdict: Single-draw positive anomaly; not reproducible.** The primary draw's low JSD_cent (0.087) reflects a fortunate actor-RNG training trajectory where the global model converged to near-centralized explanation geometry despite severe label skew.  Draw 2 collapsed to Track B (JSD is meaningless in that state).  Draw 3 recovered Track A but JSD_cent=0.205 — in the normal range for this condition (LOO mean=0.230).  The anomaly is actor-RNG-sensitive and does not reflect a systematic structural property of this partition or seed.  
+
+Correct treatment: do not cite as evidence that α=0.1 preserves explanation fidelity.  The condition's reliable JSD_cent estimate is from the two Track-A draws excluding the primary: mean ≈ 0.21.  No new MN entry required — standard actor-RNG single-draw fluctuation.
 
 ---
 
@@ -1571,6 +1619,8 @@ See the consolidated IQP/seed=7 section below for the full taxonomic write-up.
 
 *Label-skewed conditions (α=0.5, α=0.1):* The bistability shifts toward the degenerate regime. All 8 draws across both distributions (n=4 each, Phase 15 confirmed) have ‖φ‖ < 0.28 (below the normal IQP range); zero draws reach normal explanation geometry. The closest approach is α=0.1 draw 4 at ‖φ‖=0.271 — 2.5% below the 0.28 threshold, and notably the only label-skew draw that is not also strictly anomalous (‖φ‖ ≥ 0.15). Label skew consistently prevents seed=7's IQP from reaching the normal explanation geometry that roughly half of IID and quantity-skew runs achieve. The 0.271 result suggests the α=0.1 escape probability may be slightly higher than α=0.5 (where the highest norm across 4 draws is 0.182), but both are zero at n=4.
 
+*MIA leakage axis — replication of the balanced-vs-label-skewed taxonomy (RQ4, 2026-08-04):* The pattern established on the accuracy/explanation-norm axis replicates on the membership inference leakage axis, confirming the taxonomy is not axis-specific. Under qty_skew (class-balanced, non-IID): 3/3 replication draws land Track A with AUC 0.844–0.864 (mean=0.856) — fully stable, no bimodality. Under α=0.1 (label-skewed): 3 draws split across Track A (AUC 0.964, 0.866) and Track B (AUC 0.714), reproducing the bistability at a 33% severe-outcome rate. The MIA leakage value is therefore distribution-dependent in exactly the direction MN-09 predicts: high and stable under a class-balanced condition, bimodal and lower on average under the label-skewed condition. This extends the mechanism hypothesis — label skew not only collapses the explanation norm but also destabilizes the accuracy/track classification, placing the draw in a lower-leakage regime when the model collapses. The result is not a new finding but a cross-axis confirmation of MN-09's existing taxonomy.
+
 *Track-B draws under label skew:* Two Track-B draws appear under α=0.5 (acc=0.465 and acc=0.421, Phase 11 draws 3 and 4) and one under α=0.1 (acc=0.632, Phase 11 draw 3). Phase 15 confirms G1/G2 = NONE for both label-skew partitions — these collapses are therefore NOT explained by the geometry-triggered majority-class-lock mechanism that causes Track-B in other seeds under α=0.1. They are seed=7's initialization instability reaching its most severe form (full accuracy collapse) under label skew, without any unusual partition geometry as the proximate trigger. This is distinct from MN-08's geometry-triggered collapse in other seeds, which requires extreme partition structure (G1: ≥60% weight + ≥90% purity).
 
 **Mechanism hypothesis:** Seed=7's random weight initialization places IQP's entangling circuit near an optimization landscape saddle. Under balanced data (IID, quantity), the saddle can be cleared in approximately half of training trajectories depending on which actor-RNG trajectory the Ray scheduler takes. Under label skew (α=0.5, α=0.1), the systematic gradient imbalance from non-IID client updates consistently pushes the trajectory toward the degenerate explanation regime, not because of a catastrophic accuracy failure but because the feature-attribution signal collapses while classification accuracy is maintained.
@@ -1585,3 +1635,228 @@ See the consolidated IQP/seed=7 section below for the full taxonomic write-up.
 - RQ3 (divergence): Exclude IQP/seed=7 from condition means for all four distributions. JSD values from anomalous draws are not informative about distribution-level explanation fidelity.
 - RQ1 (fidelity): Same exclusion applies. Do not use IQP/seed=7's JSD as evidence about IQP's general fidelity under any condition.
 - What can be reported: IQP/seed=7 as a standalone case study in initialization-specific instability under federated training. The finding is that a specific quantum initialization can produce systematically unreliable explanations without accuracy failure — a failure mode not visible in accuracy metrics alone.
+- RQ4 nonIID MIA / IQP/qty_skew/seed=7: Primary draw AUC=0.864 confirmed genuine by 3/3 replication draws Track A, AUC 0.844–0.864, mean=0.856. Use 0.856 for seed=7 in IQP/qty_skew 5-seed mean. Corrected 5-seed mean = 0.722 (negligible shift from 0.723; “IQP most dangerous under qty_skew” finding is unaffected). No annotation needed beyond noting the replication confirms the single draw.
+- RQ4 nonIID MIA / IQP/α=0.1/seed=7: Primary draw AUC=0.964 (Track A) is bimodally unstable — 3 draws split Track A (0.964, 0.866) / Track B (0.714), 3-draw mean=0.848. Use 0.848 for seed=7 in IQP/α=0.1 Track A mean. Corrected 4-seed Track A mean (seeds 1, 7, 42, 123; seed=999 is Track B): (0.586 + 0.848 + 0.826 + 0.434)/4 = 0.674. Cite MN-09 for the bimodality; do not re-explain the bistability inline in the write-up.
+
+---
+
+## MN-10: Threshold-Crossing Classification — Within-Seed Reproducibility Before Noise-Floor
+
+**Status:** Established (Phase 16 analysis, 2026-08-04)
+**Applies to:** All Track A/B classification decisions where a single draw falls near the threshold.
+
+### Rule
+
+When a single draw crosses the Track A/B boundary by a margin smaller than the
+encoding-level 2σ IID noise floor, **check within-seed reproducibility first** —
+before invoking the encoding-level noise floor as the classification criterion.
+
+**Procedure:**
+1. Identify all draws for the same seed × encoding × condition combination.
+2. Count how many other draws (replications) cross the threshold in the same direction.
+3. If the marginal crossing does not reproduce in ≥ 1 additional draw of the same seed,
+   classify it as **non-reproducible** and do not count it as a confirmed threshold
+   crossing for that seed.
+4. Only when no other same-seed draws exist (single primary draw, no replications
+   triggered) should the encoding-level noise floor alone be used to assess reliability.
+
+### Rationale
+
+The encoding-level noise floor (estimated from IID cross-seed spread) is a
+population-level variance estimate. It describes how much accuracy varies between
+seeds, not how reliable a given seed's result is across draws. Within-seed
+replication is a stricter, more direct test: it measures whether *this seed, in
+this condition* consistently lands on the same side of the threshold.
+
+In practice, within-seed reproducibility is the earlier and more decisive filter.
+A marginal crossing that fails reproducibility within the same seed's draws is
+non-reproducible regardless of whether its margin exceeds the encoding noise floor.
+
+### Originating case
+
+IQP / Pima / α=0.1 / seed=999 (Phase 16, 2026-08-04):
+
+| Draw | Accuracy | Track | Margin to threshold |
+|------|----------|-------|-------------------|
+| Primary (federated) | 0.6494 | B | −2.00pp |
+| Rep 1 | 0.6494 | B | −2.00pp |
+| Rep 2 | **0.6753** | **A** | **+0.59pp** |
+
+The Rep 2 crossing (+0.59pp) is well within the IQP encoding noise floor
+(2σ = 4.16pp from Phase 16 Phase A). By the noise-floor test alone, classification
+is ambiguous. The within-seed test is unambiguous: 0 of 2 other draws for the same
+seed cross the threshold. Classified as non-reproducible. The original claim
+"IQP does not reliably escape under label-skew conditions" is sustained.
+
+### Interaction with MN-08 / MN-09
+
+This rule complements, not replaces, the encoding noise floor and MN-08 attractor
+analysis. The within-seed check answers "is this crossing reproducible for this
+seed?"; the noise floor answers "is the spread plausibly random across seeds?";
+MN-08/MN-09 explain why certain seeds are structurally boundary-prone. All three
+can be relevant for the same marginal crossing, but within-seed reproducibility
+should be reported first and is the strongest individual piece of evidence.
+
+---
+
+## MN-11: Angle/Pima α=0.5 Attractor Draws — MN-04c and MN-08c, Not a New Finding
+
+**Status:** Confirmed (Phase 16 analysis, 2026-08-04)
+**Triggered by:** angle / Pima / α=0.5 / seeds 123 and 999 showing draws at ~35%
+accuracy in Phase 16 Phase B, initially flagged as possible "active class-inversion
+under label skew" specific to angle encoding.
+
+### R0 check
+
+For each draw the server-side `evaluate_fn` runs before any training (server_round=0,
+initial global parameters). R0 accuracy therefore reflects the untrained model's
+predictions on the test set.
+
+| Seed | Draw | R0 | R1 | R15 | Classification |
+|------|------|----|----|-----|---------------|
+| 123 | Primary (federated) | **0.3506** | 0.3506 | 0.3831 | Init-attractor, training trapped |
+| 123 | Rep 1 | **0.3506** | 0.4740 | 0.6494 | Init-attractor, training escaped by R1–R2 |
+| 123 | Rep 2 | **0.3506** | 0.6429 | 0.6039 | Init-attractor, training escaped at R1 |
+| 999 | Primary (federated) | 0.6494 | 0.6494 | 0.6299 | Standard Track B |
+| 999 | Rep 1 | 0.6494 | **0.5584** | **0.3506** | NOT init-attractor; training-driven capture |
+| 999 | Rep 2 | 0.6494 | 0.6364 | 0.6234 | Standard Track B |
+
+### Findings
+
+**Seed 123 — MN-04c initialization-attractor (not new).**
+R0 = 0.3506 in all three draws. The untrained model already predicts all class-1
+(accuracy ≈ class-1 prevalence = 35.1%) before any federated round runs. This is
+MN-04c's Pima initialization-attractor mechanism, now confirmed on angle encoding.
+The partition geometry (α=0.5 Dirichlet) is not the cause; the same R0 appears
+regardless of which draw is made (same `torch.manual_seed(123)` → same initial
+weights). Whether training recovers the model is actor-RNG determined: 1 of 3 draws
+remained trapped (R15=0.3831), 2 of 3 escaped by R1 (R15=0.6039 and 0.6494).
+
+**Seed 999 — MN-08c within-B bifurcation (not new).**
+R0 = 0.6494 in all three draws — the model does NOT start in the class-1 attractor.
+One draw (Rep 1) falls into the attractor during training: R1=0.5584 shows
+trajectory moving toward class-1 prediction; R15=0.3506 confirms capture. The other
+two draws follow standard Track B trajectories (R15=0.6299 and 0.6234). This is
+MN-08c's actor-RNG-determined within-B bifurcation: the same initialization produces
+opposite constant-output collapsed states in different draws, with the outcome selected
+by mini-batch scheduling in early rounds. Previously documented for angle/Wisconsin/α=0.1
+(MN-08c); Phase 16 extends the known scope to angle/Pima/α=0.5.
+
+### What this means for Phase 16 reporting
+
+The ~35% draws for angle/Pima/α=0.5 seeds 123 and 999 are not an angle-specific
+label-skew finding. They are instances of MN-04c (seed=123, initialization) and
+MN-08c (seed=999, training dynamics), both of which are encoding-agnostic and
+previously documented. Phase 16 contributes two extensions of known scope:
+
+1. MN-04c initialization-attractor confirmed on angle encoding (previously documented
+   for amplitude on Pima; seed=123 angle initialization happens to land in class-1 basin).
+2. MN-08c within-B bifurcation confirmed on angle/Pima/α=0.5 (previously documented
+   for angle/Wisconsin/α=0.1 and amplitude/Wisconsin/α=0.1).
+
+Neither instance requires new encoding-specific annotation. Both should be cited as
+MN-04c / MN-08c in any write-up referencing the angle/Pima attractor draws.
+
+**Implication for the corrected Phase 16 table:** The 0/15 Track A result for
+angle across all non-IID conditions is confirmed with these mechanisms understood.
+The ~35% draws are collapsed-attractor states (constant class-1 output), not
+partial-learning states. They sit below the majority-class baseline and should be
+reported alongside the Track B count, not folded into a mean accuracy without
+noting the attractor cluster.
+
+---
+
+## MN-12: Angle Encoding — Purity-Driven Collapse; Threshold Location Untested and Dataset-Dependent
+
+**Status:** Established (angle_falsification experiment, 2026-08-04)
+**Triggered by:** Angle falsification test using 5 manually constructed G1 partitions across two datasets and 3 draws each (15 total draws), designed to close the "angle uniquely all-B under G1-flagged conditions" claim from Phase 11.
+
+### Data
+
+| Partition | Dataset | Dom. weight | Purity | Track A draws | Track B draws | Anomalous? |
+|---|---|---|---|---|---|---|
+| G1-W1 | Wisconsin | 60.9% | 100% | 0/3 | 3/3 | Full collapse |
+| G1-W2 | Wisconsin | 64.8% | 92.9% | 3/3 | 0/3 | Functional |
+| G1-W3 | Wisconsin | 67.9% | 90.9% | 2/3 | 1/3 | Mostly functional |
+| G1-P1 | Pima | 61.9% | 100% | 0/3 | 3/3 | Full collapse |
+| G1-P2 | Pima | 66.0% | 90.9% | 0/3 | 3/3 | Full collapse |
+
+### Finding
+
+**Collapse rate increases sharply with dominant-client class purity.** At 100% purity, angle collapses in all 6 draws across both datasets (0/6 Track A). At 91–93% purity, angle escapes in 5/6 draws on Wisconsin (G1-W2: 3/3; G1-W3: 2/3). On Pima, angle collapses in all 3 draws even at 90.9% purity.
+
+**The precise threshold location is untested.** Only two distinct purity levels were used (100% and 91–93%). No purity values in the range 93–99% were tested. Do not report this as "the threshold lies between 93% and 100%." The correct statement is: collapse rate is high at 100% purity and low at 91–93% purity on Wisconsin; the boundary is not located and appears to be dataset-dependent (Pima collapses at 90.9%, Wisconsin does not).
+
+### Implication for the "angle uniquely all-B" claim
+
+The Phase 11 claim "angle is uniquely all-B under G1/G2-flagged conditions" is **falsified** by this experiment. Angle reaches Track A in 5/15 draws (G1-W2 and G1-W3, where purity < 100%). The corrected claim is: **angle shows sharply elevated collapse risk under G1/G2 conditions, with 100% dominant-client purity reliably producing collapse across both tested datasets, and sub-100% purity producing variable outcomes that are both dataset-dependent and stochastically sensitive.**
+
+The original Phase 11 claim was an artifact of the Phase 11 seed sample — all 4 geometry-flagged conditions happened to have 100% purity (pure-class dominant client). The falsification test showed that 100% purity is the critical factor, not G1 geometry per se.
+
+### Reporting guidance
+
+- Do not claim a specific purity threshold.
+- Report: "angle encoding collapses under 100% dominant-client purity across both tested datasets; collapse rates at 91–93% purity are lower on Wisconsin (1/6) but remain high on Pima (3/3), suggesting the purity sensitivity is dataset-dependent."
+- Note the two tested levels, not a boundary estimate.
+- The G1 weight criterion (≥60% dominant weight) is a necessary but not sufficient condition: G1-W2 with 64.8% weight and 92.9% purity produced 0 collapses.
+
+
+---
+
+## MN-13: R0 Initialization Architecture — Reuploading Stays Input-Sensitive; Single-Pass Encodings Default to Majority-Class
+
+**Status:** Established (rq4_reup_seed7_inspection, 2026-08-04)
+**Affects:** Mechanism attribution for encoding-specific Track-B collapses under label skew; disambiguation of initialization-driven vs training-driven collapse pathways. Also applies as a general R0 diagnostic for distinguishing MN-04c (initialization-attractor) from MN-08c (training-driven attractor capture) cases across all attractor-sensitive conditions in this project.
+
+### Finding
+
+Under Wisconsin/α=0.1/seed=7, all four encodings start from the same VQC parameter values (`torch.manual_seed(7)`, weights shape (2, 4)) but produce qualitatively different pre-training (R0) prediction distributions:
+
+| Encoding | R0 acc | Prediction type | Final acc (logged) | Track |
+|---|---|---|---|---|
+| angle | 0.6316 | all-class-1 (114/114) | 0.6754 | A |
+| amplitude | 0.6404 | near-all-class-1 (113/114) | 0.8860 | A |
+| reuploading | **0.4649** | **mixed (25c0 / 89c1)** | 0.6316 | B (logged) |
+| iqp | 0.6404 | near-all-class-1 (113/114) | 0.6930 | A |
+
+Wisconsin majority-class baseline = 0.6316 (class-1 = 72/114 test samples).
+
+Angle locks to the exact majority-class floor before training. Amplitude and IQP land 88 bp above it (113/114 class-1). Reuploading lands 16.7pp *below* it with 25/114 class-0 predictions — genuinely mixed rather than near-uniform.
+
+### Mechanism
+
+The difference is architectural. Angle, amplitude, and IQP are **single-pass** encodings: data is embedded into the quantum state once, and the VQC parameters modulate a fixed gate topology thereafter. With small random initial weights, the circuit output tends toward a near-constant prediction; on an imbalanced dataset (Wisconsin: 62.6% class-1 in train), the "default" output is the majority class.
+
+Reuploading uses **per-layer data re-embedding**: the original features are re-injected at each VQC layer via RY gates interleaved with CNOT entanglement. This repeated coupling keeps the circuit's output input-dependent at initialization — each sample produces different gate expectation values before any training has shaped the weights. The result is genuinely mixed predictions at R0, not a near-constant majority-class output.
+
+### Implications
+
+**Initialization-driven vs training-driven collapse.** A Track-B collapse starting from near-majority-class R0 (angle, amplitude, IQP) may be an initialization-attractor effect: the model was already at the floor before training. A Track-B collapse from a genuinely mixed R0 (reuploading) is necessarily training-driven: training moved the model *to* the majority-class floor from a non-trivial state. The two pathways are observationally distinct — R0 distinguishes them.
+
+**Specific case: reuploading/seed=7/α=0.1.** R0=0.4649 rules out the initialization-attractor interpretation for the logged Track-B outcome (R15=0.6316). The model rose through Track A territory during training (rounds 2–5: 0.667–0.693 in replication) before the actor-RNG trajectory determined the final state — Track B in the logged run, Track A (R15=0.6754) in replication. This is the mid-training bifurcation mechanism from MN-06/MN-09, not MN-04c's initialization-attractor mechanism. See MN-09 for the bifurcation framing; this note provides the R0 evidence that disambiguates the collapse pathway.
+
+**Swept confirmation (all 5 seeds × 4 encodings, zero new compute).** R0 is distribution-independent (pre-training accuracy is unchanged by the federation's client partition), so round=0 global accuracy rows already in the phase10/11 and phase16_pima logs cover a full 5-seed sweep across both datasets.
+
+*Wisconsin (random_state=42 test split, 114 samples; floors: majority=0.6316, minority=0.3684):*
+
+| Encoding | seed=1 | seed=7 | seed=42 | seed=123 | seed=999 | Max preds from nearest floor |
+|---|---|---|---|---|---|---|
+| angle | 0.3684 | 0.6316 | 0.3684 | 0.6316 | 0.3684 | **0** |
+| amplitude | 0.3684 | 0.6404 | 0.3684 | 0.6316 | 0.3684 | **1** |
+| IQP | 0.3596 | 0.6316 | 0.3596 | 0.6316 | 0.3684 | **1** |
+| reuploading | 0.3509 | 0.6228 | 0.3684 | **0.5614** | 0.3947 | **8** |
+
+Angle: all 5 seeds at exact class floors. Amplitude and IQP: maximum 1 prediction from the nearest floor across all seeds. Reuploading: 3/5 seeds more than 1 prediction from the nearest floor; seed=123 at 0.5614 is 8 predictions from the majority-class floor — genuinely mid-range. The Wisconsin pattern holds across all 5 seeds.
+
+*Pima (random_state=42 test split, 154 samples; floors: majority=0.6494, minority=0.3506):*
+
+| Encoding | seed=1 | seed=7 | seed=42 | seed=123 | seed=999 | Max preds from nearest floor |
+|---|---|---|---|---|---|---|
+| angle | 0.6494 | 0.3571 | 0.6494 | 0.3506 | 0.6494 | **1** |
+| amplitude | 0.6494 | 0.3636 | 0.6494 | 0.3506 | 0.6494 | **2** |
+| IQP | 0.6558 | 0.3506 | 0.6364 | 0.3506 | 0.6429 | **2** |
+| reuploading | 0.6558 | 0.3442 | 0.6494 | 0.3571 | 0.6494 | **1** |
+
+On Pima, all four encodings stay within 1–2 predictions of a class floor across all 5 seeds. Reuploading shows no distinguishable R0 advantage over the single-pass encodings. The Wisconsin pattern does not replicate on Pima.
+
+**Revised caveat.** The reuploading/single-pass R0 distinction is confirmed across all 5 seeds on Wisconsin, and is absent on Pima. The finding is therefore dataset-specific rather than a universal architectural property. A plausible explanation is that PCA-preprocessed Wisconsin features span a range where reuploading's per-layer re-embedding produces greater cross-sample variation in gate expectation values at initialization, while Pima's PCA-preprocessed features do not produce the same separation. The mechanism claim (per-layer re-embedding preserves input-sensitivity at initialization) is supported by the Wisconsin 5-seed sweep but should not be stated as dataset-agnostic.

@@ -1,0 +1,7 @@
+anomaly_id,encoding,distribution,seed,draw_num,run_type,target_acc,track_class,margin,direct_mia_auc,n_members,n_nonmembers,wall_time_s,timestamp
+A,iqp,alpha_0.1,7,1,primary,0.692982,A,0.041403,0.964000,50,50,0.0,2026-08-04T09:55:47.710175+00:00
+B,reuploading,qty_skew,7,1,primary,0.877193,A,0.225614,0.922000,50,50,0.0,2026-08-04T09:55:47.710469+00:00
+A,iqp,alpha_0.1,7,3,replication,0.631579,B,-0.020000,0.714000,50,50,44.6,2026-08-04T09:56:32.291969+00:00
+A,iqp,alpha_0.1,7,4,replication,0.815789,A,0.164211,0.866000,50,50,65.5,2026-08-04T09:57:37.742600+00:00
+B,reuploading,qty_skew,7,3,replication,0.877193,A,0.225614,0.916000,50,50,57.6,2026-08-04T09:58:35.298002+00:00
+B,reuploading,qty_skew,7,4,replication,0.885965,A,0.234386,0.922000,50,50,61.1,2026-08-04T09:59:36.431263+00:00
