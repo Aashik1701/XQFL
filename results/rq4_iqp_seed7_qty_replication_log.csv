@@ -1,0 +1,4 @@
+draw_num,run_type,target_acc,track_class,margin,direct_mia_auc,n_members,n_nonmembers,wall_time_s,timestamp
+1,primary,0.824561,A,0.172982,0.864000,50,50,0.0,2026-08-04T10:07:02.843952+00:00
+2,replication,0.842105,A,0.190526,0.860000,50,50,44.1,2026-08-04T10:07:46.981433+00:00
+3,replication,0.833333,A,0.181754,0.844000,50,50,44.2,2026-08-04T10:08:31.135262+00:00
