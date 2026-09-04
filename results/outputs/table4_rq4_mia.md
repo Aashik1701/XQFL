@@ -2,7 +2,7 @@
 
 | dataset | encoding | distribution | n | auc_mean | auc_std | collapse_rate | status | note |
 |---|---|---|---|---|---|---|---|---|
-| pima | amplitude | iid | 15 | 0.5620 | 0.1032 | 0.0000 | ok | RQ4 extension: cross-dataset check for the strongest encoding, n=15 — matches Wisconsin's n=15, same statistical footing. |
+| pima | amplitude | iid | 15 | 0.5620 | 0.1032 | 0.0000 | ok | RQ4 extension: cross-dataset check for the strongest encoding, n=15 — matches Wisconsin's n=15, same statistical footing. Stability check vs the n=5 preliminary read (0.579 +/- 0.130): shift = -0.017, well within the n=5 SE (0.058) — not a meaningful move. Pima (0.562) vs Wisconsin/amplitude (0.619) gap = 0.057, 1.43 SE — NOT resolved (tied, consistent with Wisconsin); vs random guess 2.33 SE — RESOLVED (genuine leakage). |
 | wisconsin | angle | iid | 15 | 0.5449 | 0.0883 | — | ok |  |
 | wisconsin | amplitude | iid | 15 | 0.6188 | 0.1145 | — | ok |  |
 | wisconsin | reuploading | iid | 15 | 0.6441 | 0.1338 | — | ok |  |

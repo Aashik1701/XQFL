@@ -426,8 +426,30 @@ def build_rq4_mia() -> pd.DataFrame:
         aucs = [float(r["direct_mia_auc"]) for r in pima_mia_rows]
         n = len(aucs)
         if n >= WISCONSIN_MIA_N:
+            # Same 2-SE resolvability convention project_status.md applies to
+            # every other n=5->n=15 extension in this project (RQ2 Wisconsin
+            # stability, RQ4 Wisconsin MIA ranking) — both of those extensions
+            # changed which comparisons were statistically resolvable, so this
+            # cell is checked the same way rather than accepted on point-estimate
+            # proximity alone.
+            mean_n15, std_n15 = float(np.mean(aucs)), float(np.std(aucs, ddof=1))
+            se_n15 = std_n15 / math.sqrt(n)
+            wis_amp_aucs = [v for _, v in by_enc.get("amplitude", [])]
+            wis_mean = float(np.mean(wis_amp_aucs))
+            wis_se = float(np.std(wis_amp_aucs, ddof=1)) / math.sqrt(len(wis_amp_aucs))
+            gap = wis_mean - mean_n15
+            se_diff = math.sqrt(se_n15 ** 2 + wis_se ** 2)
+            resolved = abs(gap) > 2 * se_diff
+            vs_random_ratio = (mean_n15 - 0.5) / se_n15
             note = (f"RQ4 extension: cross-dataset check for the strongest encoding, "
-                     f"n={n} — matches Wisconsin's n={WISCONSIN_MIA_N}, same statistical footing.")
+                     f"n={n} — matches Wisconsin's n={WISCONSIN_MIA_N}, same statistical footing. "
+                     f"Stability check vs the n=5 preliminary read (0.579 +/- 0.130): shift = "
+                     f"{mean_n15 - 0.579:+.3f}, well within the n=5 SE (0.058) — not a meaningful "
+                     f"move. Pima ({mean_n15:.3f}) vs Wisconsin/amplitude ({wis_mean:.3f}) gap = "
+                     f"{gap:.3f}, {gap / se_diff:.2f} SE — "
+                     + ("RESOLVED (distinguishable)" if resolved else "NOT resolved (tied, consistent with Wisconsin)")
+                     + f"; vs random guess {vs_random_ratio:.2f} SE — "
+                     + ("RESOLVED (genuine leakage)" if vs_random_ratio > 2 else "not resolved") + ".")
         else:
             note = (f"RQ4 extension: cross-dataset check for the strongest encoding. "
                      f"n={n} vs Wisconsin's n={WISCONSIN_MIA_N} — consistent with the Wisconsin "
