@@ -3,8 +3,9 @@
 **Governing framework:** MN-02 (noise floor ±1.75pp), MN-03a (encoding×partition interaction),
 MN-04 (α=0.1 scope limitation, collapse predictor, behavioral taxonomies), MN-05 (per-condition
 reporting mode), MN-08 (actor-RNG-determined outcomes near attractor boundaries — applies to
-Wisconsin/α=0.5/seed=7 and all α=0.1 attractor cases). All five-seed means carry ≥3pp
-meaningful-difference threshold.
+Wisconsin/α=0.5/seed=7 and all α=0.1 attractor cases on **both** Wisconsin and Pima; see §4.1
+for the unified account superseding any per-dataset "distinct mechanism" framing below). All
+five-seed means carry ≥3pp meaningful-difference threshold.
 
 ---
 
@@ -138,12 +139,19 @@ type (label vs quantity) is the primary driver of performance degradation.
 
 ## 2. Pima — Distribution Robustness
 
-**Critical context:** Pima/amplitude exhibits initialization-driven attractor trapping
-(MN-04b, MN-04c). The VQC initial parameters land near the all-class-0 (65% accuracy)
-or all-class-1 (35% accuracy) prediction surface, and training may or may not escape
-depending on partition quality. The starting attractor is determined by the VQC
+**Critical context:** Pima/amplitude exhibits attractor trapping (MN-04b, MN-04c). The
+VQC initial parameters land near the all-class-0 (65% accuracy) or all-class-1 (35%
+accuracy) prediction surface. The starting attractor is determined by the VQC
 initialization seed alone — not by the partition draw (MN-04c, confound-breaking
-experiment). Per MN-05, per-seed behavioral reporting is required for α=0.5 and α=0.1.
+experiment, confirmed across 12 replicates). Whether training subsequently escapes that
+starting attractor is **not** primarily a function of partition quality: the
+confound-breaking experiment shows within-cell final-accuracy ranges of 21–30pp from
+identical init+partition, meaning actor-RNG mini-batch stochasticity — not partition
+structure — dominates escape outcomes (MN-08). This is the same unified mechanism that
+governs Wisconsin's α=0.1 collapse cases (§4.1); initialization sets the *starting*
+point in both datasets, but the *final* outcome near an attractor boundary is
+actor-RNG-determined in both. Per MN-05, per-seed behavioral reporting is required for
+α=0.5 and α=0.1.
 
 ### 2.1 Moderate label skew (α=0.5) — per-seed taxonomy required
 

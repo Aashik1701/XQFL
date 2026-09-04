@@ -1,0 +1,17 @@
+dataset,encoding,epsilon,n,auc_mean,auc_std,status,note
+wisconsin,angle,0.1,5,0.30920000000000003,0.02629068276024797,ok,
+wisconsin,angle,0.5,5,0.3696,0.02438852189043034,ok,
+wisconsin,angle,1.0,5,0.42119999999999996,0.06212245970661496,ok,
+wisconsin,angle,5.0,5,0.5187999999999999,0.1038229261772177,ok,
+wisconsin,amplitude,0.1,5,0.3296,0.026773120849090424,ok,
+wisconsin,amplitude,0.5,5,0.47800000000000004,0.10641428475538424,ok,
+wisconsin,amplitude,1.0,5,0.5668,0.11669275898700827,ok,
+wisconsin,amplitude,5.0,5,0.6432,0.12538420953214166,ok,
+wisconsin,reuploading,0.1,5,0.3308,0.0288652039660211,ok,
+wisconsin,reuploading,0.5,5,0.4904,0.12039435202699503,ok,
+wisconsin,reuploading,1.0,5,0.5684,0.15287511242841328,ok,
+wisconsin,reuploading,5.0,5,0.6692,0.18094529560063174,ok,
+wisconsin,iqp,0.1,4,0.3255,0.024785748593361745,ok,"IQP/seed=7 excluded (MN-09, applied for consistency with other Wisconsin RQ4 tables)"
+wisconsin,iqp,0.5,4,0.48,0.09482615672903758,ok,"IQP/seed=7 excluded (MN-09, applied for consistency with other Wisconsin RQ4 tables)"
+wisconsin,iqp,1.0,4,0.562,0.12830172770985326,ok,"IQP/seed=7 excluded (MN-09, applied for consistency with other Wisconsin RQ4 tables)"
+wisconsin,iqp,5.0,4,0.635,0.16518676298864465,ok,"IQP/seed=7 excluded (MN-09, applied for consistency with other Wisconsin RQ4 tables)"

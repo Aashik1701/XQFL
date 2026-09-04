@@ -808,7 +808,7 @@ n_permutations × (1 + n_qubits) × (n_global_explain + n_clients × n_explain) 
 = 8 × 5 × (10 + 4×5) × 15 = 8 × 5 × 30 × 15 = 18,000 passes / run
 ```
 
-Cost scales linearly with `n_permutations × n_explain_samples`. With n_qubits=4
+Cost scales linearly with `n_permutations × n_explai`. With n_qubits=4
 (fixed), there is no exponential component within the sweep design.
 
 ### 2. Feasibility of proposed explanation sweep

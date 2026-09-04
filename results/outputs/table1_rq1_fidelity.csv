@@ -1,0 +1,33 @@
+dataset,encoding,distribution,n_total_draws,n_track_a,n_valid_jsd,collapse_rate,jsd_cent_mean,jsd_cent_std,status,note
+pima,angle,iid,5,0,0,1.0,,,insufficient,
+pima,angle,alpha_0.5,15,0,0,1.0,,,insufficient,
+pima,angle,alpha_0.1,15,0,0,1.0,,,insufficient,
+pima,angle,qty_skew,11,0,0,1.0,,,insufficient,
+pima,amplitude,iid,5,5,5,0.0,0.20744299794054885,0.11117610492137435,ok,
+pima,amplitude,alpha_0.5,5,3,3,0.4,0.3111160475753696,0.03133169913191344,ok,
+pima,amplitude,alpha_0.1,15,6,6,0.6,0.2238831735897825,0.037014033654356064,ok,
+pima,amplitude,qty_skew,5,5,5,0.0,0.2366981236080698,0.1153992426530394,ok,
+pima,reuploading,iid,5,5,5,0.0,0.29903653408185626,0.18051390165455816,ok,
+pima,reuploading,alpha_0.5,13,6,6,0.5384615384615384,0.34278855955546755,0.06222328056961643,ok,
+pima,reuploading,alpha_0.1,15,2,2,0.8666666666666667,,,insufficient,
+pima,reuploading,qty_skew,5,4,4,0.2,0.3091067844764735,0.12132034990719777,ok,
+pima,iqp,iid,5,1,1,0.8,,,insufficient,
+pima,iqp,alpha_0.5,15,0,0,1.0,,,insufficient,
+pima,iqp,alpha_0.1,15,1,1,0.9333333333333333,,,insufficient,
+pima,iqp,qty_skew,11,4,4,0.6363636363636364,0.32848049949316704,0.12763374044385,ok,
+wisconsin,angle,iid,5,5,5,0.0,0.1318271461843358,0.046080180065581504,ok,
+wisconsin,angle,alpha_0.5,22,13,13,0.4090909090909091,0.21014411304339786,0.0741600210947039,ok,
+wisconsin,angle,alpha_0.1,12,1,1,0.9166666666666666,,,insufficient,
+wisconsin,angle,qty_skew,5,5,5,0.0,0.10307035083256136,0.048801785790143735,ok,
+wisconsin,amplitude,iid,5,5,5,0.0,0.13915104037719064,0.0280279894770475,ok,
+wisconsin,amplitude,alpha_0.5,5,4,4,0.0,0.18748656272346326,0.0612135458950683,ok,seed(s) [123] excluded (RQ3 anomaly resolution)
+wisconsin,amplitude,alpha_0.1,5,5,5,0.0,0.19297615703878085,0.1107910603133068,ok,
+wisconsin,amplitude,qty_skew,5,5,5,0.0,0.0883844149142389,0.020745930260398508,ok,
+wisconsin,reuploading,iid,5,5,5,0.0,0.14298856624964587,0.033859734379061,ok,
+wisconsin,reuploading,alpha_0.5,15,12,12,0.0,0.20256642406430278,0.02798216373674251,ok,seed(s) [999] excluded (RQ3 anomaly resolution)
+wisconsin,reuploading,alpha_0.1,15,9,9,0.4,0.18496926119383744,0.07108604670869578,ok,
+wisconsin,reuploading,qty_skew,5,5,5,0.0,0.18696898116994753,0.05582469059560002,ok,
+wisconsin,iqp,iid,5,4,4,0.0,0.16371988490621286,0.0442147502861014,ok,IQP/seed=7 excluded (MN-09)
+wisconsin,iqp,alpha_0.5,13,10,10,0.07692307692307693,0.19853775890952702,0.08288801700203888,ok,IQP/seed=7 excluded (MN-09)
+wisconsin,iqp,alpha_0.1,15,3,3,0.6666666666666666,0.19013252584375406,0.0825739973157098,ok,IQP/seed=7 excluded (MN-09)
+wisconsin,iqp,qty_skew,5,4,4,0.0,0.14401434244212666,0.038391783045103954,ok,IQP/seed=7 excluded (MN-09)
