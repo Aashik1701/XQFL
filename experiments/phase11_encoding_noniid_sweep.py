@@ -96,12 +96,35 @@ ENCODINGS = {
     "iqp":         iqp_encoding,
 }
 
-# IID within-seed std per encoding (from Phase 10 Phase A, MN-03a, 5-seed Wisconsin)
-ENCODING_IID_STD = {
-    "angle":       0.0306,   # 3.06pp
-    "reuploading": 0.0088,   # 0.88pp
-    "iqp":         0.0394,   # 3.94pp
-}
+# IID within-seed accuracy std per encoding — Trigger-S replication threshold.
+# Derived at import time from the CURRENT (corrected) phase10_log.csv so it never
+# carries stale pre-fix values; hardcoded numbers are a fallback only if that log
+# has no federated IID rows yet.
+_IID_STD_FALLBACK = {"angle": 0.0306, "reuploading": 0.0088, "iqp": 0.0394}
+
+
+def _compute_encoding_iid_std():
+    import csv as _csv
+    path = os.path.join(PROJECT_ROOT, "results", "phase10_log.csv")
+    if not os.path.exists(path):
+        return dict(_IID_STD_FALLBACK)
+    acc = {}
+    with open(path, newline="") as fh:
+        for r in _csv.DictReader(fh):
+            if (r["run_type"] == "federated" and r["distribution"] == "iid"
+                    and r["client_id"] == "global" and int(r["round"]) == 15):
+                acc.setdefault(r["encoding"], []).append(float(r["accuracy"]))
+    out = dict(_IID_STD_FALLBACK)
+    for enc, vals in acc.items():
+        if len(vals) >= 3:
+            m = sum(vals) / len(vals)
+            out[enc] = (sum((v - m) ** 2 for v in vals) / (len(vals) - 1)) ** 0.5
+    return out
+
+
+ENCODING_IID_STD = _compute_encoding_iid_std()
+print(f"  ENCODING_IID_STD (from corrected phase10_log.csv): "
+      + ", ".join(f"{k}={v*100:.2f}pp" for k, v in sorted(ENCODING_IID_STD.items())))
 
 DISTRIBUTIONS = {
     "alpha_0.5": {"split": "dirichlet", "alpha": 0.5},

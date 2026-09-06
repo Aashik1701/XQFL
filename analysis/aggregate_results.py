@@ -6,10 +6,12 @@ the completion audit (results/XQFL_completion_audit.md, Step 6):
   Table 2 (RQ2) — stability: round-to-round Kendall's tau / cosine / L2 at
                   n=15 IID (Wisconsin), plus per-distribution where enough
                   Track-A trajectories exist to support a mean
-  Table 3 (RQ3) — divergence: the same JSD_cent data as Table 1, re-sorted
-                  distribution-first with a delta-vs-IID column, so the
-                  "does heterogeneity increase divergence" question reads
-                  directly off the table
+  Table 3 (RQ3) — local-to-global divergence: mean over clients k and rounds t
+                  of JSD(phi_k^(t), phi_g^(t)), computed directly from the
+                  per-client and global explanation rows, distribution-first
+                  with a delta-vs-IID column. This is the metric the Methods
+                  define for RQ3 and is distinct from Table 1's JSD_cent
+                  (federated-vs-centralized final attribution = RQ1).
   Table 4 (RQ4a) — MIA: direct-MIA AUC at n=15 IID (Wisconsin), non-IID
                   (qty_skew, alpha_0.1, Wisconsin), and Pima/amplitude/IID
                   when that run has completed
@@ -241,19 +243,102 @@ def build_rq1_rq3(datasets: dict) -> pd.DataFrame:
     return out.sort_values(["dataset", "_enc_ord", "_dist_ord"]).drop(columns=["_enc_ord", "_dist_ord"]).reset_index(drop=True)
 
 
-def rq3_view(rq1_table: pd.DataFrame) -> pd.DataFrame:
-    """Same underlying JSD data, re-sorted distribution-first with a
-    delta-vs-IID column, matching how RQ3 ('does divergence grow with
-    heterogeneity?') is naturally read off the table."""
-    df = rq1_table.copy()
-    iid_means = (df[df["distribution"] == "iid"]
-                 .set_index(["dataset", "encoding"])["jsd_cent_mean"])
-    df["delta_vs_iid"] = df.apply(
-        lambda r: (r["jsd_cent_mean"] - iid_means.get((r["dataset"], r["encoding"]), float("nan")))
-        if pd.notna(r["jsd_cent_mean"]) else float("nan"), axis=1)
-    df["_enc_ord"] = df["encoding"].map({e: i for i, e in enumerate(ENC_ORDER)})
-    df["_dist_ord"] = df["distribution"].map({d: i for i, d in enumerate(DIST_ORDER)})
-    return df.sort_values(["dataset", "_dist_ord", "_enc_ord"]).drop(columns=["_enc_ord", "_dist_ord"]).reset_index(drop=True)
+def rq3_local_global_cell(dataset: str, df: pd.DataFrame, encoding: str, distribution: str) -> dict:
+    """RQ3 as defined in the Methods: the mean over clients k and rounds t of
+    JSD(phi_k^(t), phi_g^(t)) — the per-round divergence between each client's
+    local Q-SHAP vector and the global (post-aggregation) Q-SHAP vector.
+
+    This is NOT JSD_cent (federated-vs-centralized final-round attribution, which
+    is RQ1). It is computed directly from the per-client and global explanation
+    rows logged every round.
+
+    Rules, consistent with the rest of this script:
+      * primary `federated` runs only, one draw per seed;
+      * a seed contributes only if its final-round (R15) global model is Track A
+        (a collapsed global model's near-constant vectors make local-to-global
+        divergence meaningless); Track-B seeds are counted, not averaged;
+      * MN-09: Wisconsin IQP/seed=7 excluded (whole-seed bimodal instability,
+        metric-independent);
+      * the RQ1 JSD_cent anomaly exclusions (amplitude/alpha_0.5/seed=123,
+        reuploading/alpha_0.5/seed=999) are NOT transferred here — they were
+        derived for a different metric; their local-to-global values are
+        reported in the audit instead;
+      * round 0 (initial broadcast, all clients == global) is skipped.
+    """
+    sub = df[(df["encoding"] == encoding)
+             & (df["distribution"] == distribution)
+             & (df["run_type"] == "federated")]
+    n_total_seeds = int(sub["seed"].nunique()) if not sub.empty else 0
+
+    excluded_note = []
+    per_seed_means = []
+    n_track_b = 0
+    for seed, g in sub.groupby("seed"):
+        if dataset == "wisconsin" and encoding == "iqp" and seed == IQP_SEED7:
+            if "IQP/seed=7 excluded (MN-09)" not in excluded_note:
+                excluded_note.append("IQP/seed=7 excluded (MN-09)")
+            continue
+
+        gfin = g[(g["client_id"] == "global") & (g["round"] == 15)]
+        if gfin.empty or gfin.iloc[-1]["track_class"] != "A":
+            n_track_b += 1
+            continue
+
+        gvecs = {int(r["round"]): np.asarray(r["explanation_vector"], dtype=float)
+                 for _, r in g[g["client_id"] == "global"].iterrows()}
+        clients_by_round = defaultdict(dict)
+        for _, r in g[g["client_id"] != "global"].iterrows():
+            clients_by_round[int(r["round"])][str(r["client_id"])] = \
+                np.asarray(r["explanation_vector"], dtype=float)
+
+        jsds = []
+        for rnd, gvec in gvecs.items():
+            if rnd == 0:
+                continue
+            for _, cvec in clients_by_round.get(rnd, {}).items():
+                jsds.append(js_divergence(cvec, gvec))
+        if jsds:
+            per_seed_means.append(float(np.mean(jsds)))
+
+    n = len(per_seed_means)
+    collapse_rate = (n_track_b / n_total_seeds) if n_total_seeds else float("nan")
+    if n >= MIN_VALID_DRAWS:
+        mean, std, status = float(np.mean(per_seed_means)), float(np.std(per_seed_means, ddof=1)), "ok"
+    elif n > 0:
+        mean, std, status = float("nan"), float("nan"), "insufficient"
+    else:
+        mean, std, status = float("nan"), float("nan"), "absent" if n_total_seeds == 0 else "insufficient"
+
+    return {
+        "dataset": dataset, "encoding": encoding, "distribution": distribution,
+        "n_total_seeds": n_total_seeds, "n_track_a_seeds": n, "n_track_b_seeds": n_track_b,
+        "collapse_rate": collapse_rate,
+        "local_global_jsd_mean": mean, "local_global_jsd_std": std,
+        "status": status, "note": "; ".join(excluded_note),
+    }
+
+
+def build_rq3_local_global(datasets: dict) -> pd.DataFrame:
+    """RQ3 table: mean_{k,t} JSD(phi_k, phi_g) by dataset x encoding x
+    distribution, with a delta-vs-IID column so 'does local-to-global divergence
+    grow with client heterogeneity?' reads directly off the table."""
+    rows = []
+    for dataset, (df, _refs) in datasets.items():
+        if df.empty:
+            continue
+        combos = df[(df["run_type"] == "federated")][["encoding", "distribution"]].drop_duplicates()
+        for _, c in combos.iterrows():
+            rows.append(rq3_local_global_cell(dataset, df, c["encoding"], c["distribution"]))
+    out = pd.DataFrame(rows)
+    iid_means = (out[out["distribution"] == "iid"]
+                 .set_index(["dataset", "encoding"])["local_global_jsd_mean"])
+    out["delta_vs_iid"] = out.apply(
+        lambda r: (r["local_global_jsd_mean"] - iid_means.get((r["dataset"], r["encoding"]), float("nan")))
+        if pd.notna(r["local_global_jsd_mean"]) else float("nan"), axis=1)
+    out["_enc_ord"] = out["encoding"].map({e: i for i, e in enumerate(ENC_ORDER)})
+    out["_dist_ord"] = out["distribution"].map({d: i for i, d in enumerate(DIST_ORDER)})
+    return (out.sort_values(["dataset", "_dist_ord", "_enc_ord"])
+               .drop(columns=["_enc_ord", "_dist_ord"]).reset_index(drop=True))
 
 
 # ── RQ2: round-to-round stability ───────────────────────────────────────────
@@ -543,15 +628,16 @@ def main():
     pima_refs = build_refs(pima_df)
 
     print("\nBuilding Table 1/3 (RQ1 fidelity / RQ3 divergence) ...")
-    rq1_table = build_rq1_rq3({
+    datasets = {
         "wisconsin": (wisconsin_df, wisconsin_refs),
         "pima": (pima_df, pima_refs),
-    })
-    rq3_table = rq3_view(rq1_table)
+    }
+    rq1_table = build_rq1_rq3(datasets)
+    rq3_table = build_rq3_local_global(datasets)
     write_table(rq1_table, out_dir, "table1_rq1_fidelity",
                 "Table 1 — RQ1 Fidelity: JSD_cent by Encoding x Distribution x Dataset")
     write_table(rq3_table, out_dir, "table3_rq3_divergence",
-                "Table 3 — RQ3 Divergence: JSD_cent by Distribution (delta vs IID)")
+                "Table 3 — RQ3 Local-to-Global Divergence: mean_{k,t} JSD(phi_k, phi_g) by Distribution (delta vs IID)")
 
     print("\nBuilding Table 2 (RQ2 stability) ...")
     rq2_table = build_rq2(wisconsin_df, wisconsin_ext_df, pima_df)
