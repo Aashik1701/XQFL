@@ -1,0 +1,17 @@
+
+========================================================================
+[19:47:16] START experiments/phase10_explanation_sweep.py
+  log -> /Users/mohammedaashik/Documents/PROJECT/XQFL/results/phase10_explanation_sweep.rerun.log
+========================================================================
+[20:45:28] DONE  experiments/phase10_explanation_sweep.py  rc=0  (58.2 min)
+
+========================================================================
+[20:45:28] START experiments/rq2_seed_extension.py
+  log -> /Users/mohammedaashik/Documents/PROJECT/XQFL/results/rq2_seed_extension.rerun.log
+========================================================================
+[21:36:07] DONE  experiments/rq2_seed_extension.py  rc=0  (50.7 min)
+
+========================================================================
+[21:36:07] START experiments/phase11_encoding_noniid_sweep.py
+  log -> /Users/mohammedaashik/Documents/PROJECT/XQFL/results/phase11_encoding_noniid_sweep.rerun.log
+========================================================================

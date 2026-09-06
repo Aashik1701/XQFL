@@ -1,0 +1,12 @@
+run_key,status,completed_at
+federated|amplitude|iid|42,done,2026-08-03T05:57:00.789797+00:00
+centralized|amplitude|iid|42,done,2026-08-03T05:58:56.591378+00:00
+federated|amplitude|iid|1,done,2026-08-03T06:00:37.391754+00:00
+centralized|amplitude|iid|1,done,2026-08-03T06:02:35.020985+00:00
+federated|amplitude|alpha_0.1|42,done,2026-08-03T06:04:41.856906+00:00
+replication|amplitude|alpha_0.1|42|rep1,done,2026-08-03T06:12:37.142298+00:00
+replication|amplitude|alpha_0.1|42|rep2,done,2026-08-03T06:14:02.186287+00:00
+federated|amplitude|alpha_0.1|1,done,2026-08-03T09:58:38.590630+00:00
+replication|amplitude|alpha_0.1|1|rep1,done,2026-08-03T10:01:25.044212+00:00
+replication|amplitude|alpha_0.1|1|rep2,done,2026-08-03T10:04:07.667484+00:00
+replcheck|amplitude|alpha_0.1,done,2026-08-03T10:04:07.681609+00:00

@@ -1,0 +1,14 @@
+dataset,encoding,distribution,n,auc_mean,auc_std,collapse_rate,status,note
+pima,amplitude,iid,15,0.5619999999999999,0.10316976301223145,0.0,ok,"RQ4 extension: cross-dataset check for the strongest encoding, n=15 — matches Wisconsin's n=15, same statistical footing. Stability check vs the n=5 preliminary read (0.579 +/- 0.130): shift = -0.017, well within the n=5 SE (0.058) — not a meaningful move. Pima (0.562) vs Wisconsin/amplitude (0.619) gap = 0.057, 1.43 SE — NOT resolved (tied, consistent with Wisconsin); vs random guess 2.33 SE — RESOLVED (genuine leakage)."
+wisconsin,angle,iid,15,0.5449333333333333,0.08829452876324677,,ok,
+wisconsin,amplitude,iid,15,0.6188,0.11445722844301771,,ok,
+wisconsin,reuploading,iid,15,0.6441333333333333,0.13381536675939867,,ok,
+wisconsin,iqp,iid,14,0.612,0.17063861949025041,,ok,IQP/seed=7 excluded (MN-09)
+wisconsin,angle,alpha_0.1,2,,,0.6,insufficient,
+wisconsin,amplitude,alpha_0.1,5,0.5488,0.12353622950373706,0.0,ok,
+wisconsin,reuploading,alpha_0.1,0,,,1.0,absent,
+wisconsin,iqp,alpha_0.1,4,0.6735,0.19893298704170037,0.2,ok,seed=7 AUC replaced with 3-draw replication mean=0.848 (MN-09 bimodality)
+wisconsin,angle,qty_skew,5,0.5456000000000001,0.11342310170331263,0.0,ok,
+wisconsin,amplitude,qty_skew,5,0.6388,0.1658348576144352,0.0,ok,
+wisconsin,reuploading,qty_skew,5,0.6916,0.1600087497607553,0.0,ok,
+wisconsin,iqp,qty_skew,5,0.7216,0.18610427184780043,0.0,ok,seed=7 AUC replaced with 3-draw replication mean=0.856 (MN-09)

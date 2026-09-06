@@ -217,7 +217,25 @@ def run_federation(
         from models.quantum_classifier import HybridQuantumClassifier
         from federation.client import XQFLClient
 
-        partition_id   = int(context.node_id) % _n_clients
+        # Partition assignment MUST use Flower's own per-client partition-id, not
+        # node_id. context.node_id is a large random integer, so the old
+        # `int(context.node_id) % _n_clients` was not a bijection onto
+        # {0..n-1}: every run it silently dropped one partition and
+        # double-counted another (nondeterministically), corrupting all non-IID
+        # results. node_config["partition-id"] is the stable 0..n-1 index Flower
+        # derives from num_clients.
+        try:
+            partition_id = int(context.node_config["partition-id"])
+        except (KeyError, TypeError, ValueError) as exc:
+            raise RuntimeError(
+                "Flower did not supply node_config['partition-id']; cannot map "
+                "clients to data partitions deterministically. "
+                f"node_config={getattr(context, 'node_config', None)!r}"
+            ) from exc
+        if not 0 <= partition_id < _n_clients:
+            raise RuntimeError(
+                f"partition-id {partition_id} out of range for n_clients={_n_clients}"
+            )
         X_i, y_i      = _partitions[partition_id]
 
         model          = HybridQuantumClassifier(

@@ -31,6 +31,22 @@ class DeterministicFedAvg(FedAvg):
     """
 
     def aggregate_fit(self, server_round, results, failures):
+        # Correctness guard for the node_id%n_clients partition-assignment bug
+        # (fixed in run_federation.client_fn): every round MUST train each data
+        # partition exactly once. The observed partition ids are logged here and
+        # asserted to be exactly {0, 1, ..., n-1}; anything else (a dropped or
+        # doubled partition) halts the run rather than silently corrupting it.
+        pids = sorted(int(fr.metrics["client_id"]) for _, fr in results
+                      if fr.metrics and "client_id" in fr.metrics)
+        if pids:
+            expected = list(range(self.min_fit_clients))
+            print(f"[round {server_round}] partitions trained: {pids}")
+            if pids != expected:
+                raise RuntimeError(
+                    f"[round {server_round}] partition ids {pids} != expected "
+                    f"{expected} — a partition was dropped, double-counted, or "
+                    "failed; client-to-partition assignment is broken."
+                )
         sorted_results = sorted(results, key=lambda x: int(x[0].cid))
         return super().aggregate_fit(server_round, sorted_results, failures)
 
