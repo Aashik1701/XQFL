@@ -9,16 +9,16 @@
 | wisconsin | angle | iid | 15 | 15 | 0.9348 | 0.0456 | 0.9431 | 0.0617 | 0.0201 | 0.0008 | ok |  |
 | wisconsin | amplitude | iid | 15 | 15 | 0.9363 | 0.0556 | 0.9644 | 0.0462 | 0.0247 | 0.0012 | ok |  |
 | wisconsin | reuploading | iid | 15 | 15 | 0.8859 | 0.0489 | 0.9395 | 0.0600 | 0.0335 | 0.0025 | ok |  |
-| wisconsin | iqp | iid | 14 | 15 | 0.8651 | 0.0904 | 0.9334 | 0.0698 | 0.0301 | 0.0025 | ok | IQP/seed=7 excluded (MN-09) |
+| wisconsin | iqp | iid | 15 | 15 | 0.8578 | 0.0915 | 0.9286 | 0.0698 | 0.0308 | 0.0035 | ok |  |
 | wisconsin | angle | alpha_0.5 | 3 | 5 | 0.9407 | 0.0463 | 0.9384 | 0.0631 | 0.0178 | 0.0026 | ok |  |
 | wisconsin | amplitude | alpha_0.5 | 5 | 5 | 0.9244 | 0.0659 | 0.9408 | 0.0658 | 0.0270 | 0.0024 | ok |  |
 | wisconsin | reuploading | alpha_0.5 | 5 | 5 | 0.8044 | 0.1211 | 0.9576 | 0.0500 | 0.0334 | 0.0031 | ok |  |
-| wisconsin | iqp | alpha_0.5 | 4 | 5 | 0.8500 | 0.0664 | 0.9354 | 0.0549 | 0.0323 | 0.0063 | ok | IQP/seed=7 excluded (MN-09) |
+| wisconsin | iqp | alpha_0.5 | 5 | 5 | 0.8311 | 0.0713 | 0.9248 | 0.0532 | 0.0306 | 0.0066 | ok |  |
 | wisconsin | angle | alpha_0.1 | 1 | 5 | — | — | — | — | — | — | insufficient |  |
 | wisconsin | amplitude | alpha_0.1 | 5 | 5 | 0.9067 | 0.0760 | 0.9409 | 0.0653 | 0.0228 | 0.0054 | ok |  |
 | wisconsin | reuploading | alpha_0.1 | 3 | 5 | 0.9111 | 0.0385 | 0.9500 | 0.0640 | 0.0371 | 0.0039 | ok |  |
-| wisconsin | iqp | alpha_0.1 | 3 | 5 | 0.8741 | 0.0780 | 0.9532 | 0.0519 | 0.0226 | 0.0058 | ok | IQP/seed=7 excluded (MN-09) |
+| wisconsin | iqp | alpha_0.1 | 4 | 5 | 0.8278 | 0.1124 | 0.9384 | 0.0516 | 0.0249 | 0.0066 | ok |  |
 | wisconsin | angle | qty_skew | 5 | 5 | 0.9333 | 0.0351 | 0.9372 | 0.0639 | 0.0209 | 0.0012 | ok |  |
 | wisconsin | amplitude | qty_skew | 5 | 5 | 0.9156 | 0.0655 | 0.9401 | 0.0655 | 0.0264 | 0.0020 | ok |  |
 | wisconsin | reuploading | qty_skew | 5 | 5 | 0.8978 | 0.0337 | 0.9635 | 0.0533 | 0.0374 | 0.0040 | ok |  |
-| wisconsin | iqp | qty_skew | 4 | 5 | 0.8333 | 0.1210 | 0.9343 | 0.0543 | 0.0353 | 0.0050 | ok | IQP/seed=7 excluded (MN-09) |
+| wisconsin | iqp | qty_skew | 5 | 5 | 0.8044 | 0.1231 | 0.9212 | 0.0554 | 0.0333 | 0.0062 | ok |  |

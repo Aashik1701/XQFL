@@ -26,26 +26,14 @@ notes); the computation is the source of truth, not the cross-check.
 
 Exclusion rules applied throughout
 -----------------------------------
-* IQP/seed=7 is excluded from every Wisconsin aggregation (RQ1, RQ2, RQ3,
-  RQ4a-IID, RQ4b-DP) per MN-09: initialization-specific bimodal instability
-  in explanation geometry, confirmed across 14 draws spanning all 4
-  distributions. (Verified: reproduces the audit's "IQP: 0.868 ± 0.076
-  (n=14)" RQ2 figure and "IQP: 0.612 ± 0.171 (n=14)" RQ4 IID-MIA figure
-  exactly.)
-* Two further Wisconsin RQ3/RQ1 seed exclusions, both documented in
-  methods_notes.md's RQ3-anomaly-resolution items and reproduced here from
-  the raw per-seed JSD values:
-    - reuploading/alpha_0.5 excludes seed=999 (MN-08 boundary-sensitive;
-      2/3 replicate draws show anomalous ||phi||)
-    - amplitude/alpha_0.5 excludes seed=123 (JSD_cent elevation reproducible
-      across 3 draws, ~4.4 sigma above the leave-one-out mean; reported
-      separately rather than folded into the condition mean)
-* For IQP/seed=7 under alpha_0.1 and qty_skew non-IID MIA specifically, the
-  raw single-draw value is bimodally unstable (MN-09); the mean of the
-  3-draw replication (rq4_seed7_replication_log.csv /
-  rq4_iqp_seed7_qty_replication_log.csv) is used in its place, per the
-  finalized non-IID MIA write-up. This is the one place a "seed value" is
-  corrected rather than a "seed excluded" — noted explicitly in the table.
+* NO per-seed anomaly exclusions. The corrected federated recompute
+  (2026-09-07, results/CORRECTED_RERUN_AUDIT.md) showed all three pre-fix
+  anomalies (MN-09 IQP/seed=7; MN-08 reuploading/alpha_0.5/seed=999 and
+  amplitude/alpha_0.5/seed=123) to be artifacts of the node_id%n_clients
+  partition-assignment bug, not real instability. Every seed now enters
+  every aggregation; no seed value is substituted. IQP Wisconsin IID is
+  therefore n=15 (RQ2/RQ4) and the MN-09 3-draw-mean MIA substitution is
+  disabled.
 * Track-B (collapsed) draws are excluded from every divergence/stability
   mean; the collapse rate (B / total draws) is reported alongside every
   cell so a near-zero JSD from a dead model is never misread as "good
@@ -94,17 +82,26 @@ DIST_CANON = {
 DIST_ORDER = ["iid", "alpha_0.5", "alpha_0.1", "qty_skew"]
 ENC_ORDER = ["angle", "amplitude", "reuploading", "iqp"]
 
-# ── global exclusion rules (see module docstring) ──────────────────────────
-
-# MN-09: IQP/seed=7 excluded from every Wisconsin aggregation.
-IQP_SEED7_EXCLUDE_DATASET = "wisconsin"
+# ── global exclusion rules ────────────────────────────────────────────────
+#
+# The corrected federated recompute (2026-09-07, results/CORRECTED_RERUN_AUDIT.md)
+# eliminated all three pre-fix seed anomalies — they were artifacts of the
+# node_id%n_clients partition-assignment bug, not real instability:
+#   * MN-09  IQP/seed=7  : now Track-A ~0.868, mid-pack, stable across all
+#                          distributions (was "bimodal 0.63 <-> 0.90").
+#   * MN-08  reuploading/alpha_0.5/seed=999 : ||phi|| now 0.41/0.41/0.43
+#                          (was ~0.07 "near-collapse").
+#   * MN-08  amplitude/alpha_0.5/seed=123   : JSD_cent now 0.97 sigma above the
+#                          leave-one-out mean (was 4.4 sigma).
+# None of the three is excluded any longer; every seed enters every aggregation.
+IQP_SEED7_EXCLUDE_DATASET = None          # was "wisconsin" (MN-09) — retired
 IQP_SEED7 = 7
+RQ3_EXTRA_EXCLUSIONS: dict = {}           # was {reup/a0.5:999, amp/a0.5:123} — retired
 
-# RQ3/RQ1 seed exclusions, Wisconsin only, keyed by (encoding, distribution).
-RQ3_EXTRA_EXCLUSIONS = {
-    ("reuploading", "alpha_0.5"): {999},  # MN-08 boundary-sensitive
-    ("amplitude", "alpha_0.5"): {123},    # reproducible JSD_cent elevation
-}
+
+def _exclude_iqp_seed7(dataset: str, encoding: str) -> bool:
+    return (IQP_SEED7_EXCLUDE_DATASET is not None
+            and dataset == IQP_SEED7_EXCLUDE_DATASET and encoding == "iqp")
 
 
 def get_out_dir() -> Path:
@@ -189,7 +186,7 @@ def jsd_cell(dataset: str, df: pd.DataFrame, refs: dict, encoding: str, distribu
     track_a = draws[draws["track_class"] == "A"].copy()
 
     excluded_note = []
-    if dataset == "wisconsin" and encoding == "iqp":
+    if _exclude_iqp_seed7(dataset, encoding):
         track_a = track_a[track_a["seed"] != IQP_SEED7]
         excluded_note.append("IQP/seed=7 excluded (MN-09)")
     extra = RQ3_EXTRA_EXCLUSIONS.get((encoding, distribution))
@@ -257,12 +254,13 @@ def rq3_local_global_cell(dataset: str, df: pd.DataFrame, encoding: str, distrib
       * a seed contributes only if its final-round (R15) global model is Track A
         (a collapsed global model's near-constant vectors make local-to-global
         divergence meaningless); Track-B seeds are counted, not averaged;
-      * MN-09: Wisconsin IQP/seed=7 excluded (whole-seed bimodal instability,
-        metric-independent);
-      * the RQ1 JSD_cent anomaly exclusions (amplitude/alpha_0.5/seed=123,
-        reuploading/alpha_0.5/seed=999) are NOT transferred here — they were
-        derived for a different metric; their local-to-global values are
-        reported in the audit instead;
+      * NO per-seed anomaly exclusions. After the 2026-09-07 corrected rerun
+        the module-level exclusion constants are disabled
+        (IQP_SEED7_EXCLUDE_DATASET is None, RQ3_EXTRA_EXCLUSIONS is empty), so
+        the _exclude_iqp_seed7() branch below never fires and every seed enters
+        the mean. The pre-fix MN-09 (IQP/seed=7) and MN-08
+        (amplitude/alpha_0.5/seed=123, reuploading/alpha_0.5/seed=999)
+        exclusions were shown to be partition-bug artifacts and retired;
       * round 0 (initial broadcast, all clients == global) is skipped.
     """
     sub = df[(df["encoding"] == encoding)
@@ -274,7 +272,7 @@ def rq3_local_global_cell(dataset: str, df: pd.DataFrame, encoding: str, distrib
     per_seed_means = []
     n_track_b = 0
     for seed, g in sub.groupby("seed"):
-        if dataset == "wisconsin" and encoding == "iqp" and seed == IQP_SEED7:
+        if _exclude_iqp_seed7(dataset, encoding) and seed == IQP_SEED7:
             if "IQP/seed=7 excluded (MN-09)" not in excluded_note:
                 excluded_note.append("IQP/seed=7 excluded (MN-09)")
             continue
@@ -350,7 +348,7 @@ def stability_cell(dataset: str, df: pd.DataFrame, encoding: str, distribution: 
     per_seed = {}
     excluded_note = []
     for seed, g in sub.groupby("seed"):
-        if dataset == "wisconsin" and encoding == "iqp" and seed == IQP_SEED7:
+        if _exclude_iqp_seed7(dataset, encoding) and seed == IQP_SEED7:
             excluded_note.append("IQP/seed=7 excluded (MN-09)")
             continue
         g = g.sort_values("round")
@@ -438,7 +436,7 @@ def build_rq4_mia() -> pd.DataFrame:
     for enc in ENC_ORDER:
         vals = by_enc.get(enc, [])
         note = ""
-        if enc == "iqp":
+        if _exclude_iqp_seed7("wisconsin", enc):
             vals = [(s, v) for s, v in vals if s != IQP_SEED7]
             note = "IQP/seed=7 excluded (MN-09)"
         aucs = [v for _, v in vals]
@@ -457,19 +455,11 @@ def build_rq4_mia() -> pd.DataFrame:
         dist = DIST_CANON.get(r["distribution"], r["distribution"])
         cell[(r["encoding"], dist)][int(r["seed"])] = (float(r["direct_mia_auc"]), r["track_class"])
 
-    # Corrections: IQP/seed=7 replicated 3-draw means (MN-09).
-    def _replication_mean(name: str, filt) -> float:
-        recs = _read_csv(name)
-        vals = [float(r["direct_mia_auc"]) for r in recs if filt(r)]
-        return float(np.mean(vals)) if vals else float("nan")
-
-    iqp_a01_seed7_corrected = _replication_mean(
-        "rq4_seed7_replication_log.csv",
-        lambda r: r.get("anomaly_id") == "A" and r["encoding"] == "iqp" and r["distribution"] == "alpha_0.1" and r["seed"] == "7",
-    )
-    iqp_qty_seed7_corrected = _replication_mean(
-        "rq4_iqp_seed7_qty_replication_log.csv", lambda r: True,
-    )
+    # MN-09 IQP/seed=7 replication corrections are RETIRED after the corrected
+    # rerun (seed 7 is no longer anomalous); the 3-draw-mean substitution is
+    # disabled. Kept as NaN so the substitution branches below never fire.
+    iqp_a01_seed7_corrected = float("nan")
+    iqp_qty_seed7_corrected = float("nan")
 
     for (enc, dist), seedmap in cell.items():
         note_parts = []
@@ -572,7 +562,7 @@ def build_rq4_dp() -> pd.DataFrame:
     rows = []
     for (enc, eps), vals in cell.items():
         note = ""
-        if enc == "iqp":
+        if _exclude_iqp_seed7("wisconsin", enc):
             vals = [(s, v) for s, v in vals if s != IQP_SEED7]
             note = "IQP/seed=7 excluded (MN-09, applied for consistency with other Wisconsin RQ4 tables)"
         aucs = [v for _, v in vals]

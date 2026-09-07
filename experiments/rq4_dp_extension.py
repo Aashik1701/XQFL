@@ -13,11 +13,13 @@ Per (encoding, seed):
      sensitivity = mean(‖φ‖) from Phase 10 IID data.
   4. Run direct MIA on noisy explanations (cv=5 LR) for each ε.
 
-Sensitivity calibration (from Phase 10 IID global norm_phi, Track A rows):
-  angle:       Δf = 0.2258
-  amplitude:   Δf = 0.2607
-  reuploading: Δf = 0.3547
-  iqp:         Δf = 0.2536
+Sensitivity calibration: Δf = mean(‖φ‖) over IID Track-A GLOBAL rows (rounds
+1-15) of the CURRENT results/phase10_log.csv, computed at import by
+_compute_sensitivity(). After the 2026-09-07 corrected rerun these are
+approximately angle 0.229 / amplitude 0.262 / reuploading 0.344 / iqp 0.287
+(printed at startup). The dict below (_SENSITIVITY_FALLBACK, 0.2258 / 0.2607 /
+0.3547 / 0.2536) is only used if phase10_log.csv is missing and reflects a
+pre-fix run — it is NOT the calibration used for the reported results.
 
 ε values: [0.1, 0.5, 1.0, 5.0] — spans aggressive protection to near-unprotected.
 Noise-to-signal ratio (NSR = Δf/(ε × median_norm)):

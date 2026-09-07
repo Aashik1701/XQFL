@@ -3,9 +3,10 @@
 (results/XQFL_completion_audit.md, Step 6):
 
   Figure 2 — stability over rounds     (RQ2, Wisconsin IID n=15)
-  Figure 3 — divergence by distribution (RQ3, JSD_cent, Wisconsin + Pima)
+  Figure 3 — local-to-global divergence by distribution
+             (RQ3, mean_{k,t} JSD(phi_k, phi_g), Wisconsin + Pima)
   Figure 4 — MIA AUC comparison        (RQ4, Wisconsin IID n=15 + Pima/amplitude)
-  Figure 5 — DP AUC vs epsilon         (RQ4, Wisconsin)
+  Figure 5 — MIA AUC under calibrated Laplace noise vs epsilon   (RQ4, Wisconsin)
 
 (Numbered to match the audit's Figure 1 = existing architecture diagram, so
 Figures 2-5 here line up with the audit's own numbering.)
@@ -122,7 +123,7 @@ def make_figure2_stability(wisconsin_df, wisconsin_ext_df, out_dir: Path):
 
     fig, ax = plt.subplots(figsize=(8, 5))
     for enc in ENC_ORDER:
-        exclude = {IQP_SEED7} if enc == "iqp" else set()
+        exclude = set()   # MN-09 retired — IQP/seed=7 no longer excluded
         rounds, means, stds = round_pair_series(iid_combined, enc, exclude)
         if len(rounds) == 0:
             continue
@@ -133,7 +134,7 @@ def make_figure2_stability(wisconsin_df, wisconsin_ext_df, out_dir: Path):
     ax.set_xlabel("Federation round")
     ax.set_ylabel("Kendall's τ (round $r{-}1$ vs. round $r$)")
     _titled(fig, ax, "RQ2 — Explanation stability over training rounds",
-            "Wisconsin, IID, n=15 seeds (IQP: n=14, seed=7 excluded — MN-09)")
+            "Wisconsin, IID, n=15 seeds (all encodings)")
     ax.set_ylim(0, 1.05)
     ax.set_xticks(range(1, 16))
     _legend(ax, loc="lower right")
@@ -228,7 +229,7 @@ def make_figure4_mia(rq4_mia_table: pd.DataFrame, out_dir: Path):
     ax.set_ylim(0, 1.0)
     pima_note = "hatched = Pima check (preliminary — see bar label for n)" if pima_underpowered else "hatched = Pima check (n-matched)"
     _titled(fig, ax, "RQ4 — Membership-inference leakage by encoding",
-            f"Wisconsin IID n={wisconsin_n} (IQP n=14, seed=7 excl. — MN-09); {pima_note}")
+            f"Wisconsin IID n={wisconsin_n} (all encodings); {pima_note}")
     fig.tight_layout(rect=(0, 0, 1, 0.92))
     path = out_dir / "figure4_mia_auc_comparison.png"
     fig.savefig(path)
@@ -256,8 +257,8 @@ def make_figure5_dp(rq4_dp_table: pd.DataFrame, out_dir: Path):
     ax.set_xlabel("Privacy budget ε (log scale; lower = more private)")
     ax.set_ylabel("Direct-MIA AUC")
     ax.set_ylim(0.25, 0.85)
-    _titled(fig, ax, "RQ4 — DP protection vs. privacy budget",
-            "Wisconsin, 4 encodings × 5 seeds (IQP n=4, seed=7 excluded — MN-09)")
+    _titled(fig, ax, "RQ4 — MIA AUC under calibrated Laplace noise vs. budget",
+            "Wisconsin, 4 encodings × 5 seeds")
     _legend(ax, loc="upper left")
     fig.tight_layout(rect=(0, 0, 1, 0.93))
     path = out_dir / "figure5_dp_auc_vs_epsilon.png"

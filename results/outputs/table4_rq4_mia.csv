@@ -1,9 +1,9 @@
 dataset,encoding,distribution,n,auc_mean,auc_std,collapse_rate,status,note
-pima,amplitude,iid,15,0.5619999999999999,0.10316976301223145,0.0,ok,"RQ4 extension: cross-dataset check for the strongest encoding, n=15 — matches Wisconsin's n=15, same statistical footing. Stability check vs the n=5 preliminary read (0.579 +/- 0.130): shift = -0.017, well within the n=5 SE (0.058) — not a meaningful move. Pima (0.562) vs Wisconsin/amplitude (0.620) gap = 0.058, 1.48 SE — NOT resolved (tied, consistent with Wisconsin); vs random guess 2.33 SE — RESOLVED (genuine leakage)."
+pima,amplitude,iid,15,0.5637333333333333,0.10860904110396984,0.0,ok,"RQ4 extension: cross-dataset check for the strongest encoding, n=15 — matches Wisconsin's n=15, same statistical footing. Stability check vs the n=5 preliminary read (0.579 +/- 0.130): shift = -0.015, well within the n=5 SE (0.058) — not a meaningful move. Pima (0.564) vs Wisconsin/amplitude (0.620) gap = 0.056, 1.40 SE — NOT resolved (tied, consistent with Wisconsin); vs random guess 2.27 SE — RESOLVED (genuine leakage)."
 wisconsin,angle,iid,15,0.5326666666666665,0.07986297789398562,,ok,
 wisconsin,amplitude,iid,15,0.6199999999999999,0.11175739029573967,,ok,
 wisconsin,reuploading,iid,15,0.6652,0.13650913103943949,,ok,
-wisconsin,iqp,iid,14,0.6318571428571429,0.15205153839955166,,ok,IQP/seed=7 excluded (MN-09)
+wisconsin,iqp,iid,15,0.6469333333333334,0.15772646605829377,,ok,
 wisconsin,angle,alpha_0.1,1,,,0.8,insufficient,
 wisconsin,amplitude,alpha_0.1,5,0.5732,0.1667309209474955,0.0,ok,
 wisconsin,reuploading,alpha_0.1,4,0.651,0.19926197161860398,0.2,ok,
