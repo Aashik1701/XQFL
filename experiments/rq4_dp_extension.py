@@ -71,13 +71,36 @@ ENCODINGS = {
     "iqp":         iqp_encoding,
 }
 
-# Per-encoding calibrated Laplace sensitivity = mean(‖φ‖) from Phase 10 IID Track-A rows
-SENSITIVITY = {
-    "angle":       0.2258,
-    "amplitude":   0.2607,
-    "reuploading": 0.3547,
-    "iqp":         0.2536,
+# Per-encoding calibrated Laplace sensitivity Δf = mean(‖φ‖) over IID Track-A
+# GLOBAL rows (rounds 1-15) of the CURRENT phase10_log.csv. Derived at import
+# time so it never carries stale pre-fix norms; the dict below is a fallback.
+_SENSITIVITY_FALLBACK = {
+    "angle": 0.2258, "amplitude": 0.2607, "reuploading": 0.3547, "iqp": 0.2536,
 }
+
+
+def _compute_sensitivity():
+    import csv as _csv
+    path = os.path.join(PROJECT_ROOT, "results", "phase10_log.csv")
+    if not os.path.exists(path):
+        return dict(_SENSITIVITY_FALLBACK)
+    norms = {}
+    with open(path, newline="") as fh:
+        for r in _csv.DictReader(fh):
+            if (r["run_type"] == "federated" and r["distribution"] == "iid"
+                    and r["client_id"] == "global" and int(r["round"]) >= 1
+                    and r["track_class"] == "A"):
+                norms.setdefault(r["encoding"], []).append(float(r["norm_phi"]))
+    out = dict(_SENSITIVITY_FALLBACK)
+    for enc, vals in norms.items():
+        if len(vals) >= 10:
+            out[enc] = sum(vals) / len(vals)
+    return out
+
+
+SENSITIVITY = _compute_sensitivity()
+print("  SENSITIVITY Δf (from corrected phase10_log.csv): "
+      + ", ".join(f"{k}={v:.4f}" for k, v in sorted(SENSITIVITY.items())))
 
 EPSILONS = [0.1, 0.5, 1.0, 5.0]    # privacy-utility curve
 

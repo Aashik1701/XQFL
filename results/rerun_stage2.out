@@ -1,0 +1,17 @@
+
+========================================================================
+[2026-09-07 08:53:11] START experiments/phase16_pima_explanation_sweep.py
+  free disk: 35.1 GB   log -> /Users/mohammedaashik/Documents/PROJECT/XQFL/results/phase16_pima_explanation_sweep.rerun.log
+========================================================================
+[12:41:55] DONE  experiments/phase16_pima_explanation_sweep.py  rc=0  (228.7 min)  free now 33.0 GB
+
+========================================================================
+[2026-09-07 12:41:56] START experiments/phase13_mia_sweep.py
+  free disk: 33.1 GB   log -> /Users/mohammedaashik/Documents/PROJECT/XQFL/results/phase13_mia_sweep.rerun.log
+========================================================================
+[13:17:36] DONE  experiments/phase13_mia_sweep.py  rc=0  (35.7 min)  free now 30.6 GB
+
+========================================================================
+[2026-09-07 13:17:36] START experiments/rq4_seed_extension.py
+  free disk: 30.6 GB   log -> /Users/mohammedaashik/Documents/PROJECT/XQFL/results/rq4_seed_extension.rerun.log
+========================================================================
