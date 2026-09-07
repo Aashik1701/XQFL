@@ -1,17 +1,17 @@
 dataset,encoding,epsilon,n,auc_mean,auc_std,status,note
-wisconsin,angle,0.1,5,0.30920000000000003,0.02629068276024797,ok,
-wisconsin,angle,0.5,5,0.3696,0.02438852189043034,ok,
-wisconsin,angle,1.0,5,0.42119999999999996,0.06212245970661496,ok,
-wisconsin,angle,5.0,5,0.5187999999999999,0.1038229261772177,ok,
-wisconsin,amplitude,0.1,5,0.3296,0.026773120849090424,ok,
-wisconsin,amplitude,0.5,5,0.47800000000000004,0.10641428475538424,ok,
-wisconsin,amplitude,1.0,5,0.5668,0.11669275898700827,ok,
-wisconsin,amplitude,5.0,5,0.6432,0.12538420953214166,ok,
-wisconsin,reuploading,0.1,5,0.3308,0.0288652039660211,ok,
-wisconsin,reuploading,0.5,5,0.4904,0.12039435202699503,ok,
-wisconsin,reuploading,1.0,5,0.5684,0.15287511242841328,ok,
-wisconsin,reuploading,5.0,5,0.6692,0.18094529560063174,ok,
-wisconsin,iqp,0.1,4,0.3255,0.024785748593361745,ok,"IQP/seed=7 excluded (MN-09, applied for consistency with other Wisconsin RQ4 tables)"
-wisconsin,iqp,0.5,4,0.48,0.09482615672903758,ok,"IQP/seed=7 excluded (MN-09, applied for consistency with other Wisconsin RQ4 tables)"
-wisconsin,iqp,1.0,4,0.562,0.12830172770985326,ok,"IQP/seed=7 excluded (MN-09, applied for consistency with other Wisconsin RQ4 tables)"
-wisconsin,iqp,5.0,4,0.635,0.16518676298864465,ok,"IQP/seed=7 excluded (MN-09, applied for consistency with other Wisconsin RQ4 tables)"
+wisconsin,angle,0.1,5,0.31120000000000003,0.027151427218472326,ok,
+wisconsin,angle,0.5,5,0.36760000000000004,0.022333830840229826,ok,
+wisconsin,angle,1.0,5,0.4152,0.05724683397359194,ok,
+wisconsin,angle,5.0,5,0.5208,0.09994598541212148,ok,
+wisconsin,amplitude,0.1,5,0.33,0.027386127875258317,ok,
+wisconsin,amplitude,0.5,5,0.4720000000000001,0.10120276676059801,ok,
+wisconsin,amplitude,1.0,5,0.5616,0.11108915338591792,ok,
+wisconsin,amplitude,5.0,5,0.6380000000000001,0.11926441212700462,ok,
+wisconsin,reuploading,0.1,5,0.3308,0.030351276744150325,ok,
+wisconsin,reuploading,0.5,5,0.4984,0.11882255678110956,ok,
+wisconsin,reuploading,1.0,5,0.5768000000000001,0.14186331449673661,ok,
+wisconsin,reuploading,5.0,5,0.6696,0.1681570694321235,ok,
+wisconsin,iqp,0.1,5,0.3284,0.02662329806766998,ok,
+wisconsin,iqp,0.5,5,0.4972,0.11076642090453225,ok,
+wisconsin,iqp,1.0,5,0.5884,0.13809706731136615,ok,
+wisconsin,iqp,5.0,5,0.6771999999999999,0.18357886588602731,ok,

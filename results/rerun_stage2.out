@@ -15,3 +15,18 @@
 [2026-09-07 13:17:36] START experiments/rq4_seed_extension.py
   free disk: 30.6 GB   log -> /Users/mohammedaashik/Documents/PROJECT/XQFL/results/rq4_seed_extension.rerun.log
 ========================================================================
+[13:55:54] DONE  experiments/rq4_seed_extension.py  rc=0  (38.3 min)  free now 29.5 GB
+
+========================================================================
+[2026-09-07 13:55:54] START experiments/rq4_noniid_mia.py
+  free disk: 29.5 GB   log -> /Users/mohammedaashik/Documents/PROJECT/XQFL/results/rq4_noniid_mia.rerun.log
+========================================================================
+[15:10:23] DONE  experiments/rq4_noniid_mia.py  rc=0  (74.5 min)  free now 27.1 GB
+
+========================================================================
+[2026-09-07 15:10:24] START experiments/rq4_dp_extension.py
+  free disk: 27.1 GB   log -> /Users/mohammedaashik/Documents/PROJECT/XQFL/results/rq4_dp_extension.rerun.log
+========================================================================
+[15:36:11] DONE  experiments/rq4_dp_extension.py  rc=0  (25.8 min)  free now 27.1 GB
+
+[STAGE 2 COMPLETE] total 6.72 h

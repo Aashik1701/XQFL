@@ -2,19 +2,19 @@
 
 | dataset | encoding | epsilon | n | auc_mean | auc_std | status | note |
 |---|---|---|---|---|---|---|---|
-| wisconsin | angle | 0.1000 | 5 | 0.3092 | 0.0263 | ok |  |
-| wisconsin | angle | 0.5000 | 5 | 0.3696 | 0.0244 | ok |  |
-| wisconsin | angle | 1.0000 | 5 | 0.4212 | 0.0621 | ok |  |
-| wisconsin | angle | 5.0000 | 5 | 0.5188 | 0.1038 | ok |  |
-| wisconsin | amplitude | 0.1000 | 5 | 0.3296 | 0.0268 | ok |  |
-| wisconsin | amplitude | 0.5000 | 5 | 0.4780 | 0.1064 | ok |  |
-| wisconsin | amplitude | 1.0000 | 5 | 0.5668 | 0.1167 | ok |  |
-| wisconsin | amplitude | 5.0000 | 5 | 0.6432 | 0.1254 | ok |  |
-| wisconsin | reuploading | 0.1000 | 5 | 0.3308 | 0.0289 | ok |  |
-| wisconsin | reuploading | 0.5000 | 5 | 0.4904 | 0.1204 | ok |  |
-| wisconsin | reuploading | 1.0000 | 5 | 0.5684 | 0.1529 | ok |  |
-| wisconsin | reuploading | 5.0000 | 5 | 0.6692 | 0.1809 | ok |  |
-| wisconsin | iqp | 0.1000 | 4 | 0.3255 | 0.0248 | ok | IQP/seed=7 excluded (MN-09, applied for consistency with other Wisconsin RQ4 tables) |
-| wisconsin | iqp | 0.5000 | 4 | 0.4800 | 0.0948 | ok | IQP/seed=7 excluded (MN-09, applied for consistency with other Wisconsin RQ4 tables) |
-| wisconsin | iqp | 1.0000 | 4 | 0.5620 | 0.1283 | ok | IQP/seed=7 excluded (MN-09, applied for consistency with other Wisconsin RQ4 tables) |
-| wisconsin | iqp | 5.0000 | 4 | 0.6350 | 0.1652 | ok | IQP/seed=7 excluded (MN-09, applied for consistency with other Wisconsin RQ4 tables) |
+| wisconsin | angle | 0.1000 | 5 | 0.3112 | 0.0272 | ok |  |
+| wisconsin | angle | 0.5000 | 5 | 0.3676 | 0.0223 | ok |  |
+| wisconsin | angle | 1.0000 | 5 | 0.4152 | 0.0572 | ok |  |
+| wisconsin | angle | 5.0000 | 5 | 0.5208 | 0.0999 | ok |  |
+| wisconsin | amplitude | 0.1000 | 5 | 0.3300 | 0.0274 | ok |  |
+| wisconsin | amplitude | 0.5000 | 5 | 0.4720 | 0.1012 | ok |  |
+| wisconsin | amplitude | 1.0000 | 5 | 0.5616 | 0.1111 | ok |  |
+| wisconsin | amplitude | 5.0000 | 5 | 0.6380 | 0.1193 | ok |  |
+| wisconsin | reuploading | 0.1000 | 5 | 0.3308 | 0.0304 | ok |  |
+| wisconsin | reuploading | 0.5000 | 5 | 0.4984 | 0.1188 | ok |  |
+| wisconsin | reuploading | 1.0000 | 5 | 0.5768 | 0.1419 | ok |  |
+| wisconsin | reuploading | 5.0000 | 5 | 0.6696 | 0.1682 | ok |  |
+| wisconsin | iqp | 0.1000 | 5 | 0.3284 | 0.0266 | ok |  |
+| wisconsin | iqp | 0.5000 | 5 | 0.4972 | 0.1108 | ok |  |
+| wisconsin | iqp | 1.0000 | 5 | 0.5884 | 0.1381 | ok |  |
+| wisconsin | iqp | 5.0000 | 5 | 0.6772 | 0.1836 | ok |  |

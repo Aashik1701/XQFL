@@ -32,7 +32,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from aggregate_results import (
     PROJECT_ROOT, RESULTS_DIR, ENC_ORDER, DIST_ORDER, IQP_SEED7,
     MIN_VALID_DRAWS, get_out_dir, load_explanation_log, build_refs,
-    build_rq1_rq3, build_rq4_mia, build_rq4_dp, _read_csv,
+    build_rq1_rq3, build_rq3_local_global, build_rq4_mia, build_rq4_dp, _read_csv,
 )
 from explain.metrics import kendalls_tau
 
@@ -146,22 +146,23 @@ def make_figure2_stability(wisconsin_df, wisconsin_ext_df, out_dir: Path):
 
 # ── Figure 3: divergence by distribution (RQ3, JSD_cent) ───────────────────
 
-def make_figure3_divergence(rq1_table: pd.DataFrame, out_dir: Path):
+def make_figure3_divergence(rq3_table: pd.DataFrame, out_dir: Path):
     fig, axes = plt.subplots(1, 2, figsize=(12, 5), sharey=True)
     dists = DIST_ORDER
     x = np.arange(len(dists))
     width = 0.19
 
     for ax, dataset in zip(axes, ["wisconsin", "pima"]):
-        sub = rq1_table[rq1_table["dataset"] == dataset]
+        sub = rq3_table[rq3_table["dataset"] == dataset]
         for i, enc in enumerate(ENC_ORDER):
-            means, stds, hatch = [], [], []
+            means, stds = [], []
             for d in dists:
                 row = sub[(sub["encoding"] == enc) & (sub["distribution"] == d)]
                 if row.empty or row.iloc[0]["status"] != "ok":
                     means.append(np.nan); stds.append(0.0)
                 else:
-                    means.append(row.iloc[0]["jsd_cent_mean"]); stds.append(row.iloc[0]["jsd_cent_std"])
+                    means.append(row.iloc[0]["local_global_jsd_mean"])
+                    stds.append(row.iloc[0]["local_global_jsd_std"])
             offs = (i - 1.5) * width
             ax.bar(x + offs, means, width, yerr=stds, color=ENC_COLOR[enc],
                    label=ENC_LABEL[enc], capsize=2,
@@ -171,9 +172,9 @@ def make_figure3_divergence(rq1_table: pd.DataFrame, out_dir: Path):
         ax.set_title(dataset.capitalize())
         ax.set_xlabel("Distribution")
 
-    axes[0].set_ylabel("JSD$_{cent}$ (vs. centralized reference)")
-    fig.suptitle("RQ3 — Explanation divergence by distribution\n"
-                  "Track-A draws only; missing bars = insufficient Track-A data or absent (see Table 1/3 for collapse rates)")
+    axes[0].set_ylabel(r"mean$_{k,t}$ JSD($\varphi_k$, $\varphi_g$)  (local vs. global)")
+    fig.suptitle("RQ3 — Local-to-global explanation divergence by distribution\n"
+                  "Track-A seeds only; missing bars = insufficient Track-A data or collapse (see Table 3 for rates)")
     _legend(axes[1], loc="upper left", bbox_to_anchor=(1.02, 1.0))
     fig.tight_layout(rect=(0, 0, 0.86, 0.92))
     path = out_dir / "figure3_divergence_by_distribution.png"
@@ -281,12 +282,12 @@ def main():
     print("\nFigure 2 — stability over rounds ...")
     make_figure2_stability(wisconsin_df, wisconsin_ext_df, out_dir)
 
-    print("\nFigure 3 — divergence by distribution ...")
-    rq1_table = build_rq1_rq3({
+    print("\nFigure 3 — local-to-global divergence by distribution ...")
+    rq3_table = build_rq3_local_global({
         "wisconsin": (wisconsin_df, wisconsin_refs),
         "pima": (pima_df, pima_refs),
     })
-    make_figure3_divergence(rq1_table, out_dir)
+    make_figure3_divergence(rq3_table, out_dir)
 
     print("\nFigure 4 — MIA AUC comparison ...")
     rq4_mia_table = build_rq4_mia()
