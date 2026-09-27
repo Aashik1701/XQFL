@@ -36,14 +36,19 @@ Linux `apt install fonts-stix` or change `-V mainfont`/`-V mathfont` in `build_p
 
 ## Tier A — rebuild tables and figures from the committed raw logs (seconds)
 
-This is the fastest full check: it re-derives Tables 1–5 and Figures 2–5 from the
+This is the fastest full check: it re-derives Tables 1–5 and Figures 2–6 from the
 per-seed / per-round CSVs already in `results/`, with no training.
 
 ```bash
 python analysis/aggregate_results.py     # -> results/outputs/table{1..5}_*.{csv,md}
-python analysis/plots.py                  # -> results/outputs/figure{2..5}_*.png
-python analysis/gen_figure1.py            # -> results/outputs/figure1_architecture.png
+python analysis/plots.py                  # -> results/outputs/figure{2..6}_*.{pdf,png}
+python analysis/gen_figure1.py            # -> results/outputs/figure1_architecture.png (crops paper_assets/ master)
 ```
+
+Figures are written as vector PDF (embedded in the manuscript) and 300-dpi PNG (for
+standalone viewing). `plots.py` builds Figures 2–6 through the same
+`aggregate_results.py` builders that produce the tables, so figure and table values
+cannot drift apart. Figure 1 is a hand-designed schematic (no data); its master lives in paper_assets/figure1_architecture_source.png.
 
 Then compare `results/outputs/table*.md` against the tables in `XQFL_paper.md`
 §7.1–§7.4 and Appendix A. `results/FINAL_MANUSCRIPT_AUDIT.md` records the last
@@ -67,8 +72,8 @@ bash build_pdf.sh        # -> XQFL_paper.pdf   (pandoc --pdf-engine=tectonic + f
 
 `fix_approx.lua` maps the handful of Unicode math operators (≈ → ∈ ∪ ⊆ ≤ ≥ ≠) to
 LaTeX math; Greek and the remaining symbols are covered by the STIX fonts. The
-manuscript uses plain-text mathematical notation (`φ_g^(t)`, `JSD_cent`, `Kendall's τ`)
-throughout — it renders as consistent technical prose, not typeset math environments.
+numbered equations (1)–(12) are LaTeX (`$$…\tag{n}$$`); `build_pdf.sh` also loads the
+`float` package so figures stay near their in-text references.
 
 ## Tier C — regenerate the raw logs from scratch (~12 h CPU, checkpointed)
 
