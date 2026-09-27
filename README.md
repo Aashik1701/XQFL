@@ -185,4 +185,4 @@ Exact pinned versions are in `requirements.txt`.
 
 ## License
 
-No license has been published for this repository yet. All rights reserved by the author until a license is added.
+All rights reserved. See [`LICENSE`](LICENSE) for details.
