@@ -1,0 +1,41 @@
+{
+  "protocol": {
+    "version": 1,
+    "clients": 4,
+    "rounds": 15,
+    "local_epochs": 3,
+    "qubits": 4,
+    "layers": 2,
+    "members": 50,
+    "nonmembers": 50,
+    "background": "training rows 50:70, same for both groups; excluded from attack records",
+    "permutations": 8,
+    "outer_folds": 5,
+    "inner_folds": 4,
+    "epsilon": [
+      0.1,
+      0.5,
+      1.0,
+      5.0
+    ],
+    "orientation": "inner OOF only; oracle max reported as diagnostic",
+    "threshold": "inner OOF maximum TPR-FPR; evaluate on outer test",
+    "low_fpr": "pooled OOF descriptive only; 50 negatives => 2% resolution",
+    "utility": "same clean/noisy per-sample vectors as attack",
+    "shadow": "not recomputed; old shadow scores excluded from corrected comparisons"
+  },
+  "source_hashes": {
+    "privacy/dp_noise.py": "3fd41da4e6490de43bd1fccf744ec1977cb39f1dd363d8893f92bfed9601eee7",
+    "privacy/release_evaluation.py": "37472048f3ca5866fb87fcbd6c89b0b8bf2403bfd458c5eea63706380931701a",
+    "experiments/rq4_release_repair.py": "b3a434d7ee0e4ca35a741a0a865ff7143233bde1c6b63b3d01e09d27759dad8a",
+    "federation/run_federation.py": "72bd0567794dbca1342419ab762a41021ec1e15528396d26033bba73a35ea1cc",
+    "federation/server.py": "3b34fe1b81e78a117185e258a27aac46d353cc98da37da21fdcc930c5c43a9ee",
+    "federation/client.py": "c0838760f1bd590f8edc80f049cac073afc97d9b365c3bdc7191748858284bb7",
+    "explain/q_shap.py": "8233f3e068885b3c7884f5b7907edaf928bbfae96585de595aa7d1418576a386",
+    "models/quantum_classifier.py": "0ef6ad2455e9f018a7442401138de6ec18e1fc39bd23875682509300fc0bfac8",
+    "models/encodings.py": "c1906d398af46591049082d4fe6e95ce80a4b1aeba35e0bc50cb012a60d20eed",
+    "data/loaders.py": "181c249e882fcc1bf9eaa57c32b26c3e09338e38121f1317d5eb77f95a64239b",
+    "data/partition.py": "c83e25701086dbc37fc3cce1cf5660bb8ba790c459e35c8a2af4dbcf659ace48",
+    "results/phase10_log.csv": "6694cb5e4c3023bb9d885d82412e9d91a94f913fd43d66382040858119b55a1c"
+  }
+}

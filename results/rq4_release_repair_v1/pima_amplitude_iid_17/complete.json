@@ -1,0 +1,40 @@
+{
+  "task": [
+    "pima",
+    "amplitude",
+    "iid",
+    17
+  ],
+  "data_hash": "51a650df5206179957ce826223e0cff6e9970048e0c3bc2ac999c40fc16ec320",
+  "elapsed_seconds": 110.78717979206704,
+  "rows": [
+    {
+      "dataset": "pima",
+      "encoding": "amplitude",
+      "distribution": "iid",
+      "seed": 17,
+      "epsilon": null,
+      "sensitivity": null,
+      "target_acc": 0.7987012987012987,
+      "majority": 0.6493506493506493,
+      "track_class": "A",
+      "n_members": 50,
+      "n_nonmembers": 50,
+      "auc_mean_fold": 0.506,
+      "auc_oriented_mean_fold": 0.406,
+      "auc_orientation_oracle_diagnostic": 0.506,
+      "auc_pooled_oof": 0.46520000000000006,
+      "attack_advantage": -0.09999999999999998,
+      "attack_tpr": 0.62,
+      "attack_fpr": 0.72,
+      "fpr_resolution": 0.02,
+      "tpr_at_fpr_0.01_oof_diagnostic": 0.0,
+      "tpr_at_fpr_0.02_oof_diagnostic": 0.0,
+      "tpr_at_fpr_0.05_oof_diagnostic": 0.0,
+      "cosine_mean": 1.0,
+      "cosine_valid_n": 100,
+      "cosine_undefined_n": 0,
+      "l2_mean": 0.0
+    }
+  ]
+}

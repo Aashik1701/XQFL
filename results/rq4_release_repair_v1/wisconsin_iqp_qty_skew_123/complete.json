@@ -1,0 +1,40 @@
+{
+  "task": [
+    "wisconsin",
+    "iqp",
+    "qty_skew",
+    123
+  ],
+  "data_hash": "e7dc7e4506f3d75f9464612aec5aa4331709b3c011350cbf2d77eb0da4b5675c",
+  "elapsed_seconds": 114.27391866699327,
+  "rows": [
+    {
+      "dataset": "wisconsin",
+      "encoding": "iqp",
+      "distribution": "qty_skew",
+      "seed": 123,
+      "epsilon": null,
+      "sensitivity": 0.28673252054794524,
+      "target_acc": 0.9298245614035088,
+      "majority": 0.631578947368421,
+      "track_class": "A",
+      "n_members": 50,
+      "n_nonmembers": 50,
+      "auc_mean_fold": 0.48,
+      "auc_oriented_mean_fold": 0.496,
+      "auc_orientation_oracle_diagnostic": 0.52,
+      "auc_pooled_oof": 0.4532,
+      "attack_advantage": 0.0,
+      "attack_tpr": 0.4,
+      "attack_fpr": 0.4,
+      "fpr_resolution": 0.02,
+      "tpr_at_fpr_0.01_oof_diagnostic": 0.0,
+      "tpr_at_fpr_0.02_oof_diagnostic": 0.02,
+      "tpr_at_fpr_0.05_oof_diagnostic": 0.06,
+      "cosine_mean": 1.0,
+      "cosine_valid_n": 100,
+      "cosine_undefined_n": 0,
+      "l2_mean": 0.0
+    }
+  ]
+}
