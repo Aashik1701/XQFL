@@ -4,8 +4,8 @@ Two mechanisms:
   Laplace  — noise ~ Laplace(0, sensitivity/epsilon)
   Gaussian — noise ~ N(0, sigma^2), sigma = sensitivity * sqrt(2 * ln(1.25/delta)) / epsilon
 
-For Q-SHAP over n_qubits=4 PCA features, a conservative sensitivity bound is 1.0
-(the sigmoid output is bounded [0,1], so each Shapley value is bounded by ±1).
+The caller must justify sensitivity for any formal DP claim. An empirical
+attribution scale is not a certified global sensitivity bound.
 """
 
 import numpy as np
@@ -68,18 +68,20 @@ def batch_dp_noise(
     mechanism          : 'laplace' or 'gaussian'
     sensitivity        : sensitivity bound (default 1.0)
     delta              : Gaussian failure probability
-    seed               : RNG seed for reproducibility (each row gets seed+i)
+    seed               : RNG seed (or Generator) for a single matrix draw.
+                         Reuse a Generator across batches, or spawn separate
+                         streams. Reusing the identical integer repeats noise.
 
     Returns
     -------
     noisy_matrix : ndarray of shape (n_samples, n_features)
     """
     mat  = np.asarray(explanation_matrix, dtype=np.float64)
-    rows = []
-    for i, row in enumerate(mat):
-        row_seed = None if seed is None else seed + i
-        rows.append(
-            add_dp_noise(row, epsilon, mechanism=mechanism,
-                         sensitivity=sensitivity, delta=delta, seed=row_seed)
-        )
-    return np.vstack(rows)
+    if mat.ndim != 2 or not np.isfinite(mat).all():
+        raise ValueError("Expected a finite two-dimensional explanation matrix")
+    if not np.isfinite(epsilon) or epsilon <= 0:
+        raise ValueError("epsilon must be finite and positive")
+    if sensitivity is not None and (not np.isfinite(sensitivity) or sensitivity < 0):
+        raise ValueError("sensitivity must be finite and nonnegative")
+    return add_dp_noise(mat, epsilon, mechanism=mechanism,
+                        sensitivity=sensitivity, delta=delta, seed=seed)

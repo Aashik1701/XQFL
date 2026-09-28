@@ -1,0 +1,212 @@
+[
+  {
+    "kind": "replace",
+    "before": [
+      "Across the Wisconsin Breast Cancer and Pima Indians Diabetes datasets, federating a quantum model does not by itself distort its attributions under balanced client data: under independent and identically distributed partitions and under quantity skew, federated attributions stay in a low, tight band around their centralized references. Amplitude encoding gives the strongest two-dataset fidelity (Pima federated-versus-centralized Jensen-Shannon distance 0.201 against re-uploading's 0.335) and ties angle for the most stable round-to-round attribution ranking (Kendall's tau 0.94 at fifteen seeds), ahead of re-uploading (0.89) and IQP (0.86). Among functional runs on Wisconsin, moderate label skew is the most divergent regime for local-to-global explanation disagreement while quantity skew is indistinguishable from the balanced case. Releasing the explanation vectors is not free: direct membership-inference area under the curve reaches 0.53 to 0.67 across encodings, resolvably above chance for amplitude, IQP and re-uploading, and a four-budget calibrated Laplace-noise sweep shows that no single noise level brings all four encodings back to chance. The practical consequence is that explanation-release noise in a quantum federation must be calibrated per encoding rather than set once for the system."
+    ],
+    "after": [
+      "Across the Wisconsin Breast Cancer and Pima Indians Diabetes datasets, federating a quantum model does not by itself distort its attributions under balanced client data: under independent and identically distributed partitions and under quantity skew, federated attributions stay in a low, tight band around their centralized references. Amplitude encoding gives the strongest two-dataset fidelity (Pima federated-versus-centralized Jensen-Shannon distance 0.201 against re-uploading's 0.335) and ties angle for the most stable round-to-round attribution ranking (Kendall's tau 0.94 at fifteen seeds), ahead of re-uploading (0.89) and IQP (0.86). Among functional runs on Wisconsin, moderate label skew is the most divergent regime for local-to-global explanation disagreement while quantity skew is indistinguishable from the balanced case. The corrected direct attack detects no resolved clean IID membership signal. Calibrated noise reduces attribution utility, but neither effective mitigation nor a certified privacy guarantee is established."
+    ]
+  },
+  {
+    "kind": "replace",
+    "before": [
+      "6.4  RQ4: Membership Leakage Through the Explanation Vectors\t",
+      "6.5  RQ4: Mitigation by Calibrated Release Noise\t"
+    ],
+    "after": [
+      "6.4  RQ4: Corrected Membership-Inference Evaluation\t",
+      "6.5  RQ4: Calibrated Release-Noise Evaluation\t"
+    ]
+  },
+  {
+    "kind": "replace",
+    "before": [
+      "A privacy characterisation of explanation release. Direct membership-inference area under the curve is measured per encoding at fifteen seeds, and a four-budget calibrated-noise sweep shows that no single budget brings every encoding to near-chance - so noise must be calibrated per encoding."
+    ],
+    "after": [
+      "A privacy characterisation of explanation release. A corrected fold-isolated direct-MIA protocol evaluates fifteen IID targets per group and a four-level calibrated release-noise sweep. It detects no resolved clean IID discrimination; matched noise utility is measured without claiming effective mitigation."
+    ]
+  },
+  {
+    "kind": "replace",
+    "before": [
+      "ESQFL is the closest prior work: a digital-twin-driven, explainable and secured quantum federated learning system for voltage stability assessment in smart grids, which uses Shapley values and differential privacy as components. The distinction from the present work lies in the question each asks of the Shapley analysis. ESQFL asks which client contributed, using Shapley values for participant valuation and reward allocation within the federation. This project asks whether a given explanation is trustworthy, decomposing that into whether the feature attribution is faithful to the federated model, stable across rounds, coherent between local and global models, and safe to release. ESQFL also applies differential privacy for system security; this work measures, per encoding, how much noise is actually required to suppress an explanation-based membership attack."
+    ],
+    "after": [
+      "ESQFL is the closest prior work: a digital-twin-driven, explainable and secured quantum federated learning system for voltage stability assessment in smart grids, which uses Shapley values and differential privacy as components. The distinction from the present work lies in the question each asks of the Shapley analysis. ESQFL asks which client contributed, using Shapley values for participant valuation and reward allocation within the federation. This project asks whether a given explanation is trustworthy, decomposing that into whether the feature attribution is faithful to the federated model, stable across rounds, coherent between local and global models, and safe to release. ESQFL also applies differential privacy for system security; this work measures, per encoding, how calibrated release noise affects an explanation-based membership probe and its matched utility, without establishing a required privacy budget."
+    ]
+  },
+  {
+    "kind": "replace",
+    "before": [
+      "Each explained input carries a membership label - one if it is in the training set, zero if it is a held-out test point. A logistic attack classifier is fitted on the standardised per-sample attribution vectors of fifty members and fifty non-members, and leakage is measured by its five-fold stratified cross-validated area under the receiver operating characteristic curve:",
+      "\tAUCMIA = AUC( { ( gattack( φ̂(xj) ), ymem(j) ) }j=1..100 )\t(3.13)"
+    ],
+    "after": [
+      "Each input has membership label one for a training record and zero for a test record. Fifty of each are explained against a common twenty-record training background disjoint from queried members. Standardization and logistic regression are fitted within each of five stratified outer training folds. The primary AUC is the arithmetic mean of held-out fold AUCs:",
+      "\tAUCMIA = (1/5) Σh=1..5 AUC(yIh, g-h(ΦIh))\t(3.13)"
+    ]
+  },
+  {
+    "kind": "replace",
+    "before": [
+      "Table 5.3 summarises the metric attached to each research question, the equation that defines it, and how it should be read. All of them are evaluated over functional runs only."
+    ],
+    "after": [
+      "Table 5.3 links each research question to its metric. RQ1–RQ3 use functional runs. Corrected RQ4 IID includes all targets with a Track-A-only sensitivity check; non-IID RQ4 requires at least three functional targets."
+    ]
+  },
+  {
+    "kind": "replace",
+    "before": [
+      "RQPropertyMetricDefined byReadingRQ1FidelityJSDcent - final-round Jensen-Shannon distance between the federated global and the centralized attributionEq. (3.10)Lower is better; floor at approx. 0.17RQ2Stabilitytau_stab - mean Kendall rank correlation between consecutive-round global attributionsEq. (3.11)Higher is better; saturates at 4 featuresRQ3DivergenceD_LG - mean over clients and rounds of the local-to-global Jensen-Shannon distanceEq. (3.12)Lower is better; reported as a change against the balanced regimeRQ4PrivacyAUC_MIA - cross-validated area under the curve of a membership attack on the explanation vectorsEq. (3.13)0.5 is chance; higher means more leakageRQ4MitigationAUC_MIA recomputed after calibrated Laplace noise at four budgetsEqs. (3.14)-(3.15)Traces the privacy-utility curve of explanation release"
+    ],
+    "after": [
+      "RQPropertyMetricDefined byReadingRQ1FidelityJSDcent - final-round Jensen-Shannon distance between the federated global and the centralized attributionEq. (3.10)Lower is better; floor at approx. 0.17RQ2Stabilitytau_stab - mean Kendall rank correlation between consecutive-round global attributionsEq. (3.11)Higher is better; saturates at 4 featuresRQ3DivergenceD_LG - mean over clients and rounds of the local-to-global Jensen-Shannon distanceEq. (3.12)Lower is better; reported as a change against the balanced regimeRQ4PrivacyAUC_MIA - cross-validated area under the curve of a membership attack on the explanation vectorsEq. (3.13)0.5 is chance; below-chance ranking is not privacyRQ4MitigationAUC_MIA recomputed after calibrated Laplace noise at four budgetsEqs. (3.14)-(3.15)Measures attack response and matched release utility"
+    ]
+  },
+  {
+    "kind": "replace",
+    "before": [
+      "Table 5.4  Empirical attribution scale per encoding and the resulting noise-to-signal ratio at the extreme budgets.",
+      "EncodingEmpirical scaleNoise-to-signal at the tightest budgetNoise-to-signal at the loosest budgetAngle0.229approx. 12xapprox. 0.23xAmplitude0.262approx. 14xapprox. 0.26xRe-uploading0.344approx. 18xapprox. 0.34xIQP0.287approx. 15xapprox. 0.29x",
+      "The alternative of a conservative theoretical bound of one - each Shapley value lies within the sigmoid output range - was tested and rejected. It over-suppresses: at a budget of one it drives the noise-to-signal ratio to roughly ten times and pushes the attack area under the curve to 0.296, which is below chance. Driving an attack below chance does not demonstrate privacy; it demonstrates that the signal has been destroyed rather than calibrated against."
+    ],
+    "after": [
+      "Table 5.4  Empirical attribution scale per encoding; not a certified sensitivity bound.",
+      "EncodingEmpirical scaleAngle0.229Amplitude0.262Re-uploading0.344IQP0.287",
+      "An earlier release evaluation reused noise across groups, standardized before cross-validation and used different explanation backgrounds. All 115 RQ4 targets and 195 releases were regenerated under the corrected protocol. Below-chance AUC is not evidence of privacy, and the earlier mitigation interpretation is withdrawn. RQ1–RQ3 are unchanged."
+    ]
+  },
+  {
+    "kind": "replace",
+    "before": [
+      "6.4 RQ4: MEMBERSHIP LEAKAGE THROUGH THE EXPLANATION VECTORS",
+      "At fifteen seeds under the balanced Wisconsin regime, the direct membership-inference area under the curve is 0.533 plus or minus 0.080 for angle, 0.620 plus or minus 0.112 for amplitude, 0.647 plus or minus 0.158 for IQP and 0.665 plus or minus 0.137 for re-uploading. Amplitude, IQP and re-uploading are each resolvably above angle, at 2.5, 2.5 and 3.2 standard errors respectively.",
+      "Measured against the chance level of one half, the mean is resolved beyond two standard errors for amplitude (4.2 standard errors), IQP (3.6) and re-uploading (4.7), but not for angle (1.6). Explanation-based membership leakage is therefore established for three of the four encodings and left at the boundary of chance for the fourth. The shadow-model variant of the attack fails for all four encodings, with means between 0.455 and 0.554: a shadow model trained without federation produces an explanation geometry that does not transfer to the federated target, so the direct attack is the appropriate instrument in this setting.",
+      "Table 6.5  RQ4 direct membership-inference area under the curve at fifteen seeds under the balanced regime, with the cross-dataset check for amplitude. Chance is 0.5.",
+      "DatasetEncodingnAttack AUC (mean ± std)Gap vs Wisconsin angleResolved at 2 SE?WisconsinAngle150.533 ± 0.080referencereferenceWisconsinAmplitude150.620 ± 0.112+8.7 ppYesWisconsinIQP150.647 ± 0.158+11.4 ppYesWisconsinRe-uploading150.665 ± 0.137+13.3 ppYesPimaAmplitude150.564 ± 0.109+3.1 ppNo (tied)"
+    ],
+    "after": [
+      "6.4 RQ4: CORRECTED MEMBERSHIP-INFERENCE EVALUATION",
+      "The corrected release evaluation does not reproduce the previous leakage ranking. No clean IID mean is resolved above chance under the study's two-standard-error convention. Table 6.5 retains all fifteen IID targets per group. Wisconsin Angle and Pima Amplitude each have fourteen Track-A targets; Track-A-only sensitivity does not alter the conclusion. Absence of detected discrimination by this attack does not establish privacy.",
+      "Table 6.5  Corrected clean direct-MIA AUC, mean ± SD across fifteen target seeds. Chance is 0.5; the final column tests the mean against chance, not against Angle.",
+      "DatasetEncodingnAUC (mean ± SD)Track AAbove chance at 2 SE?WisconsinAngle150.489 ± 0.07814/15NoWisconsinAmplitude150.487 ± 0.06815/15NoWisconsinRe-uploading150.479 ± 0.08515/15NoWisconsinIQP150.504 ± 0.05915/15NoPimaAmplitude150.501 ± 0.07814/15No"
+    ]
+  },
+  {
+    "kind": "replace",
+    "before": [
+      "Figure 6.3  RQ4 membership-inference signal in the explanation vectors. Bars are the direct-attack area under the curve, mean plus or minus one standard deviation across seeds, balanced Wisconsin regime at fifteen seeds, ordered by mean. The hatched bar is the Pima cross-dataset check for amplitude. The dashed line is chance. Angle's mean is not resolved above chance at two standard errors; the other three are, and all three are also resolved above angle.",
+      "Two features of the direct attack qualify these values, and both are stated rather than buried. The attack classifier's feature standardisation is fitted on the pooled member and non-member set before cross-validation, so the absolute values are a mild over-estimate; this is uniform across encodings and seeds and does not affect the cross-encoding gaps or the angle-versus-chance test. And member explanations are computed against a training-set background while non-member explanations use a test-set background, so a portion of the measured separability could reflect train/test input distribution shift carried through the background rather than memorisation of members - although angle remaining at chance bounds that portion as small. The measured value is therefore best read as a test for the presence of a leakage signal rather than as an estimate of a realistic attacker's success rate.",
+      "Under non-balanced regimes on Wisconsin, three observations follow from Table 6.6. First, the five collapsed-run values all fall between 0.40 and 0.62, below the bulk of the functional values, consistent with - though at five samples not establishing - collapsed models leaking less. Second, quantity skew leaks somewhat more than severe label skew for amplitude and re-uploading but not for IQP, whose two settings are indistinguishable. Third, under quantity skew IQP and re-uploading are tied at 0.700, ahead of amplitude and angle; the single highest value in the whole non-balanced sweep is re-uploading at one seed under quantity skew, at 0.916, which is a seed-level observation rather than an encoding-level ranking.",
+      "Table 6.6  RQ4 direct attack area under the curve under non-balanced regimes, Wisconsin. Parenthetical counts are functional seeds out of five.",
+      "RegimeAngleAmplitudeRe-uploadingIQPQuantity skew0.556 (5/5)0.643 (5/5)0.700 (5/5)0.700 (5/5)α = 0.1— (1/5)0.573 (5/5)0.651 (4/5)0.701 (5/5)",
+      "6.5 RQ4: MITIGATION BY CALIBRATED RELEASE NOISE",
+      "The calibrated Laplace-noise sweep covers four encodings, four budgets and five seeds under the balanced Wisconsin regime. Noise is added to the attribution vectors after the fact, with the model held fixed across budgets for each encoding-seed pair, so the sweep traces the privacy-utility curve of explanation release rather than of a retrained private model.",
+      "Table 6.7  RQ4 direct attack area under the curve under calibrated Laplace noise across four budgets, balanced Wisconsin regime, five seeds per cell. A smaller budget means more noise.",
+      "Budget εAngleAmplitudeRe-uploadingIQP0.10.311 ± 0.0270.330 ± 0.0270.331 ± 0.0300.328 ± 0.0270.50.368 ± 0.0220.472 ± 0.1010.498 ± 0.1190.497 ± 0.1111.00.415 ± 0.0570.562 ± 0.1110.577 ± 0.1420.588 ± 0.1385.00.521 ± 0.1000.638 ± 0.1190.670 ± 0.1680.677 ± 0.184"
+    ],
+    "after": [
+      "Figure 6.3  Corrected direct-MIA AUC. Points and error bars show mean ± SD across fifteen IID targets; the dashed line is chance. No encoding has a resolved clean IID signal. This is an attack-specific signal probe, not a realistic attacker-success rate or a privacy guarantee.",
+      "Both member and non-member explanations now use the same twenty-record training-derived background, disjoint from the fifty queried members. Standardization and logistic regression are fitted only within training folds. The primary statistic is the mean of five held-out fold AUCs. Four inner training folds select score orientation and a TPR-minus-FPR threshold for a separate direction-aware evaluation. Scores, labels and fold assignments are retained. Historical shadow-model scores are not mixed with the corrected protocol.",
+      "Non-IID summaries retain Track-A targets only and require at least three. Angle under severe label skew is insufficient at one of five targets. The corrected results do not establish the previous quantity-skew leakage leadership or a stable encoding ranking. Pima non-IID attacks remain untested.",
+      "Table 6.6  Corrected Wisconsin non-IID direct-MIA AUC means. Parentheses give functional targets out of five; a dash denotes insufficient coverage, not zero.",
+      "RegimeAngleAmplitudeRe-uploadingIQPQuantity skew0.463 (5/5)0.486 (5/5)0.520 (5/5)0.528 (5/5)α = 0.1— (1/5)0.458 (5/5)0.496 (4/5)0.467 (5/5)",
+      "6.5 RQ4: CALIBRATED RELEASE-NOISE EVALUATION",
+      "The corrected sweep evaluates four noise levels for each of five Wisconsin IID targets per encoding. Each full set of one hundred per-sample explanations receives an independently sampled noise matrix, without cross-group reuse. The target stays fixed across release settings. Utility is measured on the same clean/noisy records scored by the attack, rather than separately simulated averaged explanations.",
+      "Table 6.7  Corrected direct-MIA AUC under calibrated Laplace noise, mean ± SD across five Track-A targets per cell. Epsilon is a noise-level index, not a certified privacy budget.",
+      "Index εAngleAmplitudeRe-uploadingIQP0.10.511 ± 0.0500.463 ± 0.0740.512 ± 0.0680.491 ± 0.0770.50.505 ± 0.0700.508 ± 0.0750.513 ± 0.0990.503 ± 0.09410.441 ± 0.0680.466 ± 0.1210.479 ± 0.0810.561 ± 0.05150.481 ± 0.0880.500 ± 0.1040.492 ± 0.0650.546 ± 0.078"
+    ]
+  },
+  {
+    "kind": "replace",
+    "before": [
+      "Figure 6.4  RQ4 membership-inference signal under a calibrated Laplace-noise sweep, balanced Wisconsin regime, four encodings, five seeds per point. The attack area under the curve is recomputed after adding noise of the scale given by equation (3.14) per component; the four budgets are shown on a categorical axis, evenly spaced and not to scale, because only four values were tested. Lines are means and shaded bands are plus or minus one standard deviation. The dashed line is chance. The scale factor is an empirical attribution magnitude, not a certified sensitivity bound, and no formal privacy guarantee is claimed.",
+      "At the tightest budget all four encodings fall to between 0.311 and 0.331, uniformly near random. At a budget of one, angle falls to 0.415 while amplitude, re-uploading and IQP sit between 0.562 and 0.588. The attack strength rises monotonically with the budget for nineteen of twenty encoding-seed pairs; the single exception dips by 0.002 at the loosest budget, which is within permutation-sampling variance.",
+      "The deployment-relevant consequence is stated plainly: no single budget brings all encodings equally close to chance. Bringing all four to near-chance requires the tightest budget tested, which also destroys most of the utility of the explanation. A deployment that set its budget to one on the strength of angle's response alone would leave the other three encodings roughly fifteen points higher than it believed.",
+      "Answer to RQ4. The released explanation vectors do carry training-set membership information: leakage is resolved above chance for amplitude, IQP and re-uploading, and sits at the boundary of chance for angle. Calibrated release noise suppresses that leakage unevenly across encodings, and no single budget is simultaneously adequate for all four. Noise calibration for explanation release must therefore be per-encoding."
+    ],
+    "after": [
+      "Figure 6.4  Corrected calibrated Laplace-noise response. Points and error bars give raw direct-MIA AUC mean ± SD across five targets, with categorical tested indices and a chance line at 0.5. No monotonic mitigation is established. The empirical scale is not a certified sensitivity bound; no formal privacy guarantee is claimed.",
+      "The sweep does not reproduce the earlier monotonic suppression claim. The isolated IQP cell at epsilon = 1 has AUC 0.561 ± 0.051, approximately 2.65 standard errors above chance in an unadjusted comparison; it is exploratory, not a stable ranking. Matched cosine utility spans 0.013–0.063 at epsilon = 0.1 and 0.701–0.829 at epsilon = 5. Stronger noise degrades the explanation, but clean baselines already lack a resolved signal, so successful mitigation is not established.",
+      "Post-hoc max(AUC, 1-AUC) is an orientation diagnostic, not a validated attack score. Attack advantage is held-out TPR minus FPR at a training-selected threshold; negative estimates are retained. With fifty non-members, pooled empirical FPR resolution is 0.02. Low-FPR ROC values are descriptive and do not validate one-percent-FPR guarantees.",
+      "Answer to RQ4: the evaluated attack does not establish clean IID membership discrimination or an encoding-dependent leakage ranking. The matched release experiment measures utility degradation but establishes neither effective privacy mitigation nor formal differential privacy."
+    ]
+  },
+  {
+    "kind": "replace",
+    "before": [
+      "Prior workSettingWhat it measuresWhat it leaves openHow this work differsChen & Yoo (2021)Federated hybrid quantum-classical trainingAccuracy, training speedSingle encoding, centralised comparison of accuracy onlySame federated-averaging backbone, but the measured output is the explanation rather than the prediction: fidelity, stability, divergence and leakage across four encodingsHeese et al. (2025)Shapley attribution for quantum circuitsGate-level attribution, exact and sampled estimatorsGates as players; no federation; feature-level framing out of scopeFeatures as players in a shared reduced space, inside a federation, with the estimator validated against both the exact value and an independent implementationRen et al. (2024), ESQFLExplainable and secured QFL for smart gridsShapley-based client valuation plus differential privacyShapley answers which client contributed; privacy applied as a system propertyShapley answers whether the feature attribution is trustworthy; the noise budget actually required to suppress an explanation-based attack is measured per encodingWatkins et al. (2022)Differentially private quantum MLPrivacy-utility trade-off of DP-SGD on variational circuitsPrivatises gradients; non-federated; explanation release not consideredPrivatises the explanation release itself, with the mechanism calibrated from measured attribution magnitude and the trade-off traced across four budgetsUddin et al. (2026); Ren et al. (2025)QFL surveys and taxonomyField-level maps of architectures and techniquesExplainability is not an evaluation dimension in either surveySupplies the empirical measurement that both surveys identify as absent, with a published coverage map of where evidence exists and where it does not"
+    ],
+    "after": [
+      "Prior workSettingWhat it measuresWhat it leaves openHow this work differsChen & Yoo (2021)Federated hybrid quantum-classical trainingAccuracy, training speedSingle encoding, centralised comparison of accuracy onlySame federated-averaging backbone, but the measured output is the explanation rather than the prediction: fidelity, stability, divergence and leakage across four encodingsHeese et al. (2025)Shapley attribution for quantum circuitsGate-level attribution, exact and sampled estimatorsGates as players; no federation; feature-level framing out of scopeFeatures as players in a shared reduced space, inside a federation, with the estimator validated against both the exact value and an independent implementationRen et al. (2024), ESQFLExplainable and secured QFL for smart gridsShapley-based client valuation plus differential privacyShapley answers which client contributed; privacy applied as a system propertyShapley answers whether the feature attribution is trustworthy; membership discrimination and matched release-noise utility are evaluated without a certified privacy guaranteeWatkins et al. (2022)Differentially private quantum MLPrivacy-utility trade-off of DP-SGD on variational circuitsPrivatises gradients; non-federated; explanation release not consideredPerturbs explanation releases using an empirical attribution scale and evaluates their matched utility; no formal privacy is establishedUddin et al. (2026); Ren et al. (2025)QFL surveys and taxonomyField-level maps of architectures and techniquesExplainability is not an evaluation dimension in either surveySupplies the empirical measurement that both surveys identify as absent, with a published coverage map of where evidence exists and where it does not"
+    ]
+  },
+  {
+    "kind": "replace",
+    "before": [
+      "Noise calibration must be per encoding. The budget that brings angle to near-chance leaves the other three encodings' leakage largely intact, and bringing all four to near-chance requires a much tighter budget that also degrades the explanation's usefulness. A noise level tuned on one encoding does not transfer to another.",
+      "Explanation release carries a measurable privacy cost. That cost is present across all encodings and under both balanced and skewed data, even when the model itself is considered safe to deploy. The explanation is a second release channel and has to be governed as one."
+    ],
+    "after": [
+      "No effective privacy budget is established. The corrected attack has no resolved clean IID signal. Noise decreases attribution utility, but the evaluation does not justify a deployment protection rule.",
+      "A null attack is not a privacy certificate. Stronger attacks, independent reference data and larger evaluation samples may detect risks not resolved by this logistic-regression probe."
+    ]
+  },
+  {
+    "kind": "replace",
+    "before": [
+      "RQAmplitudeRe-uploadingAngleIQPRQ1 FidelityHigh for the two-dataset direction - functional on both datasets, lowest point estimates; the Pima gap against re-uploading is resolved at two standard errors but is comparable to the estimator noise floorMedium-high: two datasets; functional across all four Pima regimes; Pima balanced noisier (0.335)Wisconsin only; Pima collapses under every regimeWisconsin only; Pima functional under the balanced regime only (3 of 5 seeds)RQ2 StabilityHigh: two-dataset balanced result (0.936 / 0.853); tied with angle at the top tierMedium-high: two-dataset balanced result (0.886 / 0.840); lower tierHigh on Wisconsin (0.935, n = 15); collapsed throughout on PimaMedium: Wisconsin 0.858 at n = 15; Pima balanced only (0.800, 3 of 5)RQ3 DivergenceHigh on Wisconsin - moderate skew most divergent among functional runs, quantity skew close to balanced; Pima series flat and inconclusive at three functional seedsMedium: Wisconsin usable at all regimes; Pima severe skew too sparse (2 of 5)Medium: Wisconsin moderate skew clear, severe skew collapse-limited (1 of 5); no Pima dataMedium: Wisconsin all regimes; Pima balanced onlyRQ4 PrivacyMedium-high: balanced attack at n = 15 (0.620, resolved against chance and against angle); non-balanced attack; noise sweep; Pima balanced attackMedium-high: same scope; highest balanced leakage (0.665)Medium-high: same scope; lowest leakage (0.533), not resolved above chanceMedium-high: same scope; balanced 0.647; tied with re-uploading under quantity skew (0.700)"
+    ],
+    "after": [
+      "RQAmplitudeRe-uploadingAngleIQPRQ1 FidelityHigh for the two-dataset direction - functional on both datasets, lowest point estimates; the Pima gap against re-uploading is resolved at two standard errors but is comparable to the estimator noise floorMedium-high: two datasets; functional across all four Pima regimes; Pima balanced noisier (0.335)Wisconsin only; Pima collapses under every regimeWisconsin only; Pima functional under the balanced regime only (3 of 5 seeds)RQ2 StabilityHigh: two-dataset balanced result (0.936 / 0.853); tied with angle at the top tierMedium-high: two-dataset balanced result (0.886 / 0.840); lower tierHigh on Wisconsin (0.935, n = 15); collapsed throughout on PimaMedium: Wisconsin 0.858 at n = 15; Pima balanced only (0.800, 3 of 5)RQ3 DivergenceHigh on Wisconsin - moderate skew most divergent among functional runs, quantity skew close to balanced; Pima series flat and inconclusive at three functional seedsMedium: Wisconsin usable at all regimes; Pima severe skew too sparse (2 of 5)Medium: Wisconsin moderate skew clear, severe skew collapse-limited (1 of 5); no Pima dataMedium: Wisconsin all regimes; Pima balanced onlyRQ4 PrivacyLimited: clean IID n=15; no detected discrimination; Pima checkLimited: clean IID n=15; no detected discriminationLimited: clean IID n=15, Track A 14/15; no detected discriminationLimited: clean IID n=15; isolated noisy cell exploratory"
+    ]
+  },
+  {
+    "kind": "replace",
+    "before": [
+      "Releasing the explanation vectors raises direct membership-inference area under the curve to between 0.53 and 0.67 across encodings. Amplitude, IQP and re-uploading are resolvably above chance while angle sits at its boundary, and no single calibrated-noise budget brings all four encodings to near-chance."
+    ],
+    "after": [
+      "The corrected clean IID attack does not establish membership discrimination or an encoding ranking. Noise reduces matched explanation utility but does not establish privacy mitigation."
+    ]
+  },
+  {
+    "kind": "replace",
+    "before": [
+      "Two of these deserve emphasis because they are the ones a deployment would act on. The first is that explanation release is a distinct privacy channel with a distinct, measurable cost, and that the noise required to close it differs by encoding - so a budget tuned once for a system is the wrong design. The second is that a collapsed model still returns a confident-looking explanation, and that a production release path needs a functional-model gate or it will present degeneracy as insight."
+    ],
+    "after": [
+      "Two limitations matter for deployment: a null result from one attack family is not a privacy guarantee, and collapsed models require a functional-model gate before standard attribution comparisons."
+    ]
+  },
+  {
+    "kind": "replace",
+    "before": [
+      "The membership attack is a signal-presence proxy. It is trained and cross-validated on the same target model's labelled explanations, its standardisation is fitted on the pooled set, and member and non-member explanations use different backgrounds. Absolute values are therefore a mild over-estimate; the cross-encoding ranking and angle's position at chance are robust to both effects."
+    ],
+    "after": [
+      "The membership attack is a signal-presence proxy. The corrected pipeline fits standardization within training folds and uses one common training-derived background. The attack still uses labelled explanations from the same target, and only one attack family with one hundred queried records is evaluated. A null result does not establish privacy."
+    ]
+  },
+  {
+    "kind": "replace",
+    "before": [
+      "DatasetEncodingRegimenAttack AUC (mean ± std)Collapse rateStatusPimaAmplitudeBalanced150.564 ± 0.1090 %okWisconsinAngleBalanced150.533 ± 0.080—okWisconsinAmplitudeBalanced150.620 ± 0.112—okWisconsinRe-uploadingBalanced150.665 ± 0.137—okWisconsinIQPBalanced150.647 ± 0.158—okWisconsinAngleα = 0.11—80 %insufficientWisconsinAmplitudeα = 0.150.573 ± 0.1670 %okWisconsinRe-uploadingα = 0.140.651 ± 0.19920 %okWisconsinIQPα = 0.150.701 ± 0.1530 %okWisconsinAngleQuantity skew50.556 ± 0.1180 %okWisconsinAmplitudeQuantity skew50.643 ± 0.1600 %okWisconsinRe-uploadingQuantity skew50.700 ± 0.1690 %okWisconsinIQPQuantity skew50.700 ± 0.1900 %ok"
+    ],
+    "after": [
+      "DatasetEncodingRegimenAttack AUC (mean ± std)Collapse rateStatusPimaAmplitudeBalanced150.501 ± 0.0787 %okWisconsinAmplitudeα = 0.150.458 ± 0.0740 %okWisconsinAmplitudeBalanced150.487 ± 0.0680 %okWisconsinAmplitudeQuantity skew50.486 ± 0.1050 %okWisconsinAngleα = 0.11—80 %insufficientWisconsinAngleBalanced150.489 ± 0.0787 %okWisconsinAngleQuantity skew50.463 ± 0.0520 %okWisconsinIQPα = 0.150.467 ± 0.0630 %okWisconsinIQPBalanced150.504 ± 0.0590 %okWisconsinIQPQuantity skew50.528 ± 0.0690 %okWisconsinRe-uploadingα = 0.140.496 ± 0.05020 %okWisconsinRe-uploadingBalanced150.479 ± 0.0850 %okWisconsinRe-uploadingQuantity skew50.520 ± 0.1060 %ok"
+    ]
+  },
+  {
+    "kind": "replace",
+    "before": [
+      "DatasetEncodingBudget εnAttack AUC (mean ± std)StatusWisconsinAngle0.150.311 ± 0.027okWisconsinAngle0.550.368 ± 0.022okWisconsinAngle1.050.415 ± 0.057okWisconsinAngle5.050.521 ± 0.100okWisconsinAmplitude0.150.330 ± 0.027okWisconsinAmplitude0.550.472 ± 0.101okWisconsinAmplitude1.050.562 ± 0.111okWisconsinAmplitude5.050.638 ± 0.119okWisconsinRe-uploading0.150.331 ± 0.030okWisconsinRe-uploading0.550.498 ± 0.119okWisconsinRe-uploading1.050.577 ± 0.142okWisconsinRe-uploading5.050.670 ± 0.168okWisconsinIQP0.150.328 ± 0.027okWisconsinIQP0.550.497 ± 0.111okWisconsinIQP1.050.588 ± 0.138okWisconsinIQP5.050.677 ± 0.184ok"
+    ],
+    "after": [
+      "DatasetEncodingBudget εnAttack AUC (mean ± std)StatusWisconsinAmplitude0.150.463 ± 0.074okWisconsinAmplitude0.550.508 ± 0.075okWisconsinAmplitude1.050.466 ± 0.121okWisconsinAmplitude5.050.500 ± 0.104okWisconsinAngle0.150.511 ± 0.050okWisconsinAngle0.550.505 ± 0.070okWisconsinAngle1.050.441 ± 0.068okWisconsinAngle5.050.481 ± 0.088okWisconsinIQP0.150.491 ± 0.077okWisconsinIQP0.550.503 ± 0.094okWisconsinIQP1.050.561 ± 0.051okWisconsinIQP5.050.546 ± 0.078okWisconsinRe-uploading0.150.512 ± 0.068okWisconsinRe-uploading0.550.513 ± 0.099okWisconsinRe-uploading1.050.479 ± 0.081okWisconsinRe-uploading5.050.492 ± 0.065ok"
+    ]
+  }
+]

@@ -21,6 +21,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.metrics import roc_auc_score
 from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
 
 
 # ── helpers ────────────────────────────────────────────────────────────────────
@@ -225,16 +226,13 @@ def run_mia_attack(explanations_in, explanations_out, seed=42, cv=5):
     if np.unique(y).size < 2:
         return float("nan")
 
-    scaler   = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
-    clf      = LogisticRegression(max_iter=500, random_state=seed)
+    clf = make_pipeline(StandardScaler(),
+                        LogisticRegression(max_iter=500, random_state=seed))
 
     n_folds = min(cv, y.sum(), (y == 0).sum())
     if n_folds < 2:
-        clf.fit(X_scaled, y)
-        probs = clf.predict_proba(X_scaled)[:, 1]
-        return float(roc_auc_score(y, probs))
+        return float("nan")  # Training-set AUC is not a CV estimate.
 
     skf    = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=seed)
-    scores = cross_val_score(clf, X_scaled, y, cv=skf, scoring="roc_auc")
+    scores = cross_val_score(clf, X, y, cv=skf, scoring="roc_auc")
     return float(scores.mean())

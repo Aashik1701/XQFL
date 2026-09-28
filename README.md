@@ -41,7 +41,7 @@ The codebase is organized as a pipeline: **data → federated training → expla
 - **Q-SHAP** — a permutation-sampling Shapley explainer implemented from scratch for the quantum feature space (no installable feature-level Q-SHAP package exists)
 - **Non-IID partitioning** — IID, quantity skew, and Dirichlet label skew, at configurable severity
 - **Privacy attacks** — direct and shadow-model membership-inference attacks on explanation vectors
-- **Calibrated noise mechanisms** — Laplace / Gaussian noise for releasing explanation vectors under a configurable privacy budget
+- **Calibrated noise mechanisms** — configurable perturbations of explanation vectors; empirical scale calibration is not a formal privacy guarantee
 - **Deterministic, auditable aggregation** — fixed client ordering and a runtime partition-integrity check so federated results are reproducible and silent data-partition bugs fail loudly instead of silently corrupting a run
 - **Result aggregation pipeline** — raw per-seed/per-round logs are turned into analysis-ready tables and figures by a single set of aggregation functions, so downstream tables and plots can never drift apart
 
@@ -133,7 +133,10 @@ A permutation-sampling Shapley estimator built from scratch, computing feature a
 ### Privacy analysis (`privacy/`)
 
 - `membership_inference.py` — direct and shadow-model membership-inference attacks that try to distinguish training vs. non-training samples from their explanation vectors
-- `dp_noise.py` — Laplace and Gaussian noise mechanisms for releasing explanation vectors under a configurable privacy budget
+- `dp_noise.py` — Laplace and Gaussian perturbation utilities with independent per-record noise
+- `release_evaluation.py` — fold-local preprocessing, held-out raw and direction-aware AUC, validation-selected attack thresholds, and matched clean/noisy utility
+
+The current release evaluator uses a shared explanation background for members and non-members. Score direction and thresholds are selected without access to outer test labels. Post-hoc score inversion and low-FPR ROC points are diagnostics, not deployment guarantees. Chance-level performance of one attack does not certify privacy.
 
 ## Running Experiments
 
@@ -143,7 +146,7 @@ A permutation-sampling Shapley estimator built from scratch, computing feature a
 - **`rq*.py`** — targeted extensions and robustness checks that add seeds or conditions to an existing sweep
 - Two **orchestrator scripts** that run a full multi-stage sweep end-to-end with checkpoint/resume support, so a long-running sweep can be safely interrupted and continued
 
-Every script writes append-only CSV logs to `results/`, each with a companion checkpoint file so partially-completed sweeps resume without recomputation.
+Logging and checkpoint formats vary by script. The current release evaluation entry point is `experiments/rq4_release_repair.py`; it persists target checkpoints, clean/noisy vectors, labels, held-out predictions and fold records in `results/rq4_release_repair_v1/`. Legacy attack sweeps are retained for provenance and must not be used as the current evaluation path. Running the release evaluator performs model training; aggregation alone does not.
 
 ## Generating Results
 
@@ -152,6 +155,13 @@ Every script writes append-only CSV logs to `results/`, each with a companion ch
 ```bash
 python analysis/aggregate_results.py   # -> results/outputs/table*.{csv,md}
 python analysis/plots.py               # -> results/outputs/figure*.{png,pdf}
+python analysis/plot_current_rq4.py    # -> corrected release diagnostics and plots
+```
+
+Current release summaries are built by `analysis/current_rq4.py` from the completed release records, with no fallback to legacy attack CSVs. Verify the evaluation helpers without training:
+
+```bash
+python -m unittest discover -s tests -p 'test_release_evaluation.py' -v
 ```
 
 ## Reproducibility Notes
