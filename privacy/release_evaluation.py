@@ -17,10 +17,10 @@ def classifier(seed):
                          LogisticRegression(max_iter=500, random_state=seed))
 
 
-def evaluate_release(X, y, seed=42):
+def evaluate_release(X, y, seed=42, n_features=4):
     X, y = np.asarray(X, float), np.asarray(y, int)
-    if X.shape != (len(y), 4) or not np.isfinite(X).all():
-        raise ValueError("Expected finite (n,4) attributions")
+    if X.shape != (len(y), n_features) or not np.isfinite(X).all():
+        raise ValueError(f"Expected finite (n,{n_features}) attributions")
     if set(np.unique(y)) != {0, 1} or min(np.bincount(y)) < 5:
         raise ValueError("Need both membership classes and at least five per class")
     raw = np.full(len(y), np.nan)

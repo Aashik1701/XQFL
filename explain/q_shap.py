@@ -18,6 +18,7 @@ Distinction from classical_shap.py:
 """
 
 import numpy as np
+from math import factorial
 from itertools import permutations
 from typing import Callable
 
@@ -92,6 +93,57 @@ def q_shap_values(
 
         shap_values[s_idx] = phi / n_permutations
 
+    return shap_values
+
+
+def exact_q_shap_values(
+    predict_fn: Callable,
+    X_quantum: np.ndarray,
+    background: np.ndarray,
+) -> np.ndarray:
+    """Exact Shapley values by evaluating all 2^d coalitions of each sample.
+
+    Uses the same value function as q_shap_values (absent features take the
+    background mean), but no sampling: the result is deterministic. For d=4 it
+    costs 16 model evaluations per sample, against 40 for q_shap_values with
+    n_permutations=8 (which spends d+1 evaluations per permutation).
+
+    The cost grows as 2^d, so use q_shap_values for much larger feature sets.
+
+    Parameters
+    ----------
+    predict_fn : callable mapping (n, d) inputs to (n,) outputs.
+    X_quantum : ndarray of shape (n_samples, d), samples to explain.
+    background : ndarray of shape (n_bg, d); its mean is the reference.
+
+    Returns
+    -------
+    shap_values : ndarray of shape (n_samples, d).
+    """
+    n_samples, d = X_quantum.shape
+    background_mean = background.mean(axis=0)
+    n_coalitions = 2 ** d
+
+    # masks[c, i] is True when feature i belongs to coalition c (bits of c).
+    masks = ((np.arange(n_coalitions)[:, None] >> np.arange(d)) & 1).astype(bool)
+    sizes = masks.sum(axis=1)
+
+    inputs = np.where(masks[None, :, :], X_quantum[:, None, :], background_mean)
+    values = np.asarray(predict_fn(inputs.reshape(-1, d)), dtype=float)
+    values = values.reshape(n_samples, n_coalitions)
+
+    # Shapley kernel weight |S|! (d-|S|-1)! / d! for each coalition size.
+    fact = [factorial(k) for k in range(d + 1)]
+    weights = np.array(
+        [fact[k] * fact[d - k - 1] / fact[d] for k in range(d)], dtype=float
+    )
+
+    shap_values = np.zeros((n_samples, d), dtype=float)
+    for i in range(d):
+        bit = 1 << i
+        without_i = np.flatnonzero(~masks[:, i])
+        marginal = values[:, without_i + bit] - values[:, without_i]
+        shap_values[:, i] = marginal @ weights[sizes[without_i]]
     return shap_values
 
 
