@@ -1,8 +1,8 @@
 # RQ4 release evaluation repair
 
-Status: implementation checks passed; experimental results are pending.
+Status: all 115 targets and 195 release evaluations completed. Corrected RQ4 outputs are promoted to current tables and deliverables by explicit user authorization.
 
-The historical RQ4 CSVs and published aggregate tables remain unchanged. The
+The historical RQ4 raw CSVs remain unchanged; current aggregate tables now use corrected results. The
 new output directory is `results/rq4_release_repair_v1`. Its manifest records
 source hashes and the protocol; changing that protocol requires a new version.
 
@@ -78,11 +78,10 @@ The one-target pilot is part of the requested sweep and is reused on resume.
 Do not run legacy sweep scripts to produce replacement results: they retain
 historical output paths and legacy explanation-background construction.
 
-## Final audit required
+## Final audit and promotion
 
 Before promoting any replacement tables: verify completion counts, source and
 historical-output hashes, all partition logs, disjoint folds and held-out
 predictions, label orientation, matched utility provenance, actual Track-A
 counts, and old-versus-new results. If the data no longer support earlier
-rankings or mitigation claims, report that explicitly. Manuscript changes
-remain deferred until the user can review the audited results.
+rankings or mitigation claims, report that explicitly. The user authorized downstream updates after completion. See `RQ4_PROJECT_UPDATE_AUDIT.md` for the promotion record. The original `rq4_release_repair_v1/AUDIT.md` is retained: its only failure was a user-modified Word-file hash. `RESULTS_ONLY_AUDIT.md` rechecks experimental evidence without requiring intentionally updated presentation files to retain old hashes.

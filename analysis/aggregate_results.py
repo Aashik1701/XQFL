@@ -426,157 +426,14 @@ def build_rq2(wisconsin_df: pd.DataFrame, wisconsin_ext_df: pd.DataFrame, pima_d
 # ── RQ4a: MIA ────────────────────────────────────────────────────────────────
 
 def build_rq4_mia() -> pd.DataFrame:
-    rows = []
-
-    # --- Wisconsin IID n=15 ---
-    iid_rows = _read_csv("phase13_mia_log.csv") + _read_csv("rq4_extension_log.csv")
-    by_enc = defaultdict(list)
-    for r in iid_rows:
-        by_enc[r["encoding"]].append((int(r["seed"]), float(r["direct_mia_auc"])))
-    for enc in ENC_ORDER:
-        vals = by_enc.get(enc, [])
-        note = ""
-        if _exclude_iqp_seed7("wisconsin", enc):
-            vals = [(s, v) for s, v in vals if s != IQP_SEED7]
-            note = "IQP/seed=7 excluded (MN-09)"
-        aucs = [v for _, v in vals]
-        rows.append({
-            "dataset": "wisconsin", "encoding": enc, "distribution": "iid",
-            "n": len(aucs), "auc_mean": float(np.mean(aucs)) if aucs else float("nan"),
-            "auc_std": float(np.std(aucs, ddof=1)) if len(aucs) > 1 else float("nan"),
-            "collapse_rate": float("nan"), "status": "ok" if len(aucs) >= MIN_VALID_DRAWS else "insufficient",
-            "note": note,
-        })
-
-    # --- Wisconsin non-IID: qty_skew, alpha_0.1 ---
-    noniid_rows = _read_csv("rq4_noniid_mia_log.csv")
-    cell = defaultdict(dict)   # (enc, dist) -> {seed: (auc, track)}
-    for r in noniid_rows:
-        dist = DIST_CANON.get(r["distribution"], r["distribution"])
-        cell[(r["encoding"], dist)][int(r["seed"])] = (float(r["direct_mia_auc"]), r["track_class"])
-
-    # MN-09 IQP/seed=7 replication corrections are RETIRED after the corrected
-    # rerun (seed 7 is no longer anomalous); the 3-draw-mean substitution is
-    # disabled. Kept as NaN so the substitution branches below never fire.
-    iqp_a01_seed7_corrected = float("nan")
-    iqp_qty_seed7_corrected = float("nan")
-
-    for (enc, dist), seedmap in cell.items():
-        note_parts = []
-        seedmap = dict(seedmap)
-        if enc == "iqp" and dist == "alpha_0.1" and 7 in seedmap and not math.isnan(iqp_a01_seed7_corrected):
-            seedmap[7] = (iqp_a01_seed7_corrected, seedmap[7][1])
-            note_parts.append(f"seed=7 AUC replaced with 3-draw replication mean={iqp_a01_seed7_corrected:.3f} (MN-09 bimodality)")
-        if enc == "iqp" and dist == "qty_skew" and 7 in seedmap and not math.isnan(iqp_qty_seed7_corrected):
-            seedmap[7] = (iqp_qty_seed7_corrected, seedmap[7][1])
-            note_parts.append(f"seed=7 AUC replaced with 3-draw replication mean={iqp_qty_seed7_corrected:.3f} (MN-09)")
-
-        n_total = len(seedmap)
-        track_a_vals = [v for v, t in seedmap.values() if t == "A"]
-        n_b = sum(1 for _, t in seedmap.values() if t == "B")
-        collapse_rate = n_b / n_total if n_total else float("nan")
-
-        if len(track_a_vals) >= MIN_VALID_DRAWS:
-            mean, std, status = float(np.mean(track_a_vals)), float(np.std(track_a_vals, ddof=1)), "ok"
-        elif track_a_vals:
-            mean, std, status = float("nan"), float("nan"), "insufficient"
-        else:
-            mean, std, status = float("nan"), float("nan"), "absent"
-
-        rows.append({
-            "dataset": "wisconsin", "encoding": enc, "distribution": dist,
-            "n": len(track_a_vals), "auc_mean": mean, "auc_std": std,
-            "collapse_rate": collapse_rate, "status": status,
-            "note": "; ".join(note_parts),
-        })
-
-    # --- Pima IID amplitude (task-3 extension run; included once available) ---
-    # Wisconsin's own IID-MIA n=15 is the statistical-power reference every
-    # other row in this table is held to; the Pima cell is only reported at
-    # matching power, and flagged explicitly below n=15 so it is never read
-    # as an equal-weight replication before it actually is one.
-    WISCONSIN_MIA_N = 15
-    pima_mia_rows = _read_csv("rq4_pima_mia_amplitude_log.csv")
-    if pima_mia_rows:
-        aucs = [float(r["direct_mia_auc"]) for r in pima_mia_rows]
-        n = len(aucs)
-        if n >= WISCONSIN_MIA_N:
-            # Same 2-SE resolvability convention project_status.md applies to
-            # every other n=5->n=15 extension in this project (RQ2 Wisconsin
-            # stability, RQ4 Wisconsin MIA ranking) — both of those extensions
-            # changed which comparisons were statistically resolvable, so this
-            # cell is checked the same way rather than accepted on point-estimate
-            # proximity alone.
-            mean_n15, std_n15 = float(np.mean(aucs)), float(np.std(aucs, ddof=1))
-            se_n15 = std_n15 / math.sqrt(n)
-            wis_amp_aucs = [v for _, v in by_enc.get("amplitude", [])]
-            wis_mean = float(np.mean(wis_amp_aucs))
-            wis_se = float(np.std(wis_amp_aucs, ddof=1)) / math.sqrt(len(wis_amp_aucs))
-            gap = wis_mean - mean_n15
-            se_diff = math.sqrt(se_n15 ** 2 + wis_se ** 2)
-            resolved = abs(gap) > 2 * se_diff
-            vs_random_ratio = (mean_n15 - 0.5) / se_n15
-            note = (f"RQ4 extension: cross-dataset check for the strongest encoding, "
-                     f"n={n} — matches Wisconsin's n={WISCONSIN_MIA_N}, same statistical footing. "
-                     f"Stability check vs the n=5 preliminary read (0.579 +/- 0.130): shift = "
-                     f"{mean_n15 - 0.579:+.3f}, well within the n=5 SE (0.058) — not a meaningful "
-                     f"move. Pima ({mean_n15:.3f}) vs Wisconsin/amplitude ({wis_mean:.3f}) gap = "
-                     f"{gap:.3f}, {gap / se_diff:.2f} SE — "
-                     + ("RESOLVED (distinguishable)" if resolved else "NOT resolved (tied, consistent with Wisconsin)")
-                     + f"; vs random guess {vs_random_ratio:.2f} SE — "
-                     + ("RESOLVED (genuine leakage)" if vs_random_ratio > 2 else "not resolved") + ".")
-        else:
-            note = (f"RQ4 extension: cross-dataset check for the strongest encoding. "
-                     f"n={n} vs Wisconsin's n={WISCONSIN_MIA_N} — consistent with the Wisconsin "
-                     f"finding, NOT yet an equal-power replication; treat as preliminary "
-                     f"until extended to n={WISCONSIN_MIA_N} "
-                     f"(experiments/rq4_pima_mia_amplitude.py resumes via checkpoint).")
-        rows.append({
-            "dataset": "pima", "encoding": "amplitude", "distribution": "iid",
-            "n": n, "auc_mean": float(np.mean(aucs)), "auc_std": float(np.std(aucs, ddof=1)) if len(aucs) > 1 else float("nan"),
-            "collapse_rate": 0.0, "status": "ok" if n >= MIN_VALID_DRAWS else "insufficient",
-            "note": note,
-        })
-    else:
-        rows.append({
-            "dataset": "pima", "encoding": "amplitude", "distribution": "iid",
-            "n": 0, "auc_mean": float("nan"), "auc_std": float("nan"),
-            "collapse_rate": float("nan"), "status": "absent",
-            "note": "rq4_pima_mia_amplitude_log.csv not found — run experiments/rq4_pima_mia_amplitude.py",
-        })
-
-    out = pd.DataFrame(rows)
-    out["_enc_ord"] = out["encoding"].map({e: i for i, e in enumerate(ENC_ORDER)})
-    out["_dist_ord"] = out["distribution"].map({d: i for i, d in enumerate(DIST_ORDER)})
-    return out.sort_values(["dataset", "_dist_ord", "_enc_ord"]).drop(columns=["_enc_ord", "_dist_ord"]).reset_index(drop=True)
-
+    from analysis.current_rq4 import mia_table
+    return mia_table()
 
 # ── RQ4b: DP sweep ──────────────────────────────────────────────────────────
 
 def build_rq4_dp() -> pd.DataFrame:
-    dp_rows = _read_csv("rq4_dp_extension_log.csv")
-    cell = defaultdict(list)
-    for r in dp_rows:
-        cell[(r["encoding"], float(r["epsilon"]))].append((int(r["seed"]), float(r["direct_mia_auc"])))
-
-    rows = []
-    for (enc, eps), vals in cell.items():
-        note = ""
-        if _exclude_iqp_seed7("wisconsin", enc):
-            vals = [(s, v) for s, v in vals if s != IQP_SEED7]
-            note = "IQP/seed=7 excluded (MN-09, applied for consistency with other Wisconsin RQ4 tables)"
-        aucs = [v for _, v in vals]
-        rows.append({
-            "dataset": "wisconsin", "encoding": enc, "epsilon": eps,
-            "n": len(aucs), "auc_mean": float(np.mean(aucs)) if aucs else float("nan"),
-            "auc_std": float(np.std(aucs, ddof=1)) if len(aucs) > 1 else float("nan"),
-            "status": "ok" if len(aucs) >= MIN_VALID_DRAWS else "insufficient",
-            "note": note,
-        })
-    out = pd.DataFrame(rows)
-    out["_enc_ord"] = out["encoding"].map({e: i for i, e in enumerate(ENC_ORDER)})
-    return out.sort_values(["_enc_ord", "epsilon"]).drop(columns=["_enc_ord"]).reset_index(drop=True)
-
+    from analysis.current_rq4 import noise_table
+    return noise_table()
 
 # ── output helpers ───────────────────────────────────────────────────────────
 
@@ -642,7 +499,7 @@ def main():
     print("\nBuilding Table 5 (RQ4 DP) ...")
     rq4_dp_table = build_rq4_dp()
     write_table(rq4_dp_table, out_dir, "table5_rq4_dp",
-                "Table 5 — RQ4 Differential Privacy: Direct-MIA AUC vs epsilon")
+                "Table 5 — RQ4 Calibrated Laplace-Noise Evaluation: Direct-MIA AUC vs epsilon")
 
     print(f"\nAll tables written to {out_dir}")
 

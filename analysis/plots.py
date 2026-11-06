@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
-"""Produce the four write-up-ready figures identified in the completion audit
-(results/XQFL_completion_audit.md, Step 6):
+"""Publication figures for XQFL (Figures 2-6).
 
-  Figure 2 — stability over rounds     (RQ2, Wisconsin IID n=15)
-  Figure 3 — local-to-global divergence by distribution
-             (RQ3, mean_{k,t} JSD(phi_k, phi_g), Wisconsin + Pima)
-  Figure 4 — MIA AUC comparison        (RQ4, Wisconsin IID n=15 + Pima/amplitude)
-  Figure 5 — MIA AUC under calibrated Laplace noise vs epsilon   (RQ4, Wisconsin)
+  Figure 2 - Evidential coverage of the experimental space (Track-A seeds per cell)
+  Figure 3 - RQ2 stability over rounds        (Wisconsin IID, n=15)
+  Figure 4 - RQ3 local-to-global divergence    (mean_{k,t} JSD(phi_k, phi_g))
+  Figure 5 - RQ4 membership-inference signal    (Wisconsin IID n=15 + Pima amplitude)
+  Figure 6 - RQ4 calibrated Laplace-noise sweep (Wisconsin, 4 eps, categorical axis)
 
-(Numbered to match the audit's Figure 1 = existing architecture diagram, so
-Figures 2-5 here line up with the audit's own numbering.)
+Every plotted value is pulled through analysis/aggregate_results.py (the same
+builders that produce results/outputs/table*.csv), so figures and tables cannot
+silently disagree. No pre-fix / archived logs are read. Figure 4 uses the
+corrected RQ3 metric build_rq3_local_global -> rq3_local_global_cell
+(local client Q-SHAP vs. same-round global Q-SHAP, Track-A seeds, round 0
+excluded).
 
-Reuses the data loading / aggregation / exclusion logic in
-analysis/aggregate_results.py rather than recomputing it, so the tables and
-figures can never silently disagree with each other.
-
-Color: a fixed Okabe-Ito (colorblind-safe) categorical assignment, one color
-per encoding, held constant across every figure so the same encoding always
-reads as the same color. No dual axes, no rainbow colormaps.
+Output: vector PDF (embedded in the manuscript) + 300-dpi PNG (for standalone
+viewing), same basename.
 """
 
 import sys
@@ -31,273 +29,318 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from aggregate_results import (
-    PROJECT_ROOT, RESULTS_DIR, ENC_ORDER, DIST_ORDER, IQP_SEED7,
-    MIN_VALID_DRAWS, get_out_dir, load_explanation_log, build_refs,
-    build_rq1_rq3, build_rq3_local_global, build_rq4_mia, build_rq4_dp, _read_csv,
+    ENC_ORDER, DIST_ORDER, get_out_dir, load_explanation_log, build_refs,
+    build_rq3_local_global, build_rq4_mia, build_rq4_dp,
 )
 from explain.metrics import kendalls_tau
 
-# Okabe-Ito palette, fixed assignment — never cycled, never reused for a
-# different encoding within or across figures.
-ENC_COLOR = {
-    "angle":       "#E69F00",  # orange
-    "amplitude":   "#0072B2",  # blue
-    "reuploading": "#009E73",  # green
-    "iqp":         "#D55E00",  # vermillion
-}
-ENC_LABEL = {
-    "angle": "Angle", "amplitude": "Amplitude",
-    "reuploading": "Re-uploading", "iqp": "IQP",
-}
-DIST_LABEL = {
-    "iid": "IID", "alpha_0.5": "α=0.5", "alpha_0.1": "α=0.1",
-    "qty_skew": "Qty. skew",
-}
+# ─────────────────────────────────────────────────────────────────────────────
+# ONE visual system for every figure.
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Each encoding has a fixed identity: colour + marker + line style, so it reads
+# the same in Figures 2-6 and stays distinguishable in grayscale.
+#   Angle         orange          circle    solid
+#   Amplitude     blue            square    solid
+#   Re-uploading  bluish-green    triangle  dashed
+#   IQP           reddish-purple  diamond   dotted
+ENC_COLOR  = {"angle": "#E69F00", "amplitude": "#0072B2",
+              "reuploading": "#009E73", "iqp": "#CC79A7"}   # Okabe-Ito: orange/blue/green/reddish-purple
+ENC_MARKER = {"angle": "o", "amplitude": "s", "reuploading": "^", "iqp": "D"}
+ENC_LS     = {"angle": "-", "amplitude": "-", "reuploading": "--", "iqp": ":"}
+ENC_LABEL  = {"angle": "Angle", "amplitude": "Amplitude",
+              "reuploading": "Re-uploading", "iqp": "IQP"}
+DIST_LABEL = {"iid": "IID", "alpha_0.5": r"$\alpha=0.5$",
+              "alpha_0.1": r"$\alpha=0.1$", "qty_skew": "Quantity\nskew"}
+DIST_LABEL_1L = {"iid": "IID", "alpha_0.5": r"$\alpha=0.5$",
+                 "alpha_0.1": r"$\alpha=0.1$", "qty_skew": "Quantity skew"}
+DATASET_LABEL = {"wisconsin": "Wisconsin", "pima": "Pima"}
+
+INK       = "#1a1a1a"
+SUBINK    = "#5a5a5a"
+GRIDCOL   = "#d9d9d9"
+CHANCECOL = "#999999"
 
 plt.rcParams.update({
-    "figure.dpi": 150,
+    "figure.facecolor": "white",
+    "savefig.facecolor": "white",
+    "savefig.bbox": "tight",
     "savefig.dpi": 300,
-    "font.size": 11,
+    "font.family": "sans-serif",
+    "font.sans-serif": ["DejaVu Sans"],
+    "font.size": 10,
+    "axes.titlesize": 11,
+    "axes.titleweight": "bold",
+    "axes.labelsize": 10,
+    "axes.edgecolor": "#7a7a7a",
+    "axes.linewidth": 0.8,
+    "axes.labelcolor": INK,
     "axes.spines.top": False,
     "axes.spines.right": False,
-    "axes.edgecolor": "#888888",
-    "axes.labelcolor": "#222222",
-    "text.color": "#222222",
-    "xtick.color": "#444444",
-    "ytick.color": "#444444",
+    "text.color": INK,
+    "xtick.color": SUBINK,
+    "ytick.color": SUBINK,
+    "xtick.labelsize": 9,
+    "ytick.labelsize": 9,
+    "legend.fontsize": 9,
     "axes.grid": True,
-    "grid.color": "#dddddd",
+    "grid.color": GRIDCOL,
     "grid.linewidth": 0.6,
     "axes.axisbelow": True,
 })
 
 
-def _legend(ax, **kw):
-    leg = ax.legend(frameon=False, **kw)
-    return leg
+def _save(fig, out_dir: Path, stem: str):
+    for ext in ("pdf", "png"):
+        p = out_dir / f"{stem}.{ext}"
+        fig.savefig(p)
+    plt.close(fig)
+    print(f"  wrote {stem}.pdf / .png")
 
 
-def _titled(fig, ax, main: str, sub: str):
-    """Bold main title (suptitle) + smaller gray detail line (axes title),
-    sized to avoid the clipping a single long two-line ax.set_title() causes
-    at default figsize."""
-    fig.suptitle(main, fontsize=13, y=0.985)
-    ax.set_title(sub, fontsize=9.5, color="#555555", pad=8)
+def _enc_handles():
+    """Proxy legend handles carrying the full colour+marker+linestyle identity."""
+    from matplotlib.lines import Line2D
+    return [Line2D([0], [0], color=ENC_COLOR[e], marker=ENC_MARKER[e],
+                   linestyle=ENC_LS[e], markersize=6, linewidth=1.8,
+                   label=ENC_LABEL[e]) for e in ENC_ORDER]
 
 
-# ── Figure 2: stability over rounds (RQ2, Wisconsin IID n=15) ──────────────
+# ── Figure 2 : RQ2 stability over rounds ─────────────────────────────────────
 
-def round_pair_series(df: pd.DataFrame, encoding: str, exclude_seeds=frozenset()) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Per round-pair (1..15), mean +/- std of Kendall's tau between
-    consecutive-round global explanation vectors, across all included seeds
-    with a Track-A final outcome."""
+def _round_pair_series(df, encoding):
+    """Per round-pair r=1..15: mean +/- std of Kendall tau between the
+    consecutive-round global attribution vectors, over Track-A-final seeds."""
     sub = df[(df["encoding"] == encoding) & (df["distribution"] == "iid")
              & (df["client_id"] == "global") & (df["run_type"] == "federated")]
-    per_seed_taus = []
-    for seed, g in sub.groupby("seed"):
-        if seed in exclude_seeds:
-            continue
+    per_seed = []
+    for _seed, g in sub.groupby("seed"):
         g = g.sort_values("round")
         if len(g) < 2 or g.iloc[-1]["track_class"] != "A":
             continue
-        vecs = list(g["explanation_vector"])
-        rounds = list(g["round"])
-        taus = {}
-        for i in range(1, len(vecs)):
-            taus[rounds[i]] = kendalls_tau(vecs[i - 1], vecs[i])
-        per_seed_taus.append(taus)
-
-    all_rounds = sorted(set().union(*[set(t) for t in per_seed_taus])) if per_seed_taus else []
-    means, stds = [], []
-    for r in all_rounds:
-        vals = [t[r] for t in per_seed_taus if r in t]
-        means.append(np.mean(vals))
-        stds.append(np.std(vals, ddof=1) if len(vals) > 1 else 0.0)
-    return np.array(all_rounds), np.array(means), np.array(stds)
+        vecs, rounds = list(g["explanation_vector"]), list(g["round"])
+        per_seed.append({rounds[i]: kendalls_tau(vecs[i - 1], vecs[i])
+                         for i in range(1, len(vecs))})
+    rr = sorted(set().union(*[set(d) for d in per_seed])) if per_seed else []
+    m = np.array([np.nanmean([d[r] for d in per_seed if r in d]) for r in rr])
+    s = np.array([np.nanstd([d[r] for d in per_seed if r in d], ddof=1) for r in rr])
+    return np.array(rr), m, s
 
 
-def make_figure2_stability(wisconsin_df, wisconsin_ext_df, out_dir: Path):
-    iid_combined = pd.concat([
-        wisconsin_df[wisconsin_df["distribution"] == "iid"], wisconsin_ext_df,
-    ], ignore_index=True) if not wisconsin_ext_df.empty else wisconsin_df[wisconsin_df["distribution"] == "iid"]
+def make_figure2(wis_df, wis_ext_df, tau_summary, out_dir):
+    iid = pd.concat([wis_df[wis_df["distribution"] == "iid"], wis_ext_df],
+                    ignore_index=True) if not wis_ext_df.empty \
+        else wis_df[wis_df["distribution"] == "iid"]
 
-    fig, ax = plt.subplots(figsize=(8, 5))
-    for enc in ENC_ORDER:
-        exclude = set()   # MN-09 retired — IQP/seed=7 no longer excluded
-        rounds, means, stds = round_pair_series(iid_combined, enc, exclude)
-        if len(rounds) == 0:
+    fig, (axL, axR) = plt.subplots(
+        1, 2, figsize=(7.4, 3.9), gridspec_kw={"width_ratios": [2.3, 1.0], "wspace": 0.42})
+
+    # -- left: mean tau vs round (mean lines only; the right panel carries uncertainty) --
+    axL.axvspan(0.5, 3, color="#eef0f2", zorder=0)
+    axL.annotate("early dominant-component lock-in", xy=(1.75, 1.005), xytext=(1.75, 1.11),
+                 ha="center", fontsize=7.8, color=SUBINK, style="italic",
+                 arrowprops=dict(arrowstyle="-", color="#bbbbbb", lw=0.8))
+    axL.text(9, 1.02, "high-$\\tau$ saturation", fontsize=7.8, color=SUBINK, style="italic")
+    for e in ENC_ORDER:
+        rr, m, _s = _round_pair_series(iid, e)
+        if len(rr) == 0:
             continue
-        ax.plot(rounds, means, color=ENC_COLOR[enc], linewidth=2,
-                marker="o", markersize=4, label=ENC_LABEL[enc])
-        ax.fill_between(rounds, means - stds, means + stds, color=ENC_COLOR[enc], alpha=0.12, linewidth=0)
+        axL.plot(rr, m, color=ENC_COLOR[e], marker=ENC_MARKER[e], ls=ENC_LS[e],
+                 ms=4, lw=1.7)
+    axL.set_xlabel("Federated round $r$")
+    axL.set_ylabel(r"mean Kendall $\tau\,(\varphi_g^{(r-1)},\,\varphi_g^{(r)})$")
+    axL.set_xlim(0.5, 15.5)
+    axL.set_ylim(0, 1.18)
+    axL.set_yticks([0, 0.2, 0.4, 0.6, 0.8, 1.0])
+    axL.set_xticks([1, 3, 5, 7, 9, 11, 13, 15])
+    axL.legend(handles=_enc_handles(), loc="lower center", bbox_to_anchor=(0.5, -0.42),
+               ncol=4, frameon=False, handlelength=2.2, columnspacing=1.4)
 
-    ax.set_xlabel("Federation round")
-    ax.set_ylabel("Kendall's τ (round $r{-}1$ vs. round $r$)")
-    _titled(fig, ax, "RQ2 — Explanation stability over training rounds",
-            "Wisconsin, IID, n=15 seeds (all encodings)")
-    ax.set_ylim(0, 1.05)
-    ax.set_xticks(range(1, 16))
-    _legend(ax, loc="lower right")
-    fig.tight_layout(rect=(0, 0, 1, 0.93))
-    path = out_dir / "figure2_stability_over_rounds.png"
-    fig.savefig(path)
-    plt.close(fig)
-    print(f"  wrote {path.name}")
+    # -- right: mean tau_stab point estimate +/- std (no bar-length illusion) --
+    order = ["amplitude", "angle", "reuploading", "iqp"]
+    y = np.arange(len(order))[::-1].astype(float)
+    means = [float(tau_summary[e][0]) for e in order]
+    stds  = [float(tau_summary[e][1]) for e in order]
+    for yi, m, s, e in zip(y, means, stds, order):
+        axR.errorbar(m, yi, xerr=s, fmt=ENC_MARKER[e], color=ENC_COLOR[e],
+                     ms=7, capsize=3, elinewidth=1.2, mec="white", mew=0.6)
+        axR.text(m, yi + 0.34, f"{m:.3f}", ha="center", fontsize=8, color=INK)
+    axR.set_yticks(y)
+    axR.set_yticklabels([ENC_LABEL[e] for e in order])
+    axR.set_ylim(-0.7, 3.7)
+    axR.set_xlim(0.74, 1.02)
+    axR.set_xticks([0.8, 0.9, 1.0])
+    axR.set_xlabel(r"mean $\tau_{\mathrm{stab}}\pm$ std  ($n=15$)")
+    axR.grid(axis="y", visible=False)
+    axR.plot([1.0, 1.0], [y[0] + 0.35, y[1] - 0.35], color=SUBINK, lw=0.9)
+    axR.plot([1.0, 1.0], [y[2] + 0.35, y[3] - 0.35], color=SUBINK, lw=0.9)
+    axR.text(1.008, (y[0] + y[1]) / 2, "not\nresolved", va="center", ha="left",
+             fontsize=6.8, color=SUBINK)
+    axR.text(1.008, (y[2] + y[3]) / 2, "vs. Angle:\nresolved", va="center", ha="left",
+             fontsize=6.8, color=SUBINK)
+
+    fig.suptitle("RQ2 — round-to-round attribution stability (Wisconsin, IID)",
+                 fontsize=11, y=1.03, x=0.02, ha="left")
+    _save(fig, out_dir, "figure3_stability_over_rounds")
 
 
-# ── Figure 3: divergence by distribution (RQ3, JSD_cent) ───────────────────
+# ── Figure 3 : RQ3 local-to-global divergence ───────────────────────────────
 
-def make_figure3_divergence(rq3_table: pd.DataFrame, out_dir: Path):
-    fig, axes = plt.subplots(1, 2, figsize=(12, 5), sharey=True)
+def make_figure3(rq3_table, out_dir):
+    from matplotlib.lines import Line2D
+    # "balanced-ratio" block (IID, Quantity skew) | gap | "label-skew" block
+    slot_x = {"iid": 0.0, "qty_skew": 1.75, "alpha_0.5": 3.6, "alpha_0.1": 5.35}
+    order  = ["iid", "qty_skew", "alpha_0.5", "alpha_0.1"]
+    bar_w  = 0.30
+    YMAX   = 0.86
+    sep_x  = 2.68
+
+    fig, axes = plt.subplots(1, 2, figsize=(7.4, 4.2), sharey=True,
+                             gridspec_kw={"wspace": 0.07})
+    for ax, ds in zip(axes, ["wisconsin", "pima"]):
+        sub = rq3_table[rq3_table["dataset"] == ds]
+        for ei, e in enumerate(ENC_ORDER):
+            offs = (ei - 1.5) * bar_w
+            for d in order:
+                row = sub[(sub["encoding"] == e) & (sub["distribution"] == d)]
+                x = slot_x[d] + offs
+                if row.empty:
+                    continue
+                r = row.iloc[0]
+                nA = int(r["n_track_a_seeds"])
+                if r["status"] != "ok" or not np.isfinite(r["local_global_jsd_mean"]):
+                    ax.plot(x, 0.012, marker="v", ms=4.5, mfc="white",
+                            mec=ENC_COLOR[e], mew=1.1, clip_on=False, zorder=5)
+                    continue
+                m, s = float(r["local_global_jsd_mean"]), float(r["local_global_jsd_std"])
+                indicative = nA < 5
+                ax.bar(x, m, bar_w, color=ENC_COLOR[e],
+                       alpha=0.45 if indicative else 1.0,
+                       edgecolor=ENC_COLOR[e], linewidth=0.9,
+                       hatch="///" if indicative else None,
+                       yerr=s, error_kw={"ecolor": SUBINK, "lw": 0.9, "capsize": 1.8})
+                ax.text(x, m + s + 0.012, f"{nA}", ha="center", va="bottom",
+                        fontsize=6.2, color=SUBINK)
+        ax.axvline(sep_x, color="#d5d5d5", lw=0.9)
+        ax.set_xticks([slot_x[d] for d in order])
+        ax.set_xticklabels([DIST_LABEL_1L[d] for d in order], fontsize=8.5)
+        ax.set_title(DATASET_LABEL[ds])
+        ax.set_ylim(0, YMAX)
+        ax.set_xlim(-0.8, slot_x["alpha_0.1"] + 0.8)
+        ax.grid(axis="x", visible=False)
+        # regime brackets
+        for (a, b, txt) in [(slot_x["iid"], slot_x["qty_skew"], r"balanced ratio  (IID $\approx$ Qty)"),
+                            (slot_x["alpha_0.5"], slot_x["alpha_0.1"], "label skew")]:
+            ax.plot([a - 0.55, b + 0.55], [0.80, 0.80], color=SUBINK, lw=0.9, clip_on=False)
+            ax.text((a + b) / 2, 0.815, txt, ha="center", fontsize=7.3, color=SUBINK)
+
+    axes[0].set_ylabel(r"$D_{\mathrm{LG}}=\mathrm{mean}_{k,t}\ \mathrm{JSD}(\varphi_k^{(t)},\varphi_g^{(t)})$")
+    handles = _enc_handles() + [Line2D([0], [0], marker="v", ls="", mfc="white",
+                                       mec=SUBINK, mew=1.1, ms=6,
+                                       label=r"$<3$ Track-A seeds (not estimated)")]
+    fig.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, -0.04),
+               ncol=5, frameon=False, handlelength=2.0, columnspacing=1.4, fontsize=8.5)
+    fig.suptitle("RQ3 — local-to-global explanation divergence by data regime",
+                 fontsize=11, y=1.0, x=0.02, ha="left")
+    _save(fig, out_dir, "figure4_divergence_by_distribution")
+
+
+# ── Figure 4 : RQ4 membership-inference signal ──────────────────────────────
+
+def make_figure4(rq4_mia_table, out_dir):
+    from analysis.plot_current_rq4 import membership
+    membership(out_dir, 'figure5_mia_auc_comparison', panels=False)
+
+def make_figure5(rq4_dp_table, out_dir):
+    from analysis.plot_current_rq4 import noise
+    noise(out_dir, 'figure6_dp_auc_vs_epsilon', utility=False)
+
+def make_figure6_coverage(rq3_table, out_dir):
+    """Track-A seed coverage per (dataset x encoding x distribution) cell, from
+    the RQ3 table's distinct-seed count (n_track_a_seeds). Dot glyph encodes the
+    evidential tier; the number is the actual Track-A seed count."""
     dists = DIST_ORDER
-    x = np.arange(len(dists))
-    width = 0.19
+    rows = [(ds, e) for ds in ["wisconsin", "pima"] for e in ENC_ORDER]
 
-    for ax, dataset in zip(axes, ["wisconsin", "pima"]):
-        sub = rq3_table[rq3_table["dataset"] == dataset]
-        for i, enc in enumerate(ENC_ORDER):
-            means, stds = [], []
-            for d in dists:
-                row = sub[(sub["encoding"] == enc) & (sub["distribution"] == d)]
-                if row.empty or row.iloc[0]["status"] != "ok":
-                    means.append(np.nan); stds.append(0.0)
-                else:
-                    means.append(row.iloc[0]["local_global_jsd_mean"])
-                    stds.append(row.iloc[0]["local_global_jsd_std"])
-            offs = (i - 1.5) * width
-            ax.bar(x + offs, means, width, yerr=stds, color=ENC_COLOR[enc],
-                   label=ENC_LABEL[enc], capsize=2,
-                   error_kw={"linewidth": 1, "ecolor": "#555555"})
-        ax.set_xticks(x)
-        ax.set_xticklabels([DIST_LABEL[d] for d in dists])
-        ax.set_title(dataset.capitalize())
-        ax.set_xlabel("Distribution")
+    fig, ax = plt.subplots(figsize=(6.4, 4.4))
+    ax.set_xlim(-0.5, len(dists) - 0.5)
+    ax.set_ylim(-0.5, len(rows) - 0.5)
+    ax.set_xticks(range(len(dists)))
+    ax.set_xticklabels([DIST_LABEL_1L[d] for d in dists])
+    ax.set_yticks(range(len(rows)))
+    ax.set_yticklabels([f"{DATASET_LABEL[ds]} · {ENC_LABEL[e]}" for ds, e in rows][::-1])
+    ax.grid(True, color="#ececec", lw=0.6)
+    ax.set_axisbelow(True)
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+    ax.tick_params(length=0)
 
-    axes[0].set_ylabel(r"mean$_{k,t}$ JSD($\varphi_k$, $\varphi_g$)  (local vs. global)")
-    fig.suptitle("RQ3 — Local-to-global explanation divergence by distribution\n"
-                  "Track-A seeds only; missing bars = insufficient Track-A data or collapse (see Table 3 for rates)")
-    _legend(axes[1], loc="upper left", bbox_to_anchor=(1.02, 1.0))
-    fig.tight_layout(rect=(0, 0, 0.86, 0.92))
-    path = out_dir / "figure3_divergence_by_distribution.png"
-    fig.savefig(path)
-    plt.close(fig)
-    print(f"  wrote {path.name}")
+    def tier(n):
+        if n >= 5:  return ("#2f6f3e", 230, "sufficient")      # filled, dark green
+        if n >= 3:  return ("#c98a00", 165, "limited")         # amber
+        return ("#b23b3b", 120, "insufficient")                # red, small
 
+    for yi, (ds, e) in enumerate(rows[::-1]):
+        for xi, d in enumerate(dists):
+            r = rq3_table[(rq3_table["dataset"] == ds) & (rq3_table["encoding"] == e)
+                          & (rq3_table["distribution"] == d)]
+            n = int(r.iloc[0]["n_track_a_seeds"]) if not r.empty else 0
+            col, size, _ = tier(n)
+            if n == 0:
+                ax.plot(xi, yi, marker="x", ms=6, mew=1.4, color="#b23b3b")
+            else:
+                ax.scatter(xi, yi, s=size, color=col, edgecolor="white", linewidth=0.6, zorder=3)
+                ax.text(xi, yi, str(n), ha="center", va="center", fontsize=7,
+                        color="white", fontweight="bold", zorder=4)
 
-# ── Figure 4: MIA AUC comparison (RQ4) ──────────────────────────────────────
+    from matplotlib.lines import Line2D
+    leg = [Line2D([0], [0], marker="o", ls="", mfc="#2f6f3e", mec="white", ms=11,
+                  label="sufficient  ($\\geq 5$ Track-A seeds)"),
+           Line2D([0], [0], marker="o", ls="", mfc="#c98a00", mec="white", ms=9,
+                  label="limited  ($3$–$4$)"),
+           Line2D([0], [0], marker="o", ls="", mfc="#b23b3b", mec="white", ms=6,
+                  label="insufficient  ($1$–$2$)"),
+           Line2D([0], [0], marker="x", ls="", mec="#b23b3b", ms=7, mew=1.4,
+                  label="none  (all seeds collapsed)")]
+    ax.legend(handles=leg, loc="upper left", bbox_to_anchor=(1.02, 1.0),
+              frameon=False, handletextpad=0.6, labelspacing=0.9)
 
-def make_figure4_mia(rq4_mia_table: pd.DataFrame, out_dir: Path):
-    iid = rq4_mia_table[(rq4_mia_table["distribution"] == "iid") & (rq4_mia_table["dataset"] == "wisconsin")]
-    pima_row = rq4_mia_table[(rq4_mia_table["dataset"] == "pima")]
-
-    labels, means, stds, colors, ns = [], [], [], [], []
-    for enc in ENC_ORDER:
-        row = iid[iid["encoding"] == enc]
-        if row.empty:
-            continue
-        labels.append(ENC_LABEL[enc]); colors.append(ENC_COLOR[enc])
-        means.append(row.iloc[0]["auc_mean"]); stds.append(row.iloc[0]["auc_std"])
-        ns.append(int(row.iloc[0]["n"]))
-
-    fig, ax = plt.subplots(figsize=(9, 5.5))
-    x = np.arange(len(labels))
-    ax.bar(x, means, 0.55, yerr=stds, color=colors, capsize=3,
-           error_kw={"linewidth": 1, "ecolor": "#555555"})
-    for xi, m, n in zip(x, means, ns):
-        ax.text(xi, m + 0.03, f"n={n}", ha="center", fontsize=9, color="#444444")
-
-    wisconsin_n = int(iid[iid["encoding"] == "amplitude"].iloc[0]["n"]) if not iid.empty else 15
-    pima_underpowered = False
-    if not pima_row.empty and pima_row.iloc[0]["status"] == "ok":
-        pr = pima_row.iloc[0]
-        pima_n = int(pr["n"])
-        pima_underpowered = pima_n < wisconsin_n
-        xi = len(labels)
-        ax.bar(xi, pr["auc_mean"], 0.55, yerr=pr["auc_std"], color=ENC_COLOR["amplitude"],
-               hatch="//", edgecolor="white", capsize=3,
-               error_kw={"linewidth": 1, "ecolor": "#555555"})
-        n_label = f"n={pima_n}" + (" (preliminary)" if pima_underpowered else "")
-        ax.text(xi, pr["auc_mean"] + 0.03, n_label, ha="center", fontsize=9, color="#444444")
-        labels.append("Amplitude\n(Pima)")
-        x = np.arange(len(labels))
-
-    ax.axhline(0.5, color="#888888", linestyle="--", linewidth=1)
-    ax.text(len(labels) - 0.5, 0.505, "random guess", fontsize=9, color="#888888", ha="right")
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels)
-    ax.set_ylabel("Direct-MIA AUC")
-    ax.set_ylim(0, 1.0)
-    pima_note = "hatched = Pima check (preliminary — see bar label for n)" if pima_underpowered else "hatched = Pima check (n-matched)"
-    _titled(fig, ax, "RQ4 — Membership-inference leakage by encoding",
-            f"Wisconsin IID n={wisconsin_n} (all encodings); {pima_note}")
-    fig.tight_layout(rect=(0, 0, 1, 0.92))
-    path = out_dir / "figure4_mia_auc_comparison.png"
-    fig.savefig(path)
-    plt.close(fig)
-    print(f"  wrote {path.name}")
+    fig.suptitle("Evidential coverage of the experimental space",
+                 fontsize=11, y=1.0, x=0.02, ha="left")
+    ax.set_title("digit = distinct Track-A seeds contributing to that cell "
+                 "(RQ3 basis; 15 seeds drawn for IID, 5+ elsewhere)",
+                 fontsize=8.5, color=SUBINK, fontweight="normal", pad=8)
+    _save(fig, out_dir, "figure2_experimental_coverage")
 
 
-# ── Figure 5: DP AUC vs epsilon (RQ4) ───────────────────────────────────────
-
-def make_figure5_dp(rq4_dp_table: pd.DataFrame, out_dir: Path):
-    fig, ax = plt.subplots(figsize=(8, 5))
-    for enc in ENC_ORDER:
-        sub = rq4_dp_table[rq4_dp_table["encoding"] == enc].sort_values("epsilon")
-        if sub.empty:
-            continue
-        ax.errorbar(sub["epsilon"], sub["auc_mean"], yerr=sub["auc_std"],
-                    color=ENC_COLOR[enc], linewidth=2, marker="o", markersize=5,
-                    capsize=3, label=ENC_LABEL[enc])
-
-    ax.axhline(0.5, color="#888888", linestyle="--", linewidth=1)
-    ax.text(0.11, 0.51, "random guess", fontsize=9, color="#888888")
-    ax.set_xscale("log")
-    ax.set_xticks([0.1, 0.5, 1.0, 5.0])
-    ax.set_xticklabels(["0.1", "0.5", "1.0", "5.0"])
-    ax.set_xlabel("Privacy budget ε (log scale; lower = more private)")
-    ax.set_ylabel("Direct-MIA AUC")
-    ax.set_ylim(0.25, 0.85)
-    _titled(fig, ax, "RQ4 — MIA AUC under calibrated Laplace noise vs. budget",
-            "Wisconsin, 4 encodings × 5 seeds")
-    _legend(ax, loc="upper left")
-    fig.tight_layout(rect=(0, 0, 1, 0.93))
-    path = out_dir / "figure5_dp_auc_vs_epsilon.png"
-    fig.savefig(path)
-    plt.close(fig)
-    print(f"  wrote {path.name}")
-
-
-# ── main ─────────────────────────────────────────────────────────────────────
+# ── main ────────────────────────────────────────────────────────────────────
 
 def main():
     out_dir = get_out_dir()
     print(f"Output directory: {out_dir}\n")
 
-    print("Loading raw logs ...")
-    wisconsin_df = load_explanation_log(["phase10_log.csv", "phase11_log.csv"])
-    wisconsin_ext_df = load_explanation_log(["rq2_extension_log.csv"])
+    wis_df = load_explanation_log(["phase10_log.csv", "phase11_log.csv"])
+    wis_ext_df = load_explanation_log(["rq2_extension_log.csv"])
     pima_df = load_explanation_log(["phase16_pima_log.csv"])
-    wisconsin_refs = build_refs(wisconsin_df)
-    pima_refs = build_refs(pima_df)
+    wis_refs, pima_refs = build_refs(wis_df), build_refs(pima_df)
 
-    print("\nFigure 2 — stability over rounds ...")
-    make_figure2_stability(wisconsin_df, wisconsin_ext_df, out_dir)
-
-    print("\nFigure 3 — local-to-global divergence by distribution ...")
     rq3_table = build_rq3_local_global({
-        "wisconsin": (wisconsin_df, wisconsin_refs),
-        "pima": (pima_df, pima_refs),
-    })
-    make_figure3_divergence(rq3_table, out_dir)
-
-    print("\nFigure 4 — MIA AUC comparison ...")
+        "wisconsin": (wis_df, wis_refs), "pima": (pima_df, pima_refs)})
     rq4_mia_table = build_rq4_mia()
-    make_figure4_mia(rq4_mia_table, out_dir)
-
-    print("\nFigure 5 — DP AUC vs epsilon ...")
     rq4_dp_table = build_rq4_dp()
-    make_figure5_dp(rq4_dp_table, out_dir)
 
+    # RQ2 tau_stab summary, computed the same way build_rq2 does (Table 2)
+    from aggregate_results import build_rq2
+    rq2_tbl = build_rq2(wis_df, wis_ext_df, pima_df)
+    tau_summary = {r["encoding"]: (r["tau_mean"], r["tau_std"])
+                   for _, r in rq2_tbl[(rq2_tbl["dataset"] == "wisconsin")
+                                       & (rq2_tbl["distribution"] == "iid")].iterrows()}
+
+    print("Figure 2 ..."); make_figure2(wis_df, wis_ext_df, tau_summary, out_dir)
+    print("Figure 3 ..."); make_figure3(rq3_table, out_dir)
+    print("Figure 4 ..."); make_figure4(rq4_mia_table, out_dir)
+    print("Figure 5 ..."); make_figure5(rq4_dp_table, out_dir)
+    print("Figure 6 ..."); make_figure6_coverage(rq3_table, out_dir)
     print(f"\nAll figures written to {out_dir}")
 
 

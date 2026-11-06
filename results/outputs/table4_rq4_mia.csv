@@ -1,14 +1,14 @@
-dataset,encoding,distribution,n,auc_mean,auc_std,collapse_rate,status,note
-pima,amplitude,iid,15,0.5637333333333333,0.10860904110396984,0.0,ok,"RQ4 extension: cross-dataset check for the strongest encoding, n=15 — matches Wisconsin's n=15, same statistical footing. Stability check vs the n=5 preliminary read (0.579 +/- 0.130): shift = -0.015, well within the n=5 SE (0.058) — not a meaningful move. Pima (0.564) vs Wisconsin/amplitude (0.620) gap = 0.056, 1.40 SE — NOT resolved (tied, consistent with Wisconsin); vs random guess 2.27 SE — RESOLVED (genuine leakage)."
-wisconsin,angle,iid,15,0.5326666666666665,0.07986297789398562,,ok,
-wisconsin,amplitude,iid,15,0.6199999999999999,0.11175739029573967,,ok,
-wisconsin,reuploading,iid,15,0.6652,0.13650913103943949,,ok,
-wisconsin,iqp,iid,15,0.6469333333333334,0.15772646605829377,,ok,
-wisconsin,angle,alpha_0.1,1,,,0.8,insufficient,
-wisconsin,amplitude,alpha_0.1,5,0.5732,0.1667309209474955,0.0,ok,
-wisconsin,reuploading,alpha_0.1,4,0.651,0.19926197161860398,0.2,ok,
-wisconsin,iqp,alpha_0.1,5,0.7007999999999999,0.15289604311426766,0.0,ok,
-wisconsin,angle,qty_skew,5,0.5564,0.11805422482910131,0.0,ok,
-wisconsin,amplitude,qty_skew,5,0.6428,0.1598349148340249,0.0,ok,
-wisconsin,reuploading,qty_skew,5,0.7,0.16933398950004103,0.0,ok,
-wisconsin,iqp,qty_skew,5,0.6996,0.18986521535025838,0.0,ok,
+dataset,encoding,distribution,n,auc_mean,auc_std,collapse_rate,status,n_total,n_track_a,note
+pima,amplitude,iid,15,0.5010666666666667,0.07810566713174683,0.06666666666666667,ok,15,14,release_repair_v1; mean five outer-fold raw AUCs; all IID targets; Track-A sensitivity reported separately
+wisconsin,amplitude,alpha_0.1,5,0.45759999999999995,0.07395133534967442,0.0,ok,5,5,release_repair_v1; mean five outer-fold raw AUCs; Track-A only; at least 3 seeds required
+wisconsin,amplitude,iid,15,0.4865333333333334,0.06844587712373987,0.0,ok,15,15,release_repair_v1; mean five outer-fold raw AUCs; all IID targets; Track-A sensitivity reported separately
+wisconsin,amplitude,qty_skew,5,0.48640000000000005,0.10492282878382572,0.0,ok,5,5,release_repair_v1; mean five outer-fold raw AUCs; Track-A only; at least 3 seeds required
+wisconsin,angle,alpha_0.1,1,,,0.8,insufficient,5,1,release_repair_v1; mean five outer-fold raw AUCs; Track-A only; at least 3 seeds required
+wisconsin,angle,iid,15,0.48879999999999996,0.0779186388851492,0.06666666666666667,ok,15,14,release_repair_v1; mean five outer-fold raw AUCs; all IID targets; Track-A sensitivity reported separately
+wisconsin,angle,qty_skew,5,0.46279999999999993,0.05201153718166769,0.0,ok,5,5,release_repair_v1; mean five outer-fold raw AUCs; Track-A only; at least 3 seeds required
+wisconsin,iqp,alpha_0.1,5,0.46719999999999995,0.06274711148730276,0.0,ok,5,5,release_repair_v1; mean five outer-fold raw AUCs; Track-A only; at least 3 seeds required
+wisconsin,iqp,iid,15,0.5044,0.05867683894494853,0.0,ok,15,15,release_repair_v1; mean five outer-fold raw AUCs; all IID targets; Track-A sensitivity reported separately
+wisconsin,iqp,qty_skew,5,0.5279999999999999,0.06903622237637284,0.0,ok,5,5,release_repair_v1; mean five outer-fold raw AUCs; Track-A only; at least 3 seeds required
+wisconsin,reuploading,alpha_0.1,4,0.496,0.05009324638445119,0.2,ok,5,4,release_repair_v1; mean five outer-fold raw AUCs; Track-A only; at least 3 seeds required
+wisconsin,reuploading,iid,15,0.4794666666666666,0.08524072355617915,0.0,ok,15,15,release_repair_v1; mean five outer-fold raw AUCs; all IID targets; Track-A sensitivity reported separately
+wisconsin,reuploading,qty_skew,5,0.5199999999999999,0.10632967600815867,0.0,ok,5,5,release_repair_v1; mean five outer-fold raw AUCs; Track-A only; at least 3 seeds required

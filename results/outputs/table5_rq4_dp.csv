@@ -1,17 +1,17 @@
 dataset,encoding,epsilon,n,auc_mean,auc_std,status,note
-wisconsin,angle,0.1,5,0.31120000000000003,0.027151427218472326,ok,
-wisconsin,angle,0.5,5,0.36760000000000004,0.022333830840229826,ok,
-wisconsin,angle,1.0,5,0.4152,0.05724683397359194,ok,
-wisconsin,angle,5.0,5,0.5208,0.09994598541212148,ok,
-wisconsin,amplitude,0.1,5,0.33,0.027386127875258317,ok,
-wisconsin,amplitude,0.5,5,0.4720000000000001,0.10120276676059801,ok,
-wisconsin,amplitude,1.0,5,0.5616,0.11108915338591792,ok,
-wisconsin,amplitude,5.0,5,0.6380000000000001,0.11926441212700462,ok,
-wisconsin,reuploading,0.1,5,0.3308,0.030351276744150325,ok,
-wisconsin,reuploading,0.5,5,0.4984,0.11882255678110956,ok,
-wisconsin,reuploading,1.0,5,0.5768000000000001,0.14186331449673661,ok,
-wisconsin,reuploading,5.0,5,0.6696,0.1681570694321235,ok,
-wisconsin,iqp,0.1,5,0.3284,0.02662329806766998,ok,
-wisconsin,iqp,0.5,5,0.4972,0.11076642090453225,ok,
-wisconsin,iqp,1.0,5,0.5884,0.13809706731136615,ok,
-wisconsin,iqp,5.0,5,0.6771999999999999,0.18357886588602731,ok,
+wisconsin,amplitude,0.1,5,0.46319999999999995,0.07437203775613518,ok,release_repair_v1; independent per-record noise; raw fold-mean AUC; no privacy guarantee
+wisconsin,amplitude,0.5,5,0.5084000000000001,0.07529143377569587,ok,release_repair_v1; independent per-record noise; raw fold-mean AUC; no privacy guarantee
+wisconsin,amplitude,1.0,5,0.4664,0.12137050712590772,ok,release_repair_v1; independent per-record noise; raw fold-mean AUC; no privacy guarantee
+wisconsin,amplitude,5.0,5,0.4999999999999999,0.10410571550111931,ok,release_repair_v1; independent per-record noise; raw fold-mean AUC; no privacy guarantee
+wisconsin,angle,0.1,5,0.5107999999999999,0.050091915515380336,ok,release_repair_v1; independent per-record noise; raw fold-mean AUC; no privacy guarantee
+wisconsin,angle,0.5,5,0.5048,0.06959310310655792,ok,release_repair_v1; independent per-record noise; raw fold-mean AUC; no privacy guarantee
+wisconsin,angle,1.0,5,0.4412,0.06847773360735594,ok,release_repair_v1; independent per-record noise; raw fold-mean AUC; no privacy guarantee
+wisconsin,angle,5.0,5,0.4812,0.08769948688561412,ok,release_repair_v1; independent per-record noise; raw fold-mean AUC; no privacy guarantee
+wisconsin,iqp,0.1,5,0.49119999999999997,0.07650620889836328,ok,release_repair_v1; independent per-record noise; raw fold-mean AUC; no privacy guarantee
+wisconsin,iqp,0.5,5,0.5032,0.09424011884542594,ok,release_repair_v1; independent per-record noise; raw fold-mean AUC; no privacy guarantee
+wisconsin,iqp,1.0,5,0.5608000000000001,0.05137314473535758,ok,release_repair_v1; independent per-record noise; raw fold-mean AUC; no privacy guarantee
+wisconsin,iqp,5.0,5,0.546,0.07844743462982076,ok,release_repair_v1; independent per-record noise; raw fold-mean AUC; no privacy guarantee
+wisconsin,reuploading,0.1,5,0.5124000000000001,0.06790287180966653,ok,release_repair_v1; independent per-record noise; raw fold-mean AUC; no privacy guarantee
+wisconsin,reuploading,0.5,5,0.5128,0.09877854017953495,ok,release_repair_v1; independent per-record noise; raw fold-mean AUC; no privacy guarantee
+wisconsin,reuploading,1.0,5,0.47919999999999996,0.08118620572486437,ok,release_repair_v1; independent per-record noise; raw fold-mean AUC; no privacy guarantee
+wisconsin,reuploading,5.0,5,0.492,0.06549809157525129,ok,release_repair_v1; independent per-record noise; raw fold-mean AUC; no privacy guarantee
