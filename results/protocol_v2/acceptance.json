@@ -1,0 +1,25 @@
+{
+ "unit_tests": {
+  "passed": true,
+  "tail": [
+   "Ran 46 tests in 19.006s",
+   "",
+   "OK"
+  ]
+ },
+ "wisconsin/angle/alpha_0.5/s7": {
+  "passed": true,
+  "repeat_identical": true,
+  "max_difference_flower_vs_direct": 5.750531677506387e-07,
+  "direct_seconds": 51.879938125028275,
+  "flower_seconds": 33.46832716703648
+ },
+ "pima/reuploading/iid/s42": {
+  "passed": true,
+  "repeat_identical": true,
+  "max_difference_flower_vs_direct": 2.384185791015625e-07,
+  "direct_seconds": 80.57755241700215,
+  "flower_seconds": 33.19183374999557
+ },
+ "passed": true
+}

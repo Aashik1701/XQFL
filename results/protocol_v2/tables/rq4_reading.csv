@@ -1,0 +1,3 @@
+control,valid,control_detects,target_cells_detecting,target_cells,reading
+mlp_control,False,False,0,32,pipeline unvalidated; no conclusion
+vqc_control,True,False,0,32,explanations carried no detectable signal even when loss did; attack-specific

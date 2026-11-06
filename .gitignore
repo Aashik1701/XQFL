@@ -55,3 +55,8 @@ Thumbs.db
 
 # PennyLane / NumPy cache
 .pennylane/
+
+# Protocol v2 raw run outputs
+results/protocol_v2/dry_run/
+results/protocol_v2/primary/*
+!results/protocol_v2/primary/report.json

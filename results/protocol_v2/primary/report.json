@@ -1,0 +1,37 @@
+{
+ "train": {
+  "tasks": 2160,
+  "counts": {
+   "trained": 2160
+  },
+  "seconds": 32893.356510124984
+ },
+ "explain": {
+  "tasks": 2160,
+  "counts": {
+   "explained": 2160
+  },
+  "seconds": 26035.39201816602
+ },
+ "estimators": {
+  "tasks": 240,
+  "counts": {
+   "validated": 240
+  },
+  "seconds": 4062.733480624971
+ },
+ "attacks": {
+  "tasks": 960,
+  "counts": {
+   "attacked": 960
+  },
+  "seconds": 845.8412633329863
+ },
+ "controls": {
+  "tasks": 60,
+  "counts": {
+   "attacked": 60
+  },
+  "seconds": 497.1412279170472
+ }
+}

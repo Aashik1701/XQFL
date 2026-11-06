@@ -1,0 +1,390 @@
+[train] 20/2160 {'trained': 20} 418s
+[train] 40/2160 {'trained': 40} 659s
+[train] 60/2160 {'trained': 60} 1006s
+[train] 80/2160 {'trained': 80} 1307s
+[train] 100/2160 {'trained': 100} 1594s
+[train] 120/2160 {'trained': 120} 2218s
+[train] 140/2160 {'trained': 140} 2530s
+[train] 160/2160 {'trained': 160} 2880s
+[train] 180/2160 {'trained': 180} 3147s
+[train] 200/2160 {'trained': 200} 3604s
+[train] 220/2160 {'trained': 220} 3828s
+[train] 240/2160 {'trained': 240} 4180s
+[train] 260/2160 {'trained': 260} 4540s
+[train] 280/2160 {'trained': 280} 4904s
+[train] 300/2160 {'trained': 300} 5250s
+[train] 320/2160 {'trained': 320} 5497s
+[train] 340/2160 {'trained': 340} 5894s
+[train] 360/2160 {'trained': 360} 6245s
+[train] 380/2160 {'trained': 380} 6604s
+[train] 400/2160 {'trained': 400} 6846s
+[train] 420/2160 {'trained': 420} 7193s
+[train] 440/2160 {'trained': 440} 7483s
+[train] 460/2160 {'trained': 460} 7733s
+[train] 480/2160 {'trained': 480} 8183s
+[train] 500/2160 {'trained': 500} 8492s
+[train] 520/2160 {'trained': 520} 8823s
+[train] 540/2160 {'trained': 540} 9101s
+[train] 560/2160 {'trained': 560} 9557s
+[train] 580/2160 {'trained': 580} 9809s
+[train] 600/2160 {'trained': 600} 10131s
+[train] 620/2160 {'trained': 620} 10399s
+[train] 640/2160 {'trained': 640} 10735s
+[train] 660/2160 {'trained': 660} 11075s
+[train] 680/2160 {'trained': 680} 11327s
+[train] 700/2160 {'trained': 700} 11785s
+[train] 720/2160 {'trained': 720} 12109s
+[train] 740/2160 {'trained': 740} 12471s
+[train] 760/2160 {'trained': 760} 12711s
+[train] 780/2160 {'trained': 780} 13065s
+[train] 800/2160 {'trained': 800} 13362s
+[train] 820/2160 {'trained': 820} 13636s
+[train] 840/2160 {'trained': 840} 14085s
+[train] 860/2160 {'trained': 860} 14384s
+[train] 880/2160 {'trained': 880} 14714s
+[train] 900/2160 {'trained': 900} 14972s
+[train] 920/2160 {'trained': 920} 15432s
+[train] 940/2160 {'trained': 940} 15669s
+[train] 960/2160 {'trained': 960} 15994s
+[train] 980/2160 {'trained': 980} 16271s
+[train] 1000/2160 {'trained': 1000} 16622s
+[train] 1020/2160 {'trained': 1020} 16974s
+[train] 1040/2160 {'trained': 1040} 17214s
+[train] 1060/2160 {'trained': 1060} 17595s
+[train] 1080/2160 {'trained': 1080} 17918s
+[train] 1100/2160 {'trained': 1100} 18245s
+[train] 1120/2160 {'trained': 1120} 18469s
+[train] 1140/2160 {'trained': 1140} 18844s
+[train] 1160/2160 {'trained': 1160} 19138s
+[train] 1180/2160 {'trained': 1180} 19408s
+[train] 1200/2160 {'trained': 1200} 19782s
+[train] 1220/2160 {'trained': 1220} 20017s
+[train] 1240/2160 {'trained': 1240} 20275s
+[train] 1260/2160 {'trained': 1260} 20487s
+[train] 1280/2160 {'trained': 1280} 20852s
+[train] 1300/2160 {'trained': 1300} 21038s
+[train] 1320/2160 {'trained': 1320} 21294s
+[train] 1340/2160 {'trained': 1340} 21510s
+[train] 1360/2160 {'trained': 1360} 21781s
+[train] 1380/2160 {'trained': 1380} 22054s
+[train] 1400/2160 {'trained': 1400} 22249s
+[train] 1420/2160 {'trained': 1420} 22552s
+[train] 1440/2160 {'trained': 1440} 22814s
+[train] 1460/2160 {'trained': 1460} 23083s
+[train] 1480/2160 {'trained': 1480} 23271s
+[train] 1500/2160 {'trained': 1500} 23550s
+[train] 1520/2160 {'trained': 1520} 23785s
+[train] 1540/2160 {'trained': 1540} 23993s
+[train] 1560/2160 {'trained': 1560} 24324s
+[train] 1580/2160 {'trained': 1580} 24543s
+[train] 1600/2160 {'trained': 1600} 24787s
+[train] 1620/2160 {'trained': 1620} 24986s
+[train] 1640/2160 {'trained': 1640} 25326s
+[train] 1660/2160 {'trained': 1660} 25504s
+[train] 1680/2160 {'trained': 1680} 25753s
+[train] 1700/2160 {'trained': 1700} 25960s
+[train] 1720/2160 {'trained': 1720} 26315s
+[train] 1740/2160 {'trained': 1740} 26761s
+[train] 1760/2160 {'trained': 1760} 27083s
+[train] 1780/2160 {'trained': 1780} 27425s
+[train] 1800/2160 {'trained': 1800} 27704s
+[train] 1820/2160 {'trained': 1820} 27982s
+[train] 1840/2160 {'trained': 1840} 28191s
+[train] 1860/2160 {'trained': 1860} 28475s
+[train] 1880/2160 {'trained': 1880} 28751s
+[train] 1900/2160 {'trained': 1900} 28982s
+[train] 1920/2160 {'trained': 1920} 29391s
+[train] 1940/2160 {'trained': 1940} 29665s
+[train] 1960/2160 {'trained': 1960} 29964s
+[train] 1980/2160 {'trained': 1980} 30197s
+[train] 2000/2160 {'trained': 2000} 30603s
+[train] 2020/2160 {'trained': 2020} 30820s
+[train] 2040/2160 {'trained': 2040} 31102s
+[train] 2060/2160 {'trained': 2060} 31358s
+[train] 2080/2160 {'trained': 2080} 31661s
+[train] 2100/2160 {'trained': 2100} 31974s
+[train] 2120/2160 {'trained': 2120} 32195s
+[train] 2140/2160 {'trained': 2140} 32557s
+[train] 2160/2160 {'trained': 2160} 32893s
+[explain] 20/2160 {'explained': 20} 351s
+[explain] 40/2160 {'explained': 40} 511s
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:101: RuntimeWarning: Mean of empty slice
+  tau=float(np.nanmean([_tau(a, b) for a, b in pairs])),
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:103: RuntimeWarning: Mean of empty slice
+  cosine=float(np.nanmean([_cosine(a, b) for a, b in pairs])),
+[explain] 60/2160 {'explained': 60} 706s
+[explain] 80/2160 {'explained': 80} 931s
+[explain] 100/2160 {'explained': 100} 1124s
+[explain] 120/2160 {'explained': 120} 1510s
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:101: RuntimeWarning: Mean of empty slice
+  tau=float(np.nanmean([_tau(a, b) for a, b in pairs])),
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:103: RuntimeWarning: Mean of empty slice
+  cosine=float(np.nanmean([_cosine(a, b) for a, b in pairs])),
+[explain] 140/2160 {'explained': 140} 1597s
+[explain] 160/2160 {'explained': 160} 1939s
+[explain] 180/2160 {'explained': 180} 2090s
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:101: RuntimeWarning: Mean of empty slice
+  tau=float(np.nanmean([_tau(a, b) for a, b in pairs])),
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:103: RuntimeWarning: Mean of empty slice
+  cosine=float(np.nanmean([_cosine(a, b) for a, b in pairs])),
+[explain] 200/2160 {'explained': 200} 2383s
+[explain] 220/2160 {'explained': 220} 2567s
+[explain] 240/2160 {'explained': 240} 2797s
+[explain] 260/2160 {'explained': 260} 3064s
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:101: RuntimeWarning: Mean of empty slice
+  tau=float(np.nanmean([_tau(a, b) for a, b in pairs])),
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:103: RuntimeWarning: Mean of empty slice
+  cosine=float(np.nanmean([_cosine(a, b) for a, b in pairs])),
+[explain] 280/2160 {'explained': 280} 3269s
+[explain] 300/2160 {'explained': 300} 3502s
+[explain] 320/2160 {'explained': 320} 3729s
+[explain] 340/2160 {'explained': 340} 4023s
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:101: RuntimeWarning: Mean of empty slice
+  tau=float(np.nanmean([_tau(a, b) for a, b in pairs])),
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:103: RuntimeWarning: Mean of empty slice
+  cosine=float(np.nanmean([_cosine(a, b) for a, b in pairs])),
+[explain] 360/2160 {'explained': 360} 4168s
+[explain] 380/2160 {'explained': 380} 4462s
+[explain] 400/2160 {'explained': 400} 4679s
+[explain] 420/2160 {'explained': 420} 4874s
+[explain] 440/2160 {'explained': 440} 5099s
+[explain] 460/2160 {'explained': 460} 5292s
+[explain] 480/2160 {'explained': 480} 5689s
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:101: RuntimeWarning: Mean of empty slice
+  tau=float(np.nanmean([_tau(a, b) for a, b in pairs])),
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:103: RuntimeWarning: Mean of empty slice
+  cosine=float(np.nanmean([_cosine(a, b) for a, b in pairs])),
+[explain] 500/2160 {'explained': 500} 5787s
+[explain] 520/2160 {'explained': 520} 6134s
+[explain] 540/2160 {'explained': 540} 6308s
+[explain] 560/2160 {'explained': 560} 6553s
+[explain] 580/2160 {'explained': 580} 6782s
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:101: RuntimeWarning: Mean of empty slice
+  tau=float(np.nanmean([_tau(a, b) for a, b in pairs])),
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:103: RuntimeWarning: Mean of empty slice
+  cosine=float(np.nanmean([_cosine(a, b) for a, b in pairs])),
+[explain] 600/2160 {'explained': 600} 6985s
+[explain] 620/2160 {'explained': 620} 7232s
+[explain] 640/2160 {'explained': 640} 7486s
+[explain] 660/2160 {'explained': 660} 7755s
+[explain] 680/2160 {'explained': 680} 7950s
+[explain] 700/2160 {'explained': 700} 8233s
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:101: RuntimeWarning: Mean of empty slice
+  tau=float(np.nanmean([_tau(a, b) for a, b in pairs])),
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:103: RuntimeWarning: Mean of empty slice
+  cosine=float(np.nanmean([_cosine(a, b) for a, b in pairs])),
+[explain] 720/2160 {'explained': 720} 8400s
+[explain] 740/2160 {'explained': 740} 8734s
+[explain] 760/2160 {'explained': 760} 8957s
+[explain] 780/2160 {'explained': 780} 9150s
+[explain] 800/2160 {'explained': 800} 9381s
+[explain] 820/2160 {'explained': 820} 9593s
+[explain] 840/2160 {'explained': 840} 9980s
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:101: RuntimeWarning: Mean of empty slice
+  tau=float(np.nanmean([_tau(a, b) for a, b in pairs])),
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:103: RuntimeWarning: Mean of empty slice
+  cosine=float(np.nanmean([_cosine(a, b) for a, b in pairs])),
+[explain] 860/2160 {'explained': 860} 10092s
+[explain] 880/2160 {'explained': 880} 10402s
+[explain] 900/2160 {'explained': 900} 10568s
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:101: RuntimeWarning: Mean of empty slice
+  tau=float(np.nanmean([_tau(a, b) for a, b in pairs])),
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:103: RuntimeWarning: Mean of empty slice
+  cosine=float(np.nanmean([_cosine(a, b) for a, b in pairs])),
+[explain] 920/2160 {'explained': 920} 10796s
+[explain] 940/2160 {'explained': 940} 10982s
+[explain] 960/2160 {'explained': 960} 11163s
+[explain] 980/2160 {'explained': 980} 11383s
+[explain] 1000/2160 {'explained': 1000} 11573s
+[explain] 1020/2160 {'explained': 1020} 11806s
+[explain] 1040/2160 {'explained': 1040} 12032s
+[explain] 1060/2160 {'explained': 1060} 12364s
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:101: RuntimeWarning: Mean of empty slice
+  tau=float(np.nanmean([_tau(a, b) for a, b in pairs])),
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:103: RuntimeWarning: Mean of empty slice
+  cosine=float(np.nanmean([_cosine(a, b) for a, b in pairs])),
+[explain] 1080/2160 {'explained': 1080} 12535s
+[explain] 1100/2160 {'explained': 1100} 12888s
+[explain] 1120/2160 {'explained': 1120} 13144s
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:101: RuntimeWarning: Mean of empty slice
+  tau=float(np.nanmean([_tau(a, b) for a, b in pairs])),
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:103: RuntimeWarning: Mean of empty slice
+  cosine=float(np.nanmean([_cosine(a, b) for a, b in pairs])),
+[explain] 1140/2160 {'explained': 1140} 13410s
+[explain] 1160/2160 {'explained': 1160} 13645s
+[explain] 1180/2160 {'explained': 1180} 13856s
+[explain] 1200/2160 {'explained': 1200} 14259s
+[explain] 1220/2160 {'explained': 1220} 14365s
+[explain] 1240/2160 {'explained': 1240} 14750s
+[explain] 1260/2160 {'explained': 1260} 14940s
+[explain] 1280/2160 {'explained': 1280} 15274s
+[explain] 1300/2160 {'explained': 1300} 15510s
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:101: RuntimeWarning: Mean of empty slice
+  tau=float(np.nanmean([_tau(a, b) for a, b in pairs])),
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:103: RuntimeWarning: Mean of empty slice
+  cosine=float(np.nanmean([_cosine(a, b) for a, b in pairs])),
+[explain] 1320/2160 {'explained': 1320} 15838s
+[explain] 1340/2160 {'explained': 1340} 16160s
+[explain] 1360/2160 {'explained': 1360} 16425s
+[explain] 1380/2160 {'explained': 1380} 16729s
+[explain] 1400/2160 {'explained': 1400} 16993s
+[explain] 1420/2160 {'explained': 1420} 17353s
+[explain] 1440/2160 {'explained': 1440} 17562s
+[explain] 1460/2160 {'explained': 1460} 17889s
+[explain] 1480/2160 {'explained': 1480} 18171s
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:101: RuntimeWarning: Mean of empty slice
+  tau=float(np.nanmean([_tau(a, b) for a, b in pairs])),
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:103: RuntimeWarning: Mean of empty slice
+  cosine=float(np.nanmean([_cosine(a, b) for a, b in pairs])),
+[explain] 1500/2160 {'explained': 1500} 18418s
+[explain] 1520/2160 {'explained': 1520} 18720s
+[explain] 1540/2160 {'explained': 1540} 18973s
+[explain] 1560/2160 {'explained': 1560} 19415s
+[explain] 1580/2160 {'explained': 1580} 19564s
+[explain] 1600/2160 {'explained': 1600} 19934s
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:101: RuntimeWarning: Mean of empty slice
+  tau=float(np.nanmean([_tau(a, b) for a, b in pairs])),
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:103: RuntimeWarning: Mean of empty slice
+  cosine=float(np.nanmean([_cosine(a, b) for a, b in pairs])),
+[explain] 1620/2160 {'explained': 1620} 20133s
+[explain] 1640/2160 {'explained': 1640} 20393s
+[explain] 1660/2160 {'explained': 1660} 20583s
+[explain] 1680/2160 {'explained': 1680} 20791s
+[explain] 1700/2160 {'explained': 1700} 20997s
+[explain] 1720/2160 {'explained': 1720} 21147s
+[explain] 1740/2160 {'explained': 1740} 21367s
+[explain] 1760/2160 {'explained': 1760} 21581s
+[explain] 1780/2160 {'explained': 1780} 21869s
+[explain] 1800/2160 {'explained': 1800} 22053s
+[explain] 1820/2160 {'explained': 1820} 22251s
+[explain] 1840/2160 {'explained': 1840} 22445s
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:101: RuntimeWarning: Mean of empty slice
+  tau=float(np.nanmean([_tau(a, b) for a, b in pairs])),
+/Users/mohammedaashik/Documents/PROJECT/XQFL/v2/explain.py:103: RuntimeWarning: Mean of empty slice
+  cosine=float(np.nanmean([_cosine(a, b) for a, b in pairs])),
+[explain] 1860/2160 {'explained': 1860} 22623s
+[explain] 1880/2160 {'explained': 1880} 22819s
+[explain] 1900/2160 {'explained': 1900} 23021s
+[explain] 1920/2160 {'explained': 1920} 23336s
+[explain] 1940/2160 {'explained': 1940} 23464s
+[explain] 1960/2160 {'explained': 1960} 23801s
+[explain] 1980/2160 {'explained': 1980} 23954s
+[explain] 2000/2160 {'explained': 2000} 24203s
+[explain] 2020/2160 {'explained': 2020} 24428s
+[explain] 2040/2160 {'explained': 2040} 24682s
+[explain] 2060/2160 {'explained': 2060} 24926s
+[explain] 2080/2160 {'explained': 2080} 25112s
+[explain] 2100/2160 {'explained': 2100} 25368s
+[explain] 2120/2160 {'explained': 2120} 25607s
+[explain] 2140/2160 {'explained': 2140} 25870s
+[explain] 2160/2160 {'explained': 2160} 26035s
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+[estimators] 20/240 {'validated': 20} 846s
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+/Users/mohammedaashik/Documents/PROJECT/XQFL/xqfl-env/lib/python3.11/site-packages/scipy/spatial/distance.py:1290: RuntimeWarning: invalid value encountered in sqrt
+  return np.sqrt(js / 2.0)
+[estimators] 40/240 {'validated': 40} 1559s
+[estimators] 60/240 {'validated': 60} 1873s
+[estimators] 80/240 {'validated': 80} 2116s
+[estimators] 100/240 {'validated': 100} 2372s
+[estimators] 120/240 {'validated': 120} 2612s
+[estimators] 140/240 {'validated': 140} 2854s
+[estimators] 160/240 {'validated': 160} 3097s
+[estimators] 180/240 {'validated': 180} 3343s
+[estimators] 200/240 {'validated': 200} 3590s
+[estimators] 220/240 {'validated': 220} 3840s
+[estimators] 240/240 {'validated': 240} 4063s
+[attacks] 20/960 {'attacked': 20} 20s
+[attacks] 40/960 {'attacked': 40} 36s
+[attacks] 60/960 {'attacked': 60} 55s
+[attacks] 80/960 {'attacked': 80} 73s
+[attacks] 100/960 {'attacked': 100} 90s
+[attacks] 120/960 {'attacked': 120} 107s
+[attacks] 140/960 {'attacked': 140} 126s
+[attacks] 160/960 {'attacked': 160} 144s
+[attacks] 180/960 {'attacked': 180} 161s
+[attacks] 200/960 {'attacked': 200} 178s
+[attacks] 220/960 {'attacked': 220} 196s
+[attacks] 240/960 {'attacked': 240} 214s
+[attacks] 260/960 {'attacked': 260} 230s
+[attacks] 280/960 {'attacked': 280} 247s
+[attacks] 300/960 {'attacked': 300} 266s
+[attacks] 320/960 {'attacked': 320} 284s
+[attacks] 340/960 {'attacked': 340} 301s
+[attacks] 360/960 {'attacked': 360} 318s
+[attacks] 380/960 {'attacked': 380} 337s
+[attacks] 400/960 {'attacked': 400} 355s
+[attacks] 420/960 {'attacked': 420} 372s
+[attacks] 440/960 {'attacked': 440} 389s
+[attacks] 460/960 {'attacked': 460} 409s
+[attacks] 480/960 {'attacked': 480} 427s
+[attacks] 500/960 {'attacked': 500} 445s
+[attacks] 520/960 {'attacked': 520} 462s
+[attacks] 540/960 {'attacked': 540} 480s
+[attacks] 560/960 {'attacked': 560} 498s
+[attacks] 580/960 {'attacked': 580} 515s
+[attacks] 600/960 {'attacked': 600} 532s
+[attacks] 620/960 {'attacked': 620} 551s
+[attacks] 640/960 {'attacked': 640} 568s
+[attacks] 660/960 {'attacked': 660} 586s
+[attacks] 680/960 {'attacked': 680} 603s
+[attacks] 700/960 {'attacked': 700} 619s
+[attacks] 720/960 {'attacked': 720} 638s
+[attacks] 740/960 {'attacked': 740} 654s
+[attacks] 760/960 {'attacked': 760} 671s
+[attacks] 780/960 {'attacked': 780} 689s
+[attacks] 800/960 {'attacked': 800} 708s
+[attacks] 820/960 {'attacked': 820} 724s
+[attacks] 840/960 {'attacked': 840} 741s
+[attacks] 860/960 {'attacked': 860} 759s
+[attacks] 880/960 {'attacked': 880} 777s
+[attacks] 900/960 {'attacked': 900} 794s
+[attacks] 920/960 {'attacked': 920} 811s
+[attacks] 940/960 {'attacked': 940} 828s
+[attacks] 960/960 {'attacked': 960} 846s
+[controls] 20/60 {'attacked': 20} 117s
+[controls] 40/60 {'attacked': 40} 332s
+[controls] 60/60 {'attacked': 60} 497s
+{"train": {"counts": {"trained": 2160}, "seconds": 32893}, "explain": {"counts": {"explained": 2160}, "seconds": 26035}, "estimators": {"counts": {"validated": 240}, "seconds": 4063}, "attacks": {"counts": {"attacked": 960}, "seconds": 846}, "controls": {"counts": {"attacked": 60}, "seconds": 497}}
