@@ -1,0 +1,26 @@
+{
+ "train": {
+  "tasks": 3360,
+  "counts": {
+   "trained": 3360
+  },
+  "seconds": 104899.94243316702
+ },
+ "explain": {
+  "tasks": 3360,
+  "counts": {
+   "explained": 3360
+  },
+  "seconds": 86312.09365441697
+ },
+ "estimators": {
+  "tasks": 0,
+  "counts": {},
+  "seconds": 0.10107487498316914
+ },
+ "attacks": {
+  "tasks": 0,
+  "counts": {},
+  "seconds": 0.013357457937672734
+ }
+}

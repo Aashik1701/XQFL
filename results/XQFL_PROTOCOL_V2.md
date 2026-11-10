@@ -1,6 +1,6 @@
 # XQFL experiment protocol v2
 
-**Status:** frozen on 2026-11-05, with one logged pre-run deviation (section 11), after all acceptance tests in section 10 passed. Decisions D-1 to D-5 come from `PAPER/IEEE_REVIEW_ISSUES.md`. The file hash and code hash are in `results/protocol_v2/manifest.json`, and `v2.run` refuses to start if either has changed.
+**Status:** frozen on 2026-11-05 after all acceptance tests in section 10 passed, then re-frozen on 2026-11-06 and 2026-11-07. Section 11 logs one pre-run deviation, one post-run addition and one change before the sweeps. Decisions D-1 to D-5 come from `PAPER/IEEE_REVIEW_ISSUES.md`. The file hash and code hash are in `results/protocol_v2/manifest.json`, and `v2.run` refuses to start if either has changed.
 
 **Output:** `results/protocol_v2/`. Nothing from v1 is overwritten or pooled with v2.
 
@@ -224,7 +224,7 @@ The primary stages total about 22 hours of machine time. Weights are saved for e
 4. **Clients 8, 10 and 20:** Wisconsin. 360 runs. Check sparse clients first, as 20 clients leaves about 20 records each.
 5. **Features 6 and 8:** Wisconsin 240 runs, and Pima IID 120 runs. Angle, re-uploading and IQP use one qubit per feature, so parameter counts rise. Amplitude stays on 4 qubits. Parameter counts are reported, and these contrasts are not called capacity-matched.
 
-Sweeps use explanations at the final round, plus global explanations every round for τ. Exact Shapley still applies, with 256 coalitions at 8 features. Sweep results are descriptive, with no Holm family.
+Sweeps use explanations at the final round, plus global explanations every round for τ. Exact Shapley still applies, with 256 coalitions at 8 features. Sweep results are descriptive, with no Holm family. The run counts above are federated runs and total 1,560. Each encoding, seed and factor setting also has two centralized runs, 1,800 in all. Sweeps do not run membership attacks.
 
 ---
 
@@ -245,6 +245,10 @@ All of these must pass:
 
 ## 11. Deviation log
 
+The primary run used the protocol hash and code hash in `results/protocol_v2/manifest_primary_run_2026-11-05.json`. The current protocol hash is in `manifest.json`.
+
 | Date | Change | Reason | Results seen? |
 |---|---|---|---|
 | 2026-11-05 | Client explanations reduced from every round to rounds 3, 6, 9, 12 and 15, to cut about 10 hours of machine time. Global explanations stay at every round. | Run time on one laptop | No. Only dry-run timing, failures and table shapes were inspected, and no primary run existed. |
+| 2026-11-06 | Added post-hoc RQ4 checks in `analysis/rq4_posthoc_checks.py`, with outputs in `results/protocol_v2/posthoc/`: a label-aware attack that scores records by `(2y-1)Σφ`, shuffled-label nulls, and folds stratified on membership and outcome. The checks train nothing and compute no new attributions. The planned attack, detection rule, reading table and primary tables are unchanged, and the code hash is unchanged. The label-aware attack is exploratory and may not be reported as a planned test. | Explanation AUCs sat below 0.5, which needed explaining. Checking this showed the planned attack never uses the record's label, while Shapley efficiency lets `Σφ` plus the label recover the model's confidence on the correct class. The reading "explanations carried no detectable signal" therefore holds only for the label-blind attack. | Yes. The primary results and tables had been inspected, and the checks were chosen because of them. |
+| 2026-11-07 | Sweep runs no longer run membership attacks: `v2/run.py` now attacks only specs in the primary group, which changes the code hash. The sweep text now also states that the code adds 1,800 centralized runs to the 1,560 federated runs counted there. The primary run's specs, attacks and tables are unaffected. | The one-seed sweep dry run showed the attack code accepts only the 9 columns produced by 4 features, so all 24 attacks at 6 and 8 features failed. Section 9 does not ask for attacks on sweeps and the sweep table does not read them, so skipping them is simpler than extending the attack and saves about 2 hours. The centralized runs were in the code but missing from the count. | Yes. The primary results had been inspected, as had one-seed sweep accuracy and gate outcomes, timing and failures. The sweep factors, seeds, encodings and regimes were not changed. |

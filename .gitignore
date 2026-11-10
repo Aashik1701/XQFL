@@ -60,3 +60,10 @@ Thumbs.db
 results/protocol_v2/dry_run/
 results/protocol_v2/primary/*
 !results/protocol_v2/primary/report.json
+results/protocol_v2/sweep_dry_run/
+results/protocol_v2/sweep/*
+!results/protocol_v2/sweep/report.json
+results/protocol_v2/posthoc_label_equal/
+
+# Word lock files
+~$*

@@ -68,7 +68,7 @@ def execute(specs, out, workers, controls=(), validate_extended=()):
     report["estimators"] = run_tasks(
         "estimators", [("validate", (s, out, s.seed in extended)) for s in iid_final], workers, out)
     targets = [s for s in specs if s.kind == "fed" and s.encoding in config.ENCODINGS
-               and s.zero_handling == "missing"]
+               and s.zero_handling == "missing" and s.group == "primary"]
     report["attacks"] = run_tasks("attacks", [("target", (s, out)) for s in targets], workers, out)
     if controls:
         report["controls"] = run_tasks("controls", [("control", (k, s, out)) for k, s in controls], workers, out)

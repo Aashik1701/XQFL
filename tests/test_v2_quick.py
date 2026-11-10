@@ -209,6 +209,23 @@ class SpecTests(unittest.TestCase):
         self.assertEqual(len([s for s in fed if s.zero_handling == "as_values"]), 60)
         self.assertEqual(len(specs), len({s.key for s in specs}))
 
+    def test_attacks_run_on_primary_specs_only(self):
+        from unittest import mock
+
+        from v2 import run
+
+        def attack_count(specs):
+            with mock.patch.object(run, "run_tasks", return_value={}) as tasks:
+                run.execute(specs, "unused", 1)
+            return next(len(call.args[1]) for call in tasks.call_args_list if call.args[0] == "attacks")
+
+        self.assertEqual(attack_count(config.sweep_specs(seeds=(1,))), 0)
+        primary = config.primary_specs((1,))
+        expected = sum(s.kind == "fed" and s.encoding in config.ENCODINGS
+                       and s.zero_handling == "missing" for s in primary)
+        self.assertEqual(attack_count(primary), expected)
+        self.assertEqual(expected, 32)
+
     def test_sweep_keys_unique(self):
         specs = config.sweep_specs()
         self.assertEqual(len(specs), len({(s.group, s.key) for s in specs}))

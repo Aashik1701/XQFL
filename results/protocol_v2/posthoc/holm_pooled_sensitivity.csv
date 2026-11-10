@@ -1,0 +1,86 @@
+family,contrast,p,p_holm,p_pooled
+coverage,wisconsin/iid: angle vs amplitude,0.5,1.0,1.0
+coverage,wisconsin/iid: angle vs reuploading,0.5,1.0,1.0
+coverage,wisconsin/iid: angle vs iqp,0.5,1.0,1.0
+coverage,wisconsin/iid: amplitude vs reuploading,1.0,1.0,1.0
+coverage,wisconsin/iid: amplitude vs iqp,1.0,1.0,1.0
+coverage,wisconsin/iid: reuploading vs iqp,1.0,1.0,1.0
+coverage,wisconsin/alpha_0.5: angle vs amplitude,0.00048828125,0.01171875,0.03564453125
+coverage,wisconsin/alpha_0.5: angle vs reuploading,0.0009765625,0.021484375,0.06640625
+coverage,wisconsin/alpha_0.5: angle vs iqp,0.00048828125,0.01171875,0.03564453125
+coverage,wisconsin/alpha_0.5: amplitude vs reuploading,1.0,1.0,1.0
+coverage,wisconsin/alpha_0.5: amplitude vs iqp,1.0,1.0,1.0
+coverage,wisconsin/alpha_0.5: reuploading vs iqp,1.0,1.0,1.0
+coverage,pima/iid: angle vs amplitude,0.125,1.0,1.0
+coverage,pima/iid: angle vs reuploading,0.021484375,0.408203125,1.0
+coverage,pima/iid: angle vs iqp,1.0,1.0,1.0
+coverage,pima/iid: amplitude vs reuploading,0.453125,1.0,1.0
+coverage,pima/iid: amplitude vs iqp,0.2265625,1.0,1.0
+coverage,pima/iid: reuploading vs iqp,0.0078125,0.1640625,0.4609375
+coverage,pima/alpha_0.5: angle vs amplitude,0.7265625,1.0,1.0
+coverage,pima/alpha_0.5: angle vs reuploading,0.021484375,0.408203125,1.0
+coverage,pima/alpha_0.5: angle vs iqp,0.012939453125,0.2587890625,0.737548828125
+coverage,pima/alpha_0.5: amplitude vs reuploading,0.0703125,1.0,1.0
+coverage,pima/alpha_0.5: amplitude vs iqp,0.021484375,0.408203125,1.0
+coverage,pima/alpha_0.5: reuploading vs iqp,0.7265625,1.0,1.0
+rq1_excess,wisconsin: angle excess vs 0,0.0011721327900886,0.0082049295306205,0.0785328969359362
+rq1_excess,wisconsin: amplitude excess vs 0,7.910653948783875e-05,0.0006328523159027,0.0063285231590271
+rq1_excess,wisconsin: reuploading excess vs 0,0.308520769700408,0.89874267578125,1.0
+rq1_excess,wisconsin: iqp excess vs 0,0.1190765686333179,0.5953828431665897,1.0
+rq1_pairwise,wisconsin: angle vs amplitude,0.9374814853072166,1.0,1.0
+rq1_pairwise,wisconsin: angle vs reuploading,0.3989470452070236,1.0,1.0
+rq1_pairwise,wisconsin: angle vs iqp,0.3989470452070236,1.0,1.0
+rq1_pairwise,wisconsin: amplitude vs reuploading,0.2129328530281782,1.0,1.0
+rq1_pairwise,wisconsin: amplitude vs iqp,0.0635564886033535,0.508451908826828,1.0
+rq1_pairwise,wisconsin: reuploading vs iqp,0.9838335812091829,1.0,1.0
+rq1_excess,pima: angle excess vs 0,0.2246856689453125,0.89874267578125,1.0
+rq1_excess,pima: amplitude excess vs 0,0.2289857864379882,0.89874267578125,1.0
+rq1_excess,pima: reuploading excess vs 0,0.0035509765148162,0.0213058590888977,0.2272624969482368
+rq1_excess,pima: iqp excess vs 0,0.375457763671875,0.89874267578125,1.0
+rq1_pairwise,pima: angle vs amplitude,0.40374755859375,1.0,1.0
+rq1_pairwise,pima: angle vs reuploading,0.00384521484375,0.04229736328125,0.24224853515625
+rq1_pairwise,pima: angle vs iqp,0.04248046875,0.39794921875,1.0
+rq1_pairwise,pima: amplitude vs reuploading,0.0003538131713867,0.0042457580566406,0.0261821746826158
+rq1_pairwise,pima: amplitude vs iqp,0.039794921875,0.39794921875,1.0
+rq1_pairwise,pima: reuploading vs iqp,0.705718994140625,1.0,1.0
+rq2,wisconsin: angle vs amplitude,0.0178643367494007,0.1429146939952061,1.0
+rq2,wisconsin: angle vs reuploading,4.77693790739873e-05,0.0005732325488878,0.003917089084066959
+rq2,wisconsin: angle vs iqp,0.073247628915061,0.366238144575305,1.0
+rq2,wisconsin: amplitude vs reuploading,0.0039989849431417,0.0439888343745594,0.2439380815316437
+rq2,wisconsin: amplitude vs iqp,0.568723530189696,0.9550957039469165,1.0
+rq2,wisconsin: reuploading vs iqp,0.0437805336505133,0.2626832019030801,1.0
+rq2,pima: angle vs amplitude,0.2998395547144664,0.9550957039469165,1.0
+rq2,pima: angle vs reuploading,0.0057177386479961,0.0571773864799611,0.343064318879766
+rq2,pima: angle vs iqp,0.01123046875,0.10107421875,0.6513671875
+rq2,pima: amplitude vs reuploading,0.0224852833224596,0.1573969832572177,1.0
+rq2,pima: amplitude vs iqp,0.238773925986729,0.9550957039469165,1.0
+rq2,pima: reuploading vs iqp,0.2651419755314089,0.9550957039469165,1.0
+rq3_regime,wisconsin/angle: qty_skew vs iid,1.0,1.0,1.0
+rq3_regime,wisconsin/angle: alpha_0.5 vs iid,7.62939453125e-05,0.001373291015625,0.0061798095703125
+rq3_regime,wisconsin/angle: alpha_0.1 vs iid,0.02154541015625,0.23699951171875,1.0
+rq3_floor,wisconsin/angle: D_model vs D_sample,0.0005255788564682,0.0031534731388092,0.0373160988092422
+rq3_regime,wisconsin/amplitude: qty_skew vs iid,0.6701805889606476,1.0,1.0
+rq3_regime,wisconsin/amplitude: alpha_0.5 vs iid,2.551823854446411e-07,5.358830094337463e-06,2.1690502762794495e-05
+rq3_regime,wisconsin/amplitude: alpha_0.1 vs iid,9.220093488693236e-06,0.0001751817762851,0.0007652677595615386
+rq3_floor,wisconsin/amplitude: D_model vs D_sample,0.9676735773682594,0.9676735773682594,1.0
+rq3_regime,wisconsin/reuploading: qty_skew vs iid,0.0327208992093801,0.3272089920938015,1.0
+rq3_regime,wisconsin/reuploading: alpha_0.5 vs iid,4.097819328308106e-07,8.195638656616211e-06,3.442168235778809e-05
+rq3_regime,wisconsin/reuploading: alpha_0.1 vs iid,0.0001202225685119,0.0019235610961914,0.0092571377754163
+rq3_floor,wisconsin/reuploading: D_model vs D_sample,0.0021877754479646,0.0087511017918586,0.1443931795656636
+rq3_regime,wisconsin/iqp: qty_skew vs iid,0.9676735773682594,1.0,1.0
+rq3_regime,wisconsin/iqp: alpha_0.5 vs iid,8.856505155563354e-05,0.0015056058764457,0.00699663907289505
+rq3_regime,wisconsin/iqp: alpha_0.1 vs iid,0.0039006471633911,0.0468077659606933,0.24224853515625
+rq3_floor,wisconsin/iqp: D_model vs D_sample,9.90256667137146e-05,0.0007922053337097,0.007724002003669739
+rq3_regime,pima/angle: qty_skew vs iid,0.7987060546875,1.0,1.0
+rq3_regime,pima/angle: alpha_0.5 vs iid,0.064453125,0.580078125,1.0
+rq3_floor,pima/angle: D_model vs D_sample,0.0001449584960937,0.0010147094726562,0.0110168457031212
+rq3_regime,pima/amplitude: qty_skew vs iid,0.776785135269165,1.0,1.0
+rq3_regime,pima/amplitude: alpha_0.5 vs iid,0.00341796875,0.04443359375,0.22216796875
+rq3_floor,pima/amplitude: D_model vs D_sample,0.2344708442687988,0.4689416885375976,1.0
+rq3_regime,pima/reuploading: qty_skew vs iid,0.1073147058486938,0.8585176467895508,1.0
+rq3_regime,pima/reuploading: alpha_0.5 vs iid,0.0001678466796875,0.0025177001953125,0.0125885009765625
+rq3_regime,pima/reuploading: alpha_0.1 vs iid,0.13525390625,0.94677734375,1.0
+rq3_floor,pima/reuploading: D_model vs D_sample,0.0525190830230712,0.1575572490692138,1.0
+rq3_regime,pima/iqp: qty_skew vs iid,0.5185546875,1.0,1.0
+rq3_regime,pima/iqp: alpha_0.5 vs iid,0.0008392333984375,0.011749267578125,0.0579071044921875
+rq3_floor,pima/iqp: D_model vs D_sample,0.00067138671875,0.00335693359375,0.0469970703125
